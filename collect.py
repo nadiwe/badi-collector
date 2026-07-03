@@ -18,10 +18,18 @@ ZUERICH_IDS = [
 
 async def collect():
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
-    async with websockets.connect(WEBSOCKET_URL) as ws:
-        message = await asyncio.wait_for(ws.recv(), timeout=10)
-        data = json.loads(message)
+
+    for attempt in range(3):
+        try:
+            async with websockets.connect(WEBSOCKET_URL) as ws:
+                message = await asyncio.wait_for(ws.recv(), timeout=30)
+                data = json.loads(message)
+            break
+        except (TimeoutError, asyncio.TimeoutError) as e:
+            if attempt == 2:
+                raise
+            print(f"Versuch {attempt + 1} fehlgeschlagen, erneuter Versuch...")
+            await asyncio.sleep(5)
 
     # Datei vorbereiten
     os.makedirs("data", exist_ok=True)
