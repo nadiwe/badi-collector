@@ -12,23 +12,40 @@ jobs:
       contents: write
 
     steps:
+      - name: Zeitfenster prüfen
+        id: zeitcheck
+        run: |
+          STUNDE=$(TZ=Europe/Zurich date +%H | sed 's/^0//')
+          if [ "$STUNDE" -lt 6 ] || [ "$STUNDE" -ge 22 ]; then
+            echo "Ausserhalb Zeitfenster (${STUNDE}:xx Zürich), überspringe."
+            echo "aktiv=false" >> $GITHUB_OUTPUT
+          else
+            echo "Innerhalb Zeitfenster (${STUNDE}:xx Zürich), sammle Daten."
+            echo "aktiv=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Repository laden
+        if: steps.zeitcheck.outputs.aktiv == 'true'
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Python vorbereiten
+        if: steps.zeitcheck.outputs.aktiv == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: Abhängigkeiten installieren
+        if: steps.zeitcheck.outputs.aktiv == 'true'
         run: pip install websockets
 
       - name: Daten sammeln
+        if: steps.zeitcheck.outputs.aktiv == 'true'
         run: python collect.py
 
       - name: Daten speichern
+        if: steps.zeitcheck.outputs.aktiv == 'true'
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
