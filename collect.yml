@@ -1,0 +1,35 @@
+name: Badi Daten sammeln
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"  # alle 15 Minuten
+  workflow_dispatch:          # auch manuell startbar
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repository laden
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Python vorbereiten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Abhängigkeiten installieren
+        run: pip install websockets
+
+      - name: Daten sammeln
+        run: python collect.py
+
+      - name: Daten speichern
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add data/badi_data.csv
+          git diff --staged --quiet || git commit -m "Badi Daten $(date '+%Y-%m-%d %H:%M')"
+          git push

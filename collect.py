@@ -1,0 +1,50 @@
+import asyncio
+import websockets
+import json
+import csv
+import os
+from datetime import datetime
+
+WEBSOCKET_URL = "wss://badi-public.crowdmonitor.ch:9591/api"
+CSV_FILE = "data/badi_data.csv"
+
+# Nur diese Badis speichern (Zürich)
+ZUERICH_IDS = [
+    "SSD-1", "SSD-2", "SSD-3", "SSD-4", "SSD-6", "SSD-7", "SSD-8", "SSD-10",
+    "BADI-1", "flb6939", "flb6940", "flb8803", "flb6941",
+    "fb006", "fb008", "fb012", "LETZI-1", "SSD-11", "fb018",
+    "seb6946", "seb6947", "seb6948", "SSD-5"
+]
+
+async def collect():
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    async with websockets.connect(WEBSOCKET_URL) as ws:
+        message = await asyncio.wait_for(ws.recv(), timeout=10)
+        data = json.loads(message)
+
+    # Datei vorbereiten
+    os.makedirs("data", exist_ok=True)
+    file_exists = os.path.isfile(CSV_FILE)
+
+    with open(CSV_FILE, "a", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        
+        # Spaltenüberschriften beim ersten Mal
+        if not file_exists:
+            writer.writerow(["timestamp", "uid", "name", "currentfill", "freespace", "maxspace"])
+        
+        for bad in data:
+            if bad.get("uid") in ZUERICH_IDS:
+                writer.writerow([
+                    timestamp,
+                    bad.get("uid"),
+                    bad.get("name"),
+                    bad.get("currentfill"),
+                    bad.get("freespace"),
+                    bad.get("maxspace")
+                ])
+
+    print(f"✓ Daten gespeichert: {timestamp}")
+
+asyncio.run(collect())
