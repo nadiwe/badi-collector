@@ -1,0 +1,779 @@
+{
+  "meta": {
+    "generiert": "2026-07-03T13:30:14",
+    "von": "2026-07-03",
+    "bis": "2026-07-03"
+  },
+  "badis": [
+    {
+      "uid": "BADI-1",
+      "name": "Enge",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 55.0,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 59.0,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 57.8,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 97.0,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "flb6939",
+      "name": "Flussbad Oberer Letten",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 9.4,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 9.4,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 10.9,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 18.8,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "flb6940",
+      "name": "Flussbad Unterer Letten",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 4.4,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 5.5,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 4.2,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 17.5,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "flb8803",
+      "name": "Flussbad Unterer Letten (Flussteil)",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 5.8,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 3.9,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 5.0,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 10.2,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "flb6941",
+      "name": "Frauenbad Stadthausquai",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 19.4,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 21.7,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 21.2,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 39.1,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "fb006",
+      "name": "Freibad Allenmoos",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 1.4,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 2.2,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 2.3,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 2.8,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "fb008",
+      "name": "Freibad Auhof",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 4.9,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 5.8,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 6.7,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 4.1,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "fb012",
+      "name": "Freibad Heuried",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 12.0,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 12.9,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 13.0,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 7.6,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "LETZI-1",
+      "name": "Freibad Letzigraben",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 3.3,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 4.6,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 6.2,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 8.9,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "SSD-11",
+      "name": "Freibad Seebach",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 7.1,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 7.5,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 10.2,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 7.7,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "fb018",
+      "name": "Freibad Zwischen den Hölzern",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 3.5,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 4.6,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 4.9,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 3.4,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "SSD-2",
+      "name": "Hallenbad Blaesi",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 37.1,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 28.6,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 34.8,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 32.9,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "SSD-3",
+      "name": "Hallenbad Bungertwies",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 107.1,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 78.6,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 120.2,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 53.6,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "SSD-4",
+      "name": "Hallenbad City",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 27.7,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 34.1,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 41.7,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 38.2,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "SSD-6",
+      "name": "Hallenbad Leimbach",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 48.8,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 52.5,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 78.8,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 20.0,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "SSD-7",
+      "name": "Hallenbad Oerlikon",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 44.5,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 50.0,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 56.0,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 48.5,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "SSD-8",
+      "name": "Josel-Areal",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 13.0,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 13.0,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "SSD-10",
+      "name": "Seebad Utoquai",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 15.2,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 17.5,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 18.6,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 27.9,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "seb6946",
+      "name": "Strandbad Mythenquai",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 1.3,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 3.2,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 3.8,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 8.7,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "seb6947",
+      "name": "Strandbad Tiefenbrunnen",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 1.8,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 4.0,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 5.6,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 7.2,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "seb6948",
+      "name": "Strandbad Wollishofen",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 5.1,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 5.6,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 10.9,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 11.1,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    },
+    {
+      "uid": "SSD-5",
+      "name": "Waermebad Kaeferberg",
+      "messtage_echt": 1,
+      "tage_geschaetzt": 0,
+      "erste_messung": "2026-07-03",
+      "letzte_messung": "2026-07-03",
+      "slots": {
+        "Werktag": [
+          {
+            "zeit": "08:00",
+            "auslastung": 24.3,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "08:30",
+            "auslastung": 17.1,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "09:00",
+            "auslastung": 12.9,
+            "geschaetzt": false
+          },
+          {
+            "zeit": "11:00",
+            "auslastung": 15.7,
+            "geschaetzt": false
+          }
+        ],
+        "Wochenende": [],
+        "Feiertag": []
+      },
+      "saison": null
+    }
+  ]
+}
