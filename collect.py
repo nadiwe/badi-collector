@@ -6,7 +6,6 @@ import os
 from datetime import datetime
 
 WEBSOCKET_URL = "wss://badi-public.crowdmonitor.ch:9591/api"
-CSV_FILE = "data/badi_data.csv"
 
 # Nur diese Badis speichern (Zürich)
 ZUERICH_IDS = [
@@ -17,7 +16,9 @@ ZUERICH_IDS = [
 ]
 
 async def collect():
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.now()
+    timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
+    csv_file = f"data/{now.strftime('%G-W%V')}.csv"
 
     for attempt in range(3):
         try:
@@ -32,11 +33,10 @@ async def collect():
             print(f"Versuch {attempt + 1} fehlgeschlagen, erneuter Versuch...")
             await asyncio.sleep(5)
 
-    # Datei vorbereiten
     os.makedirs("data", exist_ok=True)
-    file_exists = os.path.isfile(CSV_FILE)
+    file_exists = os.path.isfile(csv_file)
 
-    with open(CSV_FILE, "a", newline="", encoding="utf-8") as f:
+    with open(csv_file, "a", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         
         # Spaltenüberschriften beim ersten Mal
