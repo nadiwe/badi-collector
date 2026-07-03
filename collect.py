@@ -7,6 +7,11 @@ from datetime import datetime
 
 WEBSOCKET_URL = "wss://badi-public.crowdmonitor.ch:9591/api"
 
+def _csv_safe(value):
+    """Prefix formula-triggering characters to prevent CSV injection."""
+    s = str(value) if value is not None else ""
+    return ("'" + s) if s.startswith(("=", "+", "-", "@", "\t", "\r")) else s
+
 # Nur diese Badis speichern (Zürich)
 ZUERICH_IDS = [
     "SSD-1", "SSD-2", "SSD-3", "SSD-4", "SSD-6", "SSD-7", "SSD-8", "SSD-10",
@@ -47,11 +52,11 @@ async def collect():
             if bad.get("uid") in ZUERICH_IDS:
                 writer.writerow([
                     timestamp,
-                    bad.get("uid"),
-                    bad.get("name"),
+                    _csv_safe(bad.get("uid")),
+                    _csv_safe(bad.get("name")),
                     bad.get("currentfill"),
                     bad.get("freespace"),
-                    bad.get("maxspace")
+                    bad.get("maxspace"),
                 ])
 
     print(f"✓ Daten gespeichert: {timestamp}")
