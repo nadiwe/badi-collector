@@ -22,6 +22,7 @@ async def collect():
     for attempt in range(3):
         try:
             async with websockets.connect(WEBSOCKET_URL) as ws:
+                await ws.send("")
                 message = await asyncio.wait_for(ws.recv(), timeout=30)
                 data = json.loads(message)
             break
