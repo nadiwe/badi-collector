@@ -240,6 +240,60 @@ function detailBarChart(uid, dayType, periodColor) {
     <div style="display:flex;gap:2px;margin-top:7px;">${labels}</div>`;
 }
 
+function seasonChart(uid, half, color) {
+  const SOMMER = ['Mai','Jun','Jul','Aug','Sep'];
+  const WINTER = ['Okt','Nov','Dez','Jan','Feb','Mär'];
+  const months = half === 'sommer' ? SOMMER : WINTER;
+  const saison = AW[uid]?.saison;
+
+  // Wenn saisonale Durchschnittswerte vorhanden: zwei Balken (Sommer vs. Winter)
+  if (saison) {
+    const sVal = saison['Sommer_Mai_Sep'];
+    const wVal = saison['Winter_Okt_Apr'];
+    const vals = half === 'sommer'
+      ? [sVal ?? 0, wVal ?? 0]
+      : [wVal ?? 0, sVal ?? 0];
+    const labels = half === 'sommer' ? ['Sommer', 'Winter'] : ['Winter', 'Sommer'];
+    const colors = half === 'sommer' ? [ORANGE, INK + '60'] : [BLACK, ORANGE + '60'];
+    const max = Math.max(...vals, 0.001);
+    const norm = vals.map(v => v / max);
+    const n = 2;
+    const W = 100, H = 34, gap = 8;
+    const bw = (W - gap) / n;
+    const xs = i => i * (bw + gap);
+    const ys = v => H - 2 - Math.max(0.04, v) * (H - 4);
+    const bars = norm.map((v, i) => {
+      const y = ys(v);
+      return `<rect x="${xs(i).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.6, (H - 2) - y).toFixed(1)}" rx="2" fill="${colors[i]}"/>`;
+    }).join('');
+    const labelDivs = labels.map((l, i) =>
+      `<div style="flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#ADADA9;">${l}<br><span style="font-size:11px;font-weight:600;color:${INK};">${vals[i] != null ? vals[i].toFixed(1) + '%' : '–'}</span></div>`
+    ).join('');
+    return `
+      <div style="height:116px;position:relative;">
+        <div style="height:100%;">
+          <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="100%" height="100%" style="display:block;">${bars}</svg>
+        </div>
+      </div>
+      <div style="display:flex;gap:2px;margin-top:10px;">${labelDivs}</div>`;
+  }
+
+  // Noch keine Saisondaten: Monats-Platzhalter mit Hinweis
+  const isSummer = half === 'sommer';
+  const bars = months.map((m, i) => {
+    const h = isSummer ? [20, 45, 70, 60, 30][i] ?? 20 : [35, 40, 45, 42, 38, 30][i] ?? 30;
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+      <div style="width:100%;height:${h}px;background:${color}22;border-radius:3px 3px 0 0;border-top:2px dashed ${color}44;"></div>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#ADADA9;">${m}</span>
+    </div>`;
+  }).join('');
+  return `
+    <div style="display:flex;align-items:flex-end;gap:4px;height:90px;">${bars}</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:${META};margin-top:10px;font-style:italic;">
+      Saisondaten werden ab mehr Messtagen verfügbar (braucht Daten aus verschiedenen Monaten).
+    </div>`;
+}
+
 // ── Filter / sort helpers ─────────────────────────────────────────────────
 function filteredVenues() {
   let list = VENUES.slice();
@@ -384,10 +438,13 @@ function renderDetail() {
   const statusDot = isOpen ? '#2A9D63' : '#CFCFCC';
   const guestColor = isOpen ? INK : META;
 
-  // Period tabs
+  // Period tabs — Winter nur für Ganzjahres-Badis
+  const isYearRound = v.season === 'Ganzjährig';
   const periods = [
-    { key:'heute', label:'Hüt',       color: PURPLE },
-    { key:'woche', label:'Die Wuche', color: INK    },
+    { key:'heute',  label:'Hüt',       color: PURPLE },
+    { key:'woche',  label:'Die Wuche', color: INK    },
+    { key:'sommer', label:'☀ Sommer',  color: ORANGE },
+    ...(isYearRound ? [{ key:'winter', label:'❄ Winter', color: BLACK }] : []),
   ];
   const periodTabs = periods.map(p => {
     const active = S.period === p.key;
@@ -411,9 +468,14 @@ function renderDetail() {
   }).join('');
 
   // Chart
-  const chartDayType = S.period === 'heute' ? dayTypeFor(todayWd()) : dayTypeFor(S.weekday);
-  const chartColor = S.period === 'heute' ? PURPLE : INK;
-  const chart = detailBarChart(v.uid, chartDayType, chartColor);
+  let chart;
+  if (S.period === 'sommer' || S.period === 'winter') {
+    chart = seasonChart(v.uid, S.period, S.period === 'sommer' ? ORANGE : BLACK);
+  } else {
+    const chartDayType = S.period === 'heute' ? dayTypeFor(todayWd()) : dayTypeFor(S.weekday);
+    const chartColor = S.period === 'heute' ? PURPLE : INK;
+    chart = detailBarChart(v.uid, chartDayType, chartColor);
+  }
 
   // Stat cards
   const statBg = '#F4F4F4';
