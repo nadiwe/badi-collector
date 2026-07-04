@@ -60,12 +60,12 @@ const VENUES = [
   { uid:'SSD-11',   name:'Freibad Seebach',                   type:'frei',  tempUid:'fb013',   address:'Hertensteinstrasse 119, 8052 Zürich',    hours:'09:00–20:00', season:'Mai–Sep'   },
   { uid:'fb018',    name:'Freibad Zwischen den Hölzern',      type:'frei',  tempUid:'fb018',   address:'Goldbrunnenstrasse 119, 8055 Zürich',    hours:'09:00–20:00', season:'Mai–Sep'   },
   { uid:'SSD-8',    name:'Josel-Areal',                       type:'frei',  tempUid:null,      address:'Zürich',                                 hours:'09:00–20:00', season:'Mai–Sep'   },
-  { uid:'SSD-2',    name:'Hallenbad Bläsi',                   type:'halle', tempUid:null,      address:'Hofwiesenstrasse 280, 8057 Zürich',      hours:'07:00–21:30', season:'Ganzjährig'},
-  { uid:'SSD-3',    name:'Hallenbad Bungertwies',             type:'halle', tempUid:null,      address:'Kronenstrasse 18, 8006 Zürich',          hours:'07:00–21:30', season:'Ganzjährig'},
-  { uid:'SSD-4',    name:'Hallenbad City',                    type:'halle', tempUid:null,      address:'Sihlstrasse 71, 8001 Zürich',            hours:'06:30–21:00', season:'Ganzjährig'},
-  { uid:'SSD-6',    name:'Hallenbad Leimbach',                type:'halle', tempUid:null,      address:'Leimbachstrasse 200, 8041 Zürich',       hours:'07:00–21:30', season:'Ganzjährig'},
-  { uid:'SSD-7',    name:'Hallenbad Oerlikon',                type:'halle', tempUid:null,      address:'Wallisellenstrasse 100, 8050 Zürich',    hours:'07:00–21:00', season:'Ganzjährig'},
-  { uid:'SSD-5',    name:'Wärmebad Käferberg',                type:'halle', tempUid:null,      address:'Emil-Klöti-Strasse 21, 8037 Zürich',     hours:'08:00–20:00', season:'Ganzjährig'},
+  { uid:'SSD-2',    name:'Hallenbad Bläsi',                   type:'halle', tempUid:null,      address:'Hofwiesenstrasse 280, 8057 Zürich',      hours:'07:00–21:00', season:'Ganzjährig', defaultTemp:29 },
+  { uid:'SSD-3',    name:'Hallenbad Bungertwies',             type:'halle', tempUid:null,      address:'Kronenstrasse 18, 8006 Zürich',          hours:'07:00–21:00', season:'Ganzjährig', defaultTemp:29 },
+  { uid:'SSD-4',    name:'Hallenbad City',                    type:'halle', tempUid:null,      address:'Sihlstrasse 71, 8001 Zürich',            hours:'06:30–21:00', season:'Ganzjährig', defaultTemp:28 },
+  { uid:'SSD-6',    name:'Hallenbad Leimbach',                type:'halle', tempUid:null,      address:'Leimbachstrasse 200, 8041 Zürich',       hours:'07:00–21:00', season:'Ganzjährig', defaultTemp:29 },
+  { uid:'SSD-7',    name:'Hallenbad Oerlikon',                type:'halle', tempUid:null,      address:'Wallisellenstrasse 100, 8050 Zürich',    hours:'07:00–22:00', season:'Ganzjährig', defaultTemp:29 },
+  { uid:'SSD-5',    name:'Wärmebad Käferberg',                type:'halle', tempUid:null,      address:'Emil-Klöti-Strasse 21, 8037 Zürich',     hours:'08:00–20:00', season:'Ganzjährig', defaultTemp:32 },
 ];
 
 const VENUE_MAP = Object.fromEntries(VENUES.map(v => [v.uid, v]));
@@ -898,14 +898,16 @@ const BASE = new URL('.', document.baseURI).href;
 
 function parseLive(raw) {
   if (!raw) return null;
-  // Stellt sicher dass numerische Felder wirklich Zahlen sind
   const venues = {};
   for (const [uid, v] of Object.entries(raw.venues || {})) {
+    const meta = VENUE_MAP[uid];
+    const rawTemp = v.temperatureWater;
+    const temp = (rawTemp != null && rawTemp !== '') ? Number(rawTemp) : (meta?.defaultTemp ?? null);
     venues[uid] = {
-      currentfill:      (v.currentfill      != null && v.currentfill      !== '') ? Number(v.currentfill)      : null,
-      freespace:        (v.freespace         != null && v.freespace         !== '') ? Number(v.freespace)         : null,
-      maxspace:         (v.maxspace          != null && v.maxspace          !== '') ? Number(v.maxspace)          : null,
-      temperatureWater: (v.temperatureWater  != null && v.temperatureWater  !== '') ? Number(v.temperatureWater)  : null,
+      currentfill:      (v.currentfill != null && v.currentfill !== '') ? Number(v.currentfill) : null,
+      freespace:        (v.freespace   != null && v.freespace   !== '') ? Number(v.freespace)   : null,
+      maxspace:         (v.maxspace    != null && v.maxspace    !== '') ? Number(v.maxspace)    : null,
+      temperatureWater: temp,
       openClosed:       v.openClosed,
     };
   }
@@ -916,9 +918,66 @@ function fetchLive() {
   return fetch(BASE + 'data/live.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null);
 }
 
+async function fetchBesucherWS() {
+  return new Promise((resolve, reject) => {
+    try {
+      const ws = new WebSocket('wss://badi-public.crowdmonitor.ch:9591/api');
+      const t = setTimeout(() => { ws.close(); reject(new Error('timeout')); }, 12000);
+      ws.onopen    = () => ws.send('');
+      ws.onmessage = e => { clearTimeout(t); ws.close(); try { resolve(JSON.parse(e.data)); } catch(err) { reject(err); } };
+      ws.onerror   = () => { clearTimeout(t); reject(new Error('ws error')); };
+    } catch(e) { reject(e); }
+  });
+}
+
+async function fetchTemperaturenLive() {
+  const r = await fetch('https://www.stadt-zuerich.ch/stzh/bathdatadownload', { cache: 'no-store' });
+  if (!r.ok) throw new Error('temp');
+  const doc = new DOMParser().parseFromString(await r.text(), 'text/xml');
+  const byUid = {}, byName = {};
+  for (const bath of doc.querySelectorAll('bath')) {
+    const uid  = bath.querySelector('poiid')?.textContent?.trim();
+    const name = bath.querySelector('title')?.textContent?.trim();
+    const entry = {
+      temperatureWater: bath.querySelector('temperatureWater')?.textContent?.trim() || null,
+      openClosed:       bath.querySelector('openClosedTextPlain')?.textContent?.trim() || null,
+    };
+    if (uid)  byUid[uid]   = entry;
+    if (name) byName[name] = entry;
+  }
+  return { byUid, byName };
+}
+
+async function fetchLiveRT() {
+  const [wsRes, tempRes] = await Promise.allSettled([fetchBesucherWS(), fetchTemperaturenLive()]);
+  if (wsRes.status !== 'fulfilled') throw new Error('WebSocket failed');
+  const { byUid = {}, byName = {} } = tempRes.status === 'fulfilled' ? tempRes.value : {};
+  const ts = new Date().toLocaleString('sv-SE', { timeZone: 'Europe/Zurich' });
+  const venues = {};
+  for (const bad of wsRes.value) {
+    const uid = bad.uid;
+    if (!uid || !VENUE_MAP[uid]) continue;
+    const v = VENUE_MAP[uid];
+    const tempUid = v.tempUid || uid;
+    // Prefer Stadt-Zürich XML (by poiid, then by name), then WebSocket field as last resort
+    const t = byUid[tempUid] || byName[v.name] || {};
+    const wsTemp = bad.temperatureWater != null ? String(bad.temperatureWater) : null;
+    venues[uid] = {
+      currentfill:      bad.currentfill,
+      freespace:        bad.freespace,
+      maxspace:         bad.maxspace,
+      temperatureWater: t.temperatureWater ?? wsTemp,
+      openClosed:       t.openClosed ?? bad.openClosed ?? null,
+    };
+  }
+  return { timestamp: ts, venues };
+}
+
+const getLive = () => fetchLiveRT().catch(() => fetchLive());
+
 Promise.all([
   fetch(BASE + 'auswertung/auswertung.json').then(r => r.ok ? r.json() : null).catch(() => null),
-  fetchLive(),
+  getLive(),
 ]).then(([aw, live]) => {
   if (aw?.badis) {
     AW = Object.fromEntries(aw.badis.map(b => [b.uid, b]));
@@ -926,11 +985,10 @@ Promise.all([
   LIVE = parseLive(live);
   render();
 
-  // Auto-refresh live data every 5 minutes
-  setInterval(() => {
-    fetchLive().then(live => {
-      if (live) { LIVE = parseLive(live); render(); }
-    });
+  // Auto-refresh every 5 minutes
+  setInterval(async () => {
+    const live = await getLive();
+    if (live) { LIVE = parseLive(live); render(); }
   }, 5 * 60 * 1000);
 });
 </script>
