@@ -13,6 +13,7 @@ jobs:
       cancel-in-progress: true   # nur eine Instanz gleichzeitig
     permissions:
       contents: write
+      actions: write
 
     steps:
       - name: Bis zum nächsten 15-Min-Slot warten
