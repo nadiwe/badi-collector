@@ -80,7 +80,7 @@ def _strip_csv_safe(value: str) -> str:
     return value[1:] if value.startswith("'") else value
 
 
-def load_data(data_dir: str = "data") -> list:
+def load_data(data_dir: str = "data/besucher") -> list:
     rows = []
     for path in sorted(glob.glob(f"{data_dir}/*.csv")):
         with open(path, encoding="utf-8") as f:
