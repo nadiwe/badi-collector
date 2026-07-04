@@ -117,6 +117,19 @@ function hhmm(s) { // "08:30" → minutes
   return h * 60 + m;
 }
 
+function computeIsOpen(uid) {
+  const live = LIVE?.venues?.[uid];
+  if (live?.openClosed === 'offen') return true;
+  if (live?.openClosed === 'geschlossen') return false;
+  // Fallback for venues without API open/closed data (Hallenbäder etc.)
+  const v = VENUE_MAP[uid];
+  if (!v?.hours) return false;
+  const parts = v.hours.split(/[–-]/);
+  if (parts.length !== 2) return false;
+  const nowMin = nowHHMM();
+  return nowMin >= hhmm(parts[0].trim()) && nowMin < hhmm(parts[1].trim());
+}
+
 function slotsFor(uid, dayType) {
   const b = AW[uid];
   if (!b) return [];
@@ -147,7 +160,7 @@ function computeDev(uid) {
 
 function devInfo(uid) {
   const live = LIVE?.venues?.[uid];
-  const isOpen = live?.openClosed === 'offen';
+  const isOpen = computeIsOpen(uid);
   if (!isOpen) return { arrow:'', short:'geschlossen', color: META, barColor:'#DEDEDE' };
   const dev = computeDev(uid);
   if (dev == null) return { arrow:'≈', short:'etwa wie sonst', color: META, barColor: META };
@@ -493,7 +506,7 @@ function tileGaugeSVG(uid, open) {
 // ── Render: Kompakt-Kachel (farbiger Hintergrund) ─────────────────────────
 function renderCard(v) {
   const live = LIVE?.venues?.[v.uid];
-  const isOpen = live?.openClosed === 'offen';
+  const isOpen = computeIsOpen(v.uid);
   const noLive = !live;
   const fill = live?.currentfill;
   const temp = live?.temperatureWater;
@@ -542,7 +555,7 @@ function renderDetail() {
   const v = VENUE_MAP[S.currentUid];
   if (!v) return '';
   const live = LIVE?.venues?.[v.uid];
-  const isOpen = live?.openClosed === 'offen';
+  const isOpen = computeIsOpen(v.uid);
   const fill = live?.currentfill;
   const temp = live?.temperatureWater;
   const hasTemp = temp != null && temp !== '';
@@ -748,6 +761,12 @@ function render() {
   const d = new Date();
   const dateLabel = d.toLocaleDateString('de-CH', { weekday: 'long', day: 'numeric', month: 'long' });
   const timeLabel = liveTs ? liveTs.slice(11, 16) : d.toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' });
+  let ageLabel = '';
+  if (liveTs) {
+    const liveDate = new Date(liveTs.replace(' ', 'T') + '+02:00');
+    const ageMin = Math.round((d - liveDate) / 60000);
+    if (ageMin >= 1) ageLabel = ` · vor ${ageMin} Min`;
+  }
 
   const cards = list.map(renderCard).join('');
   const isEmpty = list.length === 0;
@@ -759,7 +778,7 @@ function render() {
         <div>
           <h1 style="font-family:'Outfit',sans-serif;font-size:clamp(28px,4vw,40px);font-weight:600;letter-spacing:-.01em;line-height:.95;color:${INK};">Wasserziit</h1>
           <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:${META};margin-top:8px;letter-spacing:.03em;">
-            Stand ${dateLabel}${liveTs ? ', ' + timeLabel + ' Uhr' : ''}
+            Stand ${dateLabel}${liveTs ? ', ' + timeLabel + ' Uhr' + ageLabel : ''}
           </div>
         </div>
       </div>
@@ -771,7 +790,7 @@ function render() {
         </div>
 
         <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:${META};">
-          ${list.length} Badis · ${list.filter(v => LIVE?.venues?.[v.uid]?.openClosed === 'offen').length} offen
+          ${list.length} Badis · ${list.filter(v => computeIsOpen(v.uid)).length} offen
         </div>
 
         ${isEmpty ? `
