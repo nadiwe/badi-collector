@@ -6,6 +6,9 @@ import urllib.request
 import websockets
 import xml.etree.ElementTree as ET
 from datetime import datetime
+from zoneinfo import ZoneInfo
+
+_ZURICH = ZoneInfo("Europe/Zurich")
 
 WEBSOCKET_URL    = "wss://badi-public.crowdmonitor.ch:9591/api"
 TEMPERATUREN_URL = "https://www.stadt-zuerich.ch/stzh/bathdatadownload"
@@ -37,14 +40,14 @@ TEMPERATUREN_IDS = {
 
 
 def _week_file(subdir: str) -> str:
-    now = datetime.now()
+    now = datetime.now(_ZURICH)
     path = f"data/{subdir}/{now.strftime('%G-W%V')}.csv"
     os.makedirs(f"data/{subdir}", exist_ok=True)
     return path
 
 
 async def collect_besucher():
-    now       = datetime.now()
+    now       = datetime.now(_ZURICH)
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
     csv_file  = _week_file("besucher")
 
@@ -81,7 +84,7 @@ async def collect_besucher():
 
 
 def collect_temperaturen():
-    now       = datetime.now()
+    now       = datetime.now(_ZURICH)
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
     csv_file  = _week_file("temperaturen")
 
