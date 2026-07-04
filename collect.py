@@ -15,7 +15,6 @@ TEMPERATUREN_URL = "https://www.stadt-zuerich.ch/stzh/bathdatadownload"
 
 
 def _csv_safe(value):
-    """Prefix formula-triggering characters to prevent CSV injection."""
     s = str(value) if value is not None else ""
     return ("'" + s) if s.startswith(("=", "+", "-", "@", "\t", "\r")) else s
 
@@ -30,12 +29,21 @@ BESUCHER_IDS = {
 
 # Temperaturen — poiids aus der Stadt-Zürich-API (ohne Hallenbad Altstetten)
 TEMPERATUREN_IDS = {
-    "flb6939", "flb6940", "flb8803", "flb6941",   # Flussbäder
-    "fb002",                                         # Letzigraben  (= LETZI-1)
-    "fb006", "fb008", "fb012", "fb013", "fb018",   # Freibäder (fb013 = Seebach = SSD-11)
-    "seb6943",                                       # Seebad Enge  (= BADI-1)
-    "seb6945",                                       # Seebad Utoquai (= SSD-10)
-    "seb6946", "seb6947", "seb6948",               # Strandbäder
+    "flb6939", "flb6940", "flb8803", "flb6941",
+    "fb002",
+    "fb006", "fb008", "fb012", "fb013", "fb018",
+    "seb6943",
+    "seb6945",
+    "seb6946", "seb6947", "seb6948",
+}
+
+# Mapping: Crowdmonitor-UID → Stadt-Zürich-Temperatur-poiid
+# (nur wo die UIDs nicht identisch sind)
+_TEMP_UID = {
+    "BADI-1":  "seb6943",
+    "LETZI-1": "fb002",
+    "SSD-10":  "seb6945",
+    "SSD-11":  "fb013",
 }
 
 
@@ -46,7 +54,7 @@ def _week_file(subdir: str) -> str:
     return path
 
 
-async def collect_besucher():
+async def collect_besucher() -> tuple[dict, str]:
     now       = datetime.now(_ZURICH)
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
     csv_file  = _week_file("besucher")
@@ -64,26 +72,34 @@ async def collect_besucher():
             print(f"Besucher: Versuch {attempt + 1} fehlgeschlagen, erneuter Versuch...")
             await asyncio.sleep(5)
 
+    snapshot: dict = {}
     file_exists = os.path.isfile(csv_file)
     with open(csv_file, "a", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         if not file_exists:
             writer.writerow(["timestamp", "uid", "name", "currentfill", "freespace", "maxspace"])
         for bad in data:
-            if bad.get("uid") in BESUCHER_IDS:
+            uid = bad.get("uid")
+            if uid in BESUCHER_IDS:
                 writer.writerow([
                     timestamp,
-                    _csv_safe(bad.get("uid")),
+                    _csv_safe(uid),
                     _csv_safe(bad.get("name")),
                     bad.get("currentfill"),
                     bad.get("freespace"),
                     bad.get("maxspace"),
                 ])
+                snapshot[uid] = {
+                    "currentfill": bad.get("currentfill"),
+                    "freespace":   bad.get("freespace"),
+                    "maxspace":    bad.get("maxspace"),
+                }
 
     print(f"✓ Besucherzahlen gespeichert: {timestamp}")
+    return snapshot, timestamp
 
 
-def collect_temperaturen():
+def collect_temperaturen() -> dict:
     now       = datetime.now(_ZURICH)
     timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
     csv_file  = _week_file("temperaturen")
@@ -91,6 +107,7 @@ def collect_temperaturen():
     with urllib.request.urlopen(TEMPERATUREN_URL, timeout=30) as resp:
         root = ET.fromstring(resp.read())
 
+    snapshot: dict = {}
     file_exists = os.path.isfile(csv_file)
     with open(csv_file, "a", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
@@ -100,16 +117,45 @@ def collect_temperaturen():
             uid = (bath.findtext("poiid") or "").strip()
             if uid not in TEMPERATUREN_IDS:
                 continue
+            temp = (bath.findtext("temperatureWater") or "").strip()
+            status = (bath.findtext("openClosedTextPlain") or "").strip()
             writer.writerow([
                 timestamp,
                 _csv_safe(uid),
                 _csv_safe((bath.findtext("title") or "").strip()),
-                (bath.findtext("temperatureWater") or "").strip(),
-                (bath.findtext("openClosedTextPlain") or "").strip(),
+                temp,
+                status,
             ])
+            snapshot[uid] = {
+                "temperatureWater": temp or None,
+                "openClosed":       status or None,
+            }
 
     print(f"✓ Temperaturen gespeichert: {timestamp}")
+    return snapshot
 
 
-asyncio.run(collect_besucher())
-collect_temperaturen()
+def generate_live_json(besucher: dict, temperaturen: dict, timestamp: str) -> None:
+    venues: dict = {}
+    for uid in BESUCHER_IDS:
+        b = besucher.get(uid)
+        if b is None:
+            continue
+        temp_uid = _TEMP_UID.get(uid, uid)
+        t = temperaturen.get(temp_uid, {})
+        venues[uid] = {
+            "currentfill":      b.get("currentfill"),
+            "freespace":        b.get("freespace"),
+            "maxspace":         b.get("maxspace"),
+            "temperatureWater": t.get("temperatureWater"),
+            "openClosed":       t.get("openClosed"),
+        }
+    payload = {"timestamp": timestamp, "venues": venues}
+    with open("data/live.json", "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+    print(f"✓ live.json aktualisiert: {timestamp}")
+
+
+besucher_snap, ts = asyncio.run(collect_besucher())
+temp_snap = collect_temperaturen()
+generate_live_json(besucher_snap, temp_snap, ts)

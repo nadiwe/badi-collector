@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<template id="__bundler_thumbnail" data-bg-color="#E4E2E0">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#E4E2E0"/>
+    <circle cx="600" cy="400" r="180" fill="#173D34"/>
+    <path d="M420 430 q 45 -40 90 0 q 45 40 90 0 q 45 -40 90 0 q 45 40 90 0" stroke="#F47B43" stroke-width="18" fill="none" stroke-linecap="round"/>
+  </svg>
+</template>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#E4E2E0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  ::selection{background:#6E3BF2;color:#fff;}
+  button{-webkit-tap-highlight-color:transparent;}
+  a{text-decoration:none;}
+  @keyframes livepulse{0%,100%{opacity:1;}50%{opacity:.25;}}
+</style>
+</helmet>
+<div style="min-height:100vh;background:#E4E2E0;padding:clamp(16px,3.5vw,40px);font-family:'IBM Plex Sans',system-ui,sans-serif;color:#173D34;">
+  <div style="max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:22px;">
+
+      <div style="display:flex;flex-direction:column;gap:22px;">
+
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;">
+          <div>
+            <h1 style="margin:0;font-family:'Outfit',sans-serif;font-size:clamp(28px,4vw,40px);font-weight:600;letter-spacing:-.01em;line-height:.95;color:#173D34;">Wasserziit</h1>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8C8C8C;margin-top:8px;letter-spacing:.03em;">Stand {{ todayLabel }}, {{ updated }} Uhr</div>
+          </div>
+        </div>
+
+        <section style="background:#FFFFFF;border-radius:28px;padding:22px;box-shadow:0 4px 22px rgba(23,61,52,.08);display:flex;flex-direction:column;gap:16px;">
+
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <sc-for list="{{ typeChips }}" as="chip" hint-placeholder-count="4">
+              <button onClick="{{ chip.onClick }}" style="{{ chip.style }}">{{ chip.label }}<span style="opacity:.6;">{{ chip.count }}</span></button>
+            </sc-for>
+          </div>
+
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#8C8C8C;">{{ resultCount }}</div>
+
+          <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:44px 10px 54px;text-align:center;">
+              <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:600;color:#173D34;">{{ emptyTitle }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8C8C8C;margin-top:10px;line-height:1.6;">{{ emptyMsg }}</div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;">
+            <sc-for list="{{ badis }}" as="b" hint-placeholder-count="8">
+              <sc-if value="{{ b.isDetailed }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ b.onOpen }}" role="button" style="{{ b.cardStyle }}" style-hover="box-shadow:0 4px 22px rgba(23,61,52,.14)">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;">
+                  <div style="min-width:0;">
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                      <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#8C8C8C;font-weight:600;">{{ b.typeLabel }}</span>
+                      <sc-if value="{{ b.note }}" hint-placeholder-val="{{ false }}">
+                        <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8C8C8C;">· {{ b.note }}</span>
+                      </sc-if>
+                    </div>
+                    <div style="font-family:'Outfit',sans-serif;font-size:19px;font-weight:600;letter-spacing:-.01em;margin-top:8px;line-height:1.15;color:#173D34;">{{ b.name }}</div>
+                  </div>
+                  <div style="text-align:right;flex-shrink:0;">
+                    <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:{{ b.guestColor }};font-size:44px;">{{ b.guestStr }}</div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#8C8C8C;margin-top:9px;font-weight:600;">Gäste jetzt</div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;">
+                  <span style="display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;color:{{ b.statusColor }};">
+                    <i style="width:7px;height:7px;border-radius:50%;background:{{ b.statusDot }};display:inline-block;"></i>{{ b.statusLabel }}
+                  </span>
+                  <div style="display:flex;align-items:center;gap:11px;flex-shrink:0;">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:{{ b.tempColor }};">{{ b.tempStr }}<sc-if value="{{ b.hasTemp }}" hint-placeholder-val="{{ false }}">°</sc-if></span>
+                    <button onClick="{{ b.onFav }}" aria-label="Favorit" style="{{ b.favStyle }}">{{ b.favChar }}</button>
+                  </div>
+                </div>
+                <div style="margin-top:15px;padding-top:13px;border-top:1px solid #DEDEDE;">
+                  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:#8C8C8C;font-weight:700;white-space:nowrap;">Auslastung heute</span>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:{{ b.statusColor }};white-space:nowrap;flex-shrink:0;">{{ b.hoursStr }}</span>
+                  </div>
+                  <div style="margin-top:0;">{{ b.chartEl }}</div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px;">
+                    <span style="display:inline-flex;align-items:center;gap:5px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:{{ b.devColor }};"><span style="font-size:9px;line-height:1;">{{ b.devArrow }}</span>{{ b.devShort }}</span>
+                    <span style="display:inline-flex;align-items:center;gap:7px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:500;color:#8C8C8C;"><sc-if value="{{ b.open }}" hint-placeholder-val="{{ true }}"><span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:10px;border-top:2px dotted #B5B5B5;display:inline-block;"></span>üblich</span></sc-if><span>{{ b.nowLabel }}</span></span>
+                  </div>
+                </div>
+              </div>
+              </sc-if>
+              <sc-if value="{{ b.isCompact }}" hint-placeholder-val="{{ true }}">
+              <div onClick="{{ b.onOpen }}" role="button" style="{{ b.tileCardStyle }}" style-hover="box-shadow:0 4px 22px rgba(23,61,52,.22)">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;">
+                  <div style="min-width:0;">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.8);font-weight:600;">{{ b.typeLabel }}</span>
+                    <div style="font-family:'Outfit',sans-serif;font-size:19px;font-weight:600;letter-spacing:-.01em;margin-top:6px;line-height:1.15;color:#FFFFFF;">{{ b.name }}</div>
+                  </div>
+                  <button onClick="{{ b.onFav }}" aria-label="Favorit" style="{{ b.tileFavStyle }}">{{ b.tileFavChar }}</button>
+                </div>
+                <div style="display:flex;align-items:baseline;gap:10px;margin-top:18px;">
+                  <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;color:#FFFFFF;line-height:1;font-size:40px;">{{ b.guestStr }}</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.75);">Gäste jetzt</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;color:#FFFFFF;">
+                  <i style="width:7px;height:7px;border-radius:50%;background:#FFFFFF;display:inline-block;"></i>{{ b.statusLabel }}<span style="color:rgba(255,255,255,.6);font-weight:500;">· {{ b.tempStr }}<sc-if value="{{ b.hasTemp }}" hint-placeholder-val="{{ false }}">°</sc-if> Wasser</span>
+                </div>
+                <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.22);">
+                  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.75);font-weight:700;">Auslastung jetzt</span>
+                    <span style="display:inline-flex;align-items:center;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#FFFFFF;"><span style="font-size:9px;line-height:1;">{{ b.devArrow }}</span>{{ b.devShort }}</span>
+                  </div>
+                  <div style="margin-top:11px;">{{ b.tileGaugeEl }}</div>
+                </div>
+              </div>
+              </sc-if>
+            </sc-for>
+          </div>
+          </sc-if>
+        </section>
+
+        <footer style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding-top:14px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.04em;color:#8C8C8C;line-height:1.7;max-width:640px;">
+            <div>Wassertemperatur &amp; Status — Sportamt Stadt Zürich</div>
+            <div style="margin-top:4px;">Besucherzahlen — Crowdmonitor, badi-public.crowdmonitor.ch:9591/api</div>
+            <div style="margin-top:4px;">Durchschnittliche Auslastung selber erhoben &amp; berechnet aus gesammelten Live-Daten, nicht offiziell.</div>
+            <div style="margin-top:4px;">Saisonal Mai–Sep (Frei-/Fluss-/Seebäder), Hallenbäder ganzjährig. Privates, nicht-kommerzielles Projekt.</div>
+          </div>
+          <a href="https://www.stadt-zuerich.ch/stzh/bathdatadownload" target="_blank" rel="noopener" style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#173D34;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;flex-shrink:0;">stadt-zuerich.ch ↗</a>
+        </footer>
+      </div>
+
+    <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ goBack }}" style="position:fixed;inset:0;background:rgba(0,0,0,.55);backdropFilter:blur(2px);zIndex:50;display:flex;alignItems:center;justifyContent:center;padding:clamp(0px,2vw,16px);">
+      <div onClick="{{ stop }}" style="max-width:740px;width:100%;maxHeight:calc(100vh - clamp(0px,4vw,32px));display:flex;flexDirection:column;">
+        <section style="background:#FFFFFF;border-radius:clamp(16px,4vw,28px);padding:clamp(16px,4vw,24px);box-shadow:0 4px 22px rgba(23,61,52,.08);overflowY:auto;display:flex;flexDirection:column;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;">
+            <div style="display:flex;align-items:center;gap:9px;">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#8C8C8C;font-weight:600;">{{ current.typeLabel }}</div>
+              <span style="display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;color:{{ current.statusColor }};"><i style="width:6px;height:6px;border-radius:50%;background:{{ current.statusDot }};display:inline-block;"></i>{{ current.statusLabel }}<span style="color:#8C8C8C;">· {{ current.season }}</span></span>
+            </div>
+            <button onClick="{{ goBack }}" style="font-family:'IBM Plex Mono',monospace;font-size:20px;line-height:1;font-weight:600;color:#173D34;background:none;border:none;cursor:pointer;width:38px;height:38px;display:inline-flex;alignItems:center;justifyContent:center;flexShrink:0;">×</button>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:10px;margin-top:8px;">
+            <h1 style="font-family:'Outfit',sans-serif;font-size:clamp(28px,4vw,40px);font-weight:600;letter-spacing:-.01em;margin:0;line-height:1.02;color:#173D34;">{{ current.name }}</h1>
+            <button onClick="{{ current.onFav }}" aria-label="Favorit" style="{{ current.favStyle }}">{{ current.favChar }}</button>
+          </div>
+          <sc-if value="{{ current.note }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#8C8C8C;margin-top:9px;">{{ current.note }}</div>
+          </sc-if>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8C8C8C;margin-top:8px;">{{ current.address }}</div>
+
+          <div style="margin-top:clamp(16px,4vw,26px);display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;">
+            <div onClick="{{ current.toggleGuest }}" ref="{{ current.guestCardRef }}" style="flex:1;min-width:150px;padding:clamp(14px,3.5vw,20px) clamp(14px,3.5vw,22px);background:{{ current.statBg }};border-radius:20px;cursor:pointer;align-self:stretch;display:flex;flex-direction:column;">
+              <div style="margin-top:auto;">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
+                  <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:{{ current.guestColor }};font-size:clamp(36px,8vw,52px);">{{ current.guestStr }}</div>
+                </div>
+                <div style="margin-top:10px;">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:#8C8C8C;font-weight:700;">Gäste jetzt</div>
+                </div>
+              </div>
+              <sc-if value="{{ current.guestOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">
+                <sc-for list="{{ current.guestWeekList }}" as="d" hint-placeholder-count="7">
+                  <div style="{{ d.rowStyle }}">
+                    <span style="{{ d.labelStyle }}">{{ d.label }}</span>
+                    <span style="{{ d.hoursStyle }}">{{ d.guests }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              </sc-if>
+            </div>
+            <div onClick="{{ current.toggleTemp }}" ref="{{ current.tempCardRef }}" style="flex:1;min-width:150px;padding:clamp(14px,3.5vw,20px) clamp(14px,3.5vw,22px);background:{{ current.statBg }};border-radius:20px;cursor:{{ current.tempCursor }};align-self:stretch;display:flex;flex-direction:column;">
+              <div style="margin-top:auto;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                  <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:{{ current.tempColor }};"><span style="font-size:clamp(36px,8vw,52px);">{{ current.tempStr }}</span><sc-if value="{{ current.hasTemp }}" hint-placeholder-val="{{ false }}"><span style="font-size:17px;font-weight:600;vertical-align:top;line-height:1;">°</span></sc-if></div>
+                </div>
+                <div style="margin-top:10px;">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:#8C8C8C;font-weight:700;">Wassertemperatur</div>
+                </div>
+              </div>
+              <sc-if value="{{ current.tempOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">
+                <sc-for list="{{ current.tempWeekList }}" as="d" hint-placeholder-count="7">
+                  <div style="{{ d.rowStyle }}">
+                    <span style="{{ d.labelStyle }}">{{ d.label }}</span>
+                    <span style="{{ d.hoursStyle }}">{{ d.temp }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              </sc-if>
+            </div>
+            <sc-if value="{{ current.open }}" hint-placeholder-val="{{ true }}">
+            <div onClick="{{ current.toggleHours }}" ref="{{ current.hoursCardRef }}" style="flex: 1; min-width: 150px; padding: clamp(14px,3.5vw,20px) clamp(14px,3.5vw,22px); background: {{ current.hoursCardBg }}; border-radius: 20px; cursor: pointer; transition: background .18s; align-self:stretch; display:flex; flex-direction:column;">
+              <div style="margin-top:auto;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                  <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.95;color:#000000;font-size:clamp(18px,4vw,26px);white-space:nowrap;">{{ current.hoursToday }}</div>
+                </div>
+                <div style="margin-top:10px;">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:#8C8C8C;font-weight:700;">ÖFFNIGSZIITE</div>
+                </div>
+              </div>
+              <sc-if value="{{ current.hoursOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:14px;padding-top:12px;border-top:1px solid {{ current.hoursCardBorder }};display:flex;flex-direction:column;gap:2px;">
+                <sc-for list="{{ current.hoursWeekList }}" as="d" hint-placeholder-count="7">
+                  <div style="{{ d.rowStyle }}">
+                    <span style="{{ d.labelStyle }}">{{ d.label }}</span>
+                    <span style="{{ d.hoursStyle }}">{{ d.hours }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              </sc-if>
+            </div>
+            </sc-if>
+          </div>
+
+          <div style="margin-top:clamp(18px,4vw,30px);">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;">
+              <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;letter-spacing:-.005em;color:#173D34;text-transform:uppercase;">Wie voll isch es<br></div>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:clamp(10px,3vw,16px);flex-wrap:wrap;justify-content:space-between;align-items:center;">
+              <div style="display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;">
+                <sc-for list="{{ current.periodTabs }}" as="p" hint-placeholder-count="3"><button onClick="{{ p.onClick }}" style="{{ p.style }}">{{ p.label }}</button></sc-for>
+              </div>
+              <sc-if value="{{ current.showResTabs }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:4px;">
+                <sc-for list="{{ current.resTabs }}" as="r" hint-placeholder-count="2"><button onClick="{{ r.onClick }}" style="{{ r.style }}">{{ r.label }}</button></sc-for>
+              </div>
+              </sc-if>
+              <button onClick="{{ current.toggleChartZoom }}" style="{{ current.zoomBtnStyle }}" aria-label="Zoom">Zoom</button>
+            </div>
+            <sc-if value="{{ current.showWeekdayTabs }}" hint-placeholder-val="{{ false }}">
+            <div ref="{{ current.wdRowRef }}" style="display:flex;gap:4px;margin-top:12px;">
+              <sc-for list="{{ current.weekdayTabs }}" as="w" hint-placeholder-count="7"><button onClick="{{ w.onClick }}" style="{{ w.style }}">{{ w.label }}</button></sc-for>
+            </div>
+            </sc-if>
+            <div style="margin-top:clamp(12px,3vw,22px);">{{ current.peakChartEl }}</div>
+          </div>
+        </section>
+      </div>
+    
+
+  </div>
+</sc-if></div>
+</div></x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:412,&quot;height&quot;:880},&quot;kartenVariante&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Kompakt&quot;,&quot;Übersicht&quot;],&quot;default&quot;:&quot;Kompakt&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;chartStil&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Fein (15-Min)&quot;,&quot;Glatt&quot;,&quot;Stündlich&quot;],&quot;default&quot;:&quot;Fein (15-Min)&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Verlaufsdiagramm \&quot;Wie voll ist es typisch\&quot;&quot;}}">
+class Component extends DCLogic {
+  state = { screen: 'home', currentId: null, sort: 'ruhig', filter: 'alle', weekday: 'sa', period: 'heute', seasonHalf: 'sommer', hoursOpen: false, tempOpen: false, guestOpen: false, favs: {}, chartRes: null, chartZoomed: false };
+
+  getChartRes(){ return this.state.chartRes || this.props.chartStil || 'Stündlich'; }
+
+  INK = '#173D34';
+  ORANGE = '#F47B43';
+  PURPLE = '#6E3BF2';
+  PURPLE_S = '#7849F1';
+  META = '#8C8C8C';
+  BLACK = '#000000';
+
+  hexToRgba(hex, a){
+    const h = (hex||'#173D34').replace('#','');
+    const r = parseInt(h.substring(0,2),16), g = parseInt(h.substring(2,4),16), bl = parseInt(h.substring(4,6),16);
+    return `rgba(${r},${g},${bl},${a})`;
+  }
+
+  liveDev(b){
+    if(!b.open) return { dir:'closed', pct:0, barColor:'#DEDEDE', color:this.META, arrow:'', short:'heute geschlossen', long:'heute geschlossen', tag:'—' };
+    const dev = (b.dev==null)?1:b.dev;
+    const pct = Math.round(Math.abs(dev-1)*100);
+    if(dev>=1.10) return { dir:'up', pct, barColor:this.ORANGE, color:this.ORANGE, arrow:'▲', short:pct+'% voller als sonst', long:pct+'% voller als üblich', tag:'voller als üblich' };
+    if(dev<=0.90) return { dir:'down', pct, barColor:this.INK, color:this.INK, arrow:'▼', short:pct+'% ruhiger als sonst', long:pct+'% ruhiger als üblich', tag:'ruhiger als üblich' };
+    return { dir:'flat', pct, barColor:this.META, color:this.META, arrow:'≈', short:'etwa wie sonst', long:'etwa wie üblich', tag:'wie üblich' };
+  }
+
+  componentDidMount(){
+    try{ const r=localStorage.getItem('wasserzeit_favs'); if(r) this.setState({favs:JSON.parse(r)||{}}); }catch(e){}
+    this._wdRow = null;
+    this._ro = new ResizeObserver(entries=>{
+      const w = entries[0].contentRect.width;
+      const narrow = w > 0 && w < 340;
+      if(narrow !== this.state.narrow) this.setState({narrow});
+    });
+    this._wdRowRef = (el)=>{
+      if(this._wdRow === el) return;
+      if(this._wdRow) this._ro.unobserve(this._wdRow);
+      this._wdRow = el;
+      if(el) this._ro.observe(el);
+    };
+    if (typeof window!=='undefined'){
+      this._onResize = ()=>this.forceUpdate();
+      window.addEventListener('resize', this._onResize);
+    }
+  }
+  componentWillUnmount(){
+    if(this._ro) this._ro.disconnect();
+    if (this._onResize) window.removeEventListener('resize', this._onResize);
+  }
+  toggleFav(id){ const f={...this.state.favs}; if(f[id]) delete f[id]; else f[id]=true; this.setState({favs:f}); try{ localStorage.setItem('wasserzeit_favs', JSON.stringify(f)); }catch(e){} }
+
+  RAW = [
+    ['ob_letten','Oberer Letten','fluss',21.4,true,2,'Lettensteg 10, 8037 Zürich','07:00–20:00','Mai–Sep',16,1.0,0.9,'',1850,1.28],
+    ['un_letten','Unterer Letten','fluss',21.2,true,1,'Wasserwerkstrasse 141, 8037 Zürich','07:00–20:00','Mai–Sep',15,0.8,1.4,'',720,0.82],
+    ['auhoengg','Au-Höngg','fluss',null,true,0,'Werdinsel, 8049 Zürich','08:00–20:00','Mai–Sep',15,0.5,4.2,'',210,0.70],
+    ['frauenbad','Frauenbad Stadthausquai','fluss',21.0,true,1,'Stadthausquai 12, 8001 Zürich','09:00–20:00','Mai–Sep',17,0.7,0.4,'Nur Frauen',380,1.05],
+    ['maennerbad','Männerbad Schanzengraben','fluss',20.6,false,0,'Badweg 10, 8002 Zürich','geschlossen heute','Mai–Sep',18,0.5,0.7,'Nur Männer',0,1.0],
+    ['utoquai','Seebad Utoquai','see',22.8,true,2,'Utoquai 50, 8008 Zürich','07:00–20:00','Mai–Sep',17,1.0,1.1,'',1340,1.18],
+    ['enge','Seebad Enge','see',23.1,true,2,'Mythenquai 9, 8002 Zürich','07:00–20:00','Mai–Sep',18,1.0,1.6,'',1580,1.35],
+    ['mythenquai','Strandbad Mythenquai','see',22.6,true,1,'Mythenquai 95, 8002 Zürich','09:00–20:00','Mai–Sep',15,0.9,2.0,'',2420,1.10],
+    ['tiefenbrunnen','Strandbad Tiefenbrunnen','see',22.9,true,1,'Bellerivestrasse 200, 8008 Zürich','09:00–20:00','Mai–Sep',15,0.8,2.6,'',1680,0.92],
+    ['wollishofen','Strandbad Wollishofen','see',22.4,true,0,'Seestrasse 451, 8038 Zürich','09:00–20:00','Mai–Sep',14,0.6,3.4,'',540,0.78],
+    ['katzensee','Strandbad Katzensee','see',24.2,true,1,'Katzenseestrasse, 8046 Zürich','09:00–20:00','Mai–Sep',15,0.6,6.8,'Wärmstes Wasser',1120,1.42],
+    ['letzigraben','Freibad Letzigraben','frei',24.0,true,2,'Edelweissstrasse 5, 8048 Zürich','09:00–20:00','Mai–Sep',15,0.95,2.9,'Max-Frisch-Bad',3260,1.22],
+    ['allenmoos','Freibad Allenmoos','frei',23.6,true,1,'Ria-Schwarzwald-Weg 1, 8057 Zürich','09:00–20:00','Mai–Sep',15,0.7,3.1,'',980,0.95],
+    ['auhof','Freibad Auhof','frei',23.4,true,0,'Glaubtenstrasse 67, 8046 Zürich','09:00–20:00','Mai–Sep',15,0.5,5.2,'',420,0.68],
+    ['heuried','Freibad Heuried','frei',24.5,true,1,'Döltschiweg 130, 8055 Zürich','09:00–20:00','Mai–Sep',16,0.7,3.6,'',1450,1.08],
+    ['dolder','Freibad Dolder','frei',23.8,true,0,'Adlisbergstrasse 36, 8044 Zürich','09:00–20:00','Mai–Sep',14,0.5,3.0,'',360,0.85],
+    ['hb_city','Hallenbad City','halle',29.0,true,1,'Sihlstrasse 71, 8001 Zürich','06:30–21:00','ganzjährig',18,0.8,0.5,'',240,0.60],
+    ['hb_oerlikon','Hallenbad Oerlikon','halle',28.5,true,1,'Wallisellenstrasse 100, 8050 Zürich','07:00–21:00','ganzjährig',18,0.7,4.8,'',310,0.65],
+    ['hb_bungertwies','Hallenbad Bungertwies','halle',28.0,true,0,'Hochstrasse 56, 8044 Zürich','07:00–20:00','ganzjährig',19,0.6,2.2,'',90,0.70],
+    ['hb_kaeferberg','Wärmebad Käferberg','halle',34.0,true,1,'Emil-Klöti-Strasse 21, 8037 Zürich','08:00–20:00','ganzjährig',17,0.5,3.0,'Thermalbad 34°',180,0.90],
+    ['hb_leimbach','Hallenbad Leimbach','halle',28.5,true,0,'Leimbachstrasse 200, 8041 Zürich','07:00–20:00','ganzjährig',18,0.5,5.5,'',110,0.72],
+    ['hb_blaesi','Hallenbad Bläsi','halle',28.0,true,0,'Hofwiesenstrasse 70, 8057 Zürich','07:00–20:00','ganzjährig',18,0.4,2.8,'',70,0.80],
+  ];
+
+  list() {
+    return this.RAW.map(r => ({ id:r[0], name:r[1], type:r[2], temp:r[3], open:r[4], occ:r[5], address:r[6], hours:r[7], season:r[8], peakHour:r[9], pop:r[10], dist:r[11], note:r[12], visitors:r[13], dev:r[14] }));
+  }
+
+  typeLabel(t){ return t==='fluss'?'Flussbad':t==='see'?'Seebad':t==='halle'?'Hallenbad':'Freibad'; }
+  fmt(n){ return (''+n).replace('.',','); }
+  fmtInt(n){ return (''+Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, "'"); }
+  occWord(o){ return o===0?'ruhig':o===1?'mittel':'voll'; }
+  occWordColor(o){ return o===0?this.INK:o===1?this.ORANGE:this.PURPLE; }
+
+  tempColor(t){ return t==null ? this.META : this.INK; }
+
+  occSegs(o){
+    return [0,1,2].map(i => ({ key:i, style:{ width:'5px', height:(9+i*3)+'px', borderRadius:'1px', background: i<=o ? this.INK : '#DEDEDE' } }));
+  }
+
+  tabStyle(active){
+    const c = this.INK;
+    return { font:'inherit', fontFamily:"'IBM Plex Mono',monospace", fontSize:'12.5px', fontWeight:600, letterSpacing:'.02em', padding:'8px 16px', borderRadius:'999px', cursor:'pointer', border:'1.5px solid '+c, background: active?c:'transparent', color: active?'#FFFFFF':c, transition:'all .12s' };
+  }
+  chipStyle(active, color){
+    const c = color || this.INK;
+    return { font:'inherit', fontFamily:"'IBM Plex Mono',monospace", fontSize:'11.5px', fontWeight:600, letterSpacing:'.03em', padding:'7px 15px', borderRadius:'999px', cursor:'pointer', border:'1.5px solid '+c, background: active?c:'transparent', color: active?'#FFFFFF':c, display:'inline-flex', alignItems:'center', gap:'6px', transition:'all .12s' };
+  }
+  periodTabStyle(active, color){
+    const c = color || this.INK;
+    return { font:'inherit', fontFamily:"'IBM Plex Mono',monospace", fontSize:'12px', fontWeight:700, letterSpacing:'.02em', padding:'9px 16px', borderRadius:'999px', cursor:'pointer', border: active?'none':'1.5px solid '+c, background: active?c:'transparent', color: active?'#FFFFFF':c, transition:'all .12s', flexShrink:0, whiteSpace:'nowrap' };
+  }
+  wdSegStyle(active, color){
+    const c = color || this.INK;
+    return { font:'inherit', fontFamily:"'IBM Plex Mono',monospace", fontSize:'12px', fontWeight:700, letterSpacing:'.02em', padding:'8px 16px', borderRadius:'999px', cursor:'pointer', border: active?'none':'1.5px solid '+c, background: active?c:'transparent', color: active?'#FFFFFF':c, transition:'all .12s' };
+  }
+  wdStyle(active, color){
+    const c = color || this.INK;
+    return { font:'inherit', fontFamily:"'IBM Plex Mono',monospace", fontSize:'9.5px', fontWeight:700, letterSpacing:'.01em', padding:'0 8px', height:'34px', borderRadius:'999px', cursor:'pointer', border: active?'none':'1.5px solid '+c, background: active?c:'transparent', color: active?'#FFFFFF':c, flex:'1 1 0', textAlign:'center', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', transition:'all .12s' };
+  }
+  cardStyle(open){
+    return { textAlign:'left', background: open?'#F4F4F4':'#F7F7F6', border:'none', borderRadius:'22px', padding:'16px 17px', cursor:'pointer', width:'100%', font:'inherit', color:this.INK, display:'block', opacity: open?1:0.6, transition:'box-shadow .15s' };
+  }
+  TYPE_COLOR = { see:'#173D34', fluss:'#6E3BF2', frei:'#F47B43', halle:'#000000' };
+  rowGroup(which){
+    try {
+      const els = { guest:this._guestCardEl, temp:this._tempCardEl, hours:this._hoursCardEl };
+      const clickedEl = els[which];
+      if (!clickedEl) return [which];
+      const clickedTop = Math.round(clickedEl.getBoundingClientRect().top);
+      return Object.keys(els).filter(k => els[k] && Math.round(els[k].getBoundingClientRect().top) === clickedTop);
+    } catch(e) { return [which]; }
+  }
+  toggleStat(which){
+    return ()=>this.setState(s=>{
+      const next = !s[which+'Open'];
+      const group = this.rowGroup(which);
+      const obj = {};
+      group.forEach(k => obj[k+'Open'] = next);
+      return obj;
+    });
+  }
+  isMobileViewport(){
+    try { return typeof window!=='undefined' && window.innerWidth <= 520; } catch(e) { return false; }
+  }
+  scrollChartToNow(){
+    requestAnimationFrame(()=>{
+      const el = this._chartScrollEl, meta = this._lastChartMeta;
+      if(!el || !meta || meta.showNowIdx==null || meta.showNowIdx<0) return;
+      const center = meta.showNowIdx*meta.barPx + meta.barPx/2;
+      el.scrollLeft = Math.max(0, center - el.clientWidth/2);
+    });
+  }
+  hoursAccentColor(type){
+    const c = this.TYPE_COLOR[type];
+    if(!c || c===this.INK || c===this.BLACK) return this.PURPLE;
+    return c;
+  }
+  tileColor(b){
+    if(!b.open) return '#4A4A4A';
+    return this.TYPE_COLOR[b.type] || this.INK;
+  }
+  tileCardStyle(bg, open){
+    return { textAlign:'left', background:bg, border:'none', borderRadius:'22px', padding:'16px 17px', cursor:'pointer', width:'100%', font:'inherit', color:'#F4F4F4', display:'block', opacity: open?1:0.68, transition:'box-shadow .15s' };
+  }
+  tileFavVM(b){
+    const fav=!!this.state.favs[b.id];
+    return { favChar: fav?'★':'☆', favStyle:{ font:'inherit', fontSize:'19px', lineHeight:1, background:'none', border:'none', cursor:'pointer', padding:'2px', color: fav?'#FFFFFF':'rgba(255,255,255,.45)', marginLeft:'auto', flexShrink:0, transition:'color .15s' }, onFav:(e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.toggleFav(b.id); } };
+  }
+  tileGaugeEl(b){
+    const h = React.createElement;
+    const open = b.open;
+    const dev = (b.dev==null)?1:b.dev;
+    const raw = this.genPeak(b,'sa');
+    const data=[];
+    for(let i=0;i<raw.length;i+=4){
+      const chunk = raw.slice(i,i+4);
+      const avg = chunk.reduce((a,p)=>a+p.v,0)/chunk.length;
+      data.push({h:chunk[0].h, v:avg});
+    }
+    const nowIdx = data.findIndex(p=>Math.floor(p.h)===this.NOW_H);
+    const bars = data.map((p,i)=>{
+      const isNow = open && i===nowIdx;
+      const v = isNow ? Math.max(0.05,Math.min(1,p.v*dev)) : p.v;
+      const ghost = isNow ? h('span',{key:'g',style:{position:'absolute',left:0,right:0,bottom:(p.v*100).toFixed(1)+'%',height:0,borderTop:'2px dotted rgba(255,255,255,.6)'}}) : null;
+      return h('div',{key:p.h,style:{flex:1,height:Math.max(4,v*100).toFixed(1)+'%',background:isNow?'#FFFFFF':'rgba(255,255,255,.28)',borderRadius:'2px 2px 0 0',position:'relative'}}, ghost);
+    });
+    return h('div',{style:{display:'flex',alignItems:'flex-end',gap:'3px',height:'34px'}}, bars);
+  }
+
+  genPeak(b, wd){
+    const weekend = wd==='sa'||wd==='so';
+    const peak = b.peakHour + (weekend?0.5:0);
+    const amp = b.pop*(weekend?1:0.82);
+    const sigma = weekend?3.3:2.6;
+    const out=[];
+    for(let h=6;h<=22;h+=0.25){
+      const hr = Math.round(h*100)/100;
+      let v = amp*Math.exp(-((hr-peak)**2)/(2*sigma*sigma));
+      if(hr<8) v*=0.12; if(hr>20) v*=0.22;
+      out.push({h:hr, v});
+    }
+    const max = Math.max(...out.map(o=>o.v), 0.001);
+    out.forEach(o=> o.v = o.v/max);
+    return out;
+  }
+
+  niceMax(v){
+    if(v<=0) return 10;
+    const mag = Math.pow(10, Math.floor(Math.log10(v)));
+    const n = v/mag;
+    const step = n<=1?1:n<=2?2:n<=5?5:10;
+    return step*mag;
+  }
+
+  sparkEl(vals, color){
+    const h = React.createElement;
+    const n = vals.length;
+    const W=100, H=26;
+    const min = Math.min(...vals), max = Math.max(...vals);
+    const span = Math.max(0.001, max-min);
+    const xs=i=>(i/(n-1))*W;
+    const ys=v=>H-2-((v-min)/span)*(H-4);
+    let line='';
+    vals.forEach((v,i)=>{ line += (i?'L':'M')+xs(i).toFixed(2)+' '+ys(v).toFixed(2)+' '; });
+    const area = line+'L'+W+' '+H+' L0 '+H+' Z';
+    return h('svg',{viewBox:'0 0 '+W+' '+H,preserveAspectRatio:'none',width:'100%',height:'26',style:{display:'block',overflow:'visible'}},
+      h('path',{d:area,fill:color,opacity:0.12}),
+      h('path',{d:line,fill:'none',stroke:color,strokeWidth:1.4,strokeLinejoin:'round',strokeLinecap:'round',vectorEffect:'non-scaling-stroke'}));
+  }
+  guestSparkEl(b){
+    const data = this.genPeak(b,'sa');
+    return this.sparkEl(data.map(p=>p.v), b.open?this.INK:'#DEDEDE');
+  }
+  tempSparkEl(b){
+    if(b.temp==null) return null;
+    const vals=[0,1,2,3,4,5,6,7].map(i=>Math.sin((i/7)*Math.PI)*0.6+0.4);
+    return this.sparkEl(vals, this.INK);
+  }
+  weekPoints(b){
+    return [['mo','Mo',0.78],['di','Di',0.76],['mi','Mi',0.8],['do','Do',0.82],['fr','Fr',0.92],['sa','Sa',1.0],['so','So',0.96]].map(([k,l,v])=>({ key:k, label:l, v, isNow:k==='sa' }));
+  }
+  seasonPoints(b, half){
+    const ganzjahr = b.season==='ganzjährig';
+    if(half==='winter'){
+      if(!ganzjahr) return [['Okt',0],['Nov',0],['Dez',0],['Jan',0],['Feb',0],['Mär',0]].map(([l,v])=>({ key:l, label:l, v:0.02, isNow:false }));
+      return [['Okt',0.6],['Nov',0.7],['Dez',0.75],['Jan',0.72],['Feb',0.68],['Mär',0.6]].map(([l,v])=>({ key:l, label:l, v, isNow:false }));
+    }
+    return [['Mai',0.55],['Jun',0.86],['Jul',1.0],['Aug',0.9],['Sep',0.5]].map(([l,v],i)=>({ key:l, label:l, v, isNow:i===2 }));
+  }
+
+  peakChartEl(b, wd, period, zoomed){
+    const h = React.createElement;
+    const open = b.open;
+    const dev = (b.dev==null)?1:b.dev;
+    const dv = this.liveDev(b);
+    const periodColor = { heute:this.PURPLE, woche:this.INK, sommer:this.ORANGE, winter:this.BLACK }[period] || this.INK;
+    const tc = periodColor;
+
+    let points, showNowIdx=-1;
+    if(period==='sommer'||period==='winter'){
+      points = this.seasonPoints(b, period==='winter'?'winter':'sommer');
+      showNowIdx = points.findIndex(p=>p.isNow);
+    } else if(period==='woche'){
+      const data = this.genPeak(b, wd);
+      const step = zoomed?2:4;
+      points = data.map(p=>({ key:p.h, label:(Number.isInteger(p.h)&&p.h%step===0)?(p.h+'h'):'', v:p.v }));
+      showNowIdx = data.findIndex(p=>p.h===this.NOW_H);
+    } else {
+      const data = this.genPeak(b, 'sa');
+      const chartStil = this.getChartRes();
+      if(chartStil==='Stündlich'){
+        const grouped=[];
+        for(let i=0;i<data.length;i+=4){
+          const chunk = data.slice(i,i+4);
+          const avg = chunk.reduce((a,p)=>a+p.v,0)/chunk.length;
+          grouped.push({ h:chunk[0].h, v:avg });
+        }
+        const step = zoomed?1:4;
+        points = grouped.map(p=>({ key:p.h, label:(Number.isInteger(p.h)&&p.h%step===0)?(p.h+'h'):'', v:p.v }));
+        showNowIdx = grouped.findIndex(p=>p.h===this.NOW_H);
+      } else {
+        points = data.map(p=>{
+          const hh = Math.floor(p.h), mm = Math.round((p.h-hh)*60);
+          const lbl = zoomed ? (hh+':'+(mm<10?'0':'')+mm) : ((Number.isInteger(p.h)&&p.h%4===0)?(p.h+'h'):'');
+          return { key:p.h, label:lbl, v:p.v };
+        });
+        showNowIdx = data.findIndex(p=>p.h===this.NOW_H);
+      }
+    }
+    const chartStil = this.getChartRes();
+    const showNow = open && showNowIdx>=0;
+    const n=points.length;
+    const barPx = 64;
+    const W = zoomed ? Math.max(100, n*barPx) : 100, H=34;
+    this._lastChartMeta = { showNowIdx, barPx, n };
+    const gap = n>10?0.35:1.1;
+    const bw = (W/n)-gap;
+    const xs=i=>i*(W/n)+gap/2;
+    const ys=v=>H-2-v*(H-4);
+    const isWoche = period==='woche' || (period==='heute' && chartStil==='Glatt');
+    const seed0 = (b.id||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+    const noise=(i)=>{ const x=Math.sin(seed0+i*12.9898)*43758.5453; return (x-Math.floor(x))-0.5; };
+    const bars = isWoche ? [] : points.map((p,i)=>{
+      const isNow = showNow && i===showNowIdx;
+      const y = ys(p.v);
+      return h('rect',{key:'b'+p.key,x:xs(i),y:y,width:bw,height:Math.max(0.6,(H-2)-y),rx: Math.min(1.4,bw*0.25),fill: isNow ? (open?tc:'#CFCFCC') : (open?tc+'38':'#E9E9E9')});
+    });
+    const extra=[];
+    let gridLines=[], gridLabels=[];
+    const refFrac = showNow ? points[showNowIdx].v*dev : Math.max(...points.map(p=>p.v));
+    const scale = (open && showNow && b.visitors>0) ? (b.visitors/Math.max(0.06,refFrac)) : (b.pop*520);
+    const maxFrac = Math.max(...points.map(p=>p.v*dev), ...points.map(p=>p.v))*1.15;
+    const maxVal = this.niceMax(maxFrac*scale);
+    for(let gi=0; gi<=3; gi++){
+      const frac = gi/3;
+      const gy = ys(frac);
+      gridLines.push(h('line',{key:'g'+gi,x1:0,x2:W,y1:gy,y2:gy,stroke:'#ECECE9',strokeWidth:0.5,vectorEffect:'non-scaling-stroke'}));
+      gridLabels.push(h('div',{key:'l'+gi,style:{position:'absolute',left:0,top:(gy/H*116)+'px',transform:'translateY(-50%)',fontFamily:"'IBM Plex Mono',monospace",fontSize:'9.5px',color:'#ADADA9'}}, this.fmtInt(maxVal*frac)));
+    }
+    if(isWoche){
+      const cx = i=>xs(i)+bw/2;
+      const isToday = wd==='sa';
+      const lastIdx = (showNow && isToday) ? showNowIdx : n-1;
+      let avgLine='', effLine='';
+      points.forEach((p,i)=>{ avgLine += (i?'L':'M')+cx(i).toFixed(2)+' '+ys(p.v).toFixed(2)+' '; });
+      points.forEach((p,i)=>{
+        if(i>lastIdx) return;
+        const v = Math.max(0.03,Math.min(1.18,p.v*dev + noise(i)*0.09*(open?1:0.3)));
+        effLine += (i?'L':'M')+cx(i).toFixed(2)+' '+ys(v).toFixed(2)+' ';
+      });
+      const area = effLine+'L'+cx(lastIdx).toFixed(2)+' '+(H-2)+' L'+cx(0).toFixed(2)+' '+(H-2)+' Z';
+      extra.push(h('path',{key:'area',d:area,fill: open?tc+'22':'#E9E9E9'}));
+      extra.push(h('path',{key:'avg',d:avgLine,fill:'none',stroke:'#B5B5B5',strokeWidth:1.2,strokeDasharray:'2 2',strokeLinejoin:'round',strokeLinecap:'round',vectorEffect:'non-scaling-stroke'}));
+      extra.push(h('path',{key:'eff',d:effLine,fill:'none',stroke: open?tc:'#CFCFCC',strokeWidth:1.6,strokeLinejoin:'round',strokeLinecap:'round',vectorEffect:'non-scaling-stroke'}));
+    } else if(showNow){
+      const gy=ys(points[showNowIdx].v);
+      extra.push(h('rect',{key:'gh',x:xs(showNowIdx),y:gy,width:bw,height:Math.max(0.6,(H-2)-gy),rx:Math.min(1.4,bw*0.25),fill: open?tc+'38':'#E9E9E9'}));
+    }
+    const xLabels = points.map((p,i)=> h('div',{key:p.key,style:{flex: zoomed?('0 0 '+ (W/n) +'px') : 1,textAlign:'center',fontFamily:"'IBM Plex Mono',monospace",fontSize:'9.5px',color:'#ADADA9'}}, p.label));
+    if(zoomed){
+      return h('div',null,
+        h('div',{style:{height:'143px',position:'relative'}},
+          gridLabels,
+          h('div',{style:{marginLeft:'34px',height:'100%',overflowX:'auto',WebkitOverflowScrolling:'touch'}, ref:(el)=>{ this._chartScrollEl = el; }},
+            h('div',{style:{width:W+'px'}},
+              h('div',{style:{height:'116px'}},
+                h('svg',{viewBox:'0 0 '+W+' '+H,preserveAspectRatio:'none',width:'100%',height:'100%',style:{display:'block',overflow:'visible'}},
+                  gridLines,
+                  bars,
+                  extra)),
+              h('div',{style:{display:'flex',gap:'2px',marginTop:'7px'}}, xLabels)))));
+    }
+    return h('div',null,
+      h('div',{style:{height:'116px',position:'relative'}},
+        gridLabels,
+        h('div',{style:{marginLeft:'34px',height:'100%'}},
+          h('svg',{viewBox:'0 0 '+W+' '+H,preserveAspectRatio:'none',width:'100%',height:'100%',style:{display:'block',overflow:'visible'}},
+            gridLines,
+            bars,
+            extra))),
+      h('div',{style:{display:'flex',gap:'2px',marginTop:'7px',marginLeft:'34px'}}, xLabels));
+  }
+
+  NOW_H = 14;
+
+  chartEl(b){
+    const h = React.createElement;
+    const data = this.genPeak(b,'sa');
+    const n = data.length;
+    const open = b.open;
+    const dv = this.liveDev(b);
+    const dev = (b.dev==null)?1:b.dev;
+    const nowIdx = data.findIndex(p=>p.h===this.NOW_H);
+    const labels = h('div',{style:{display:'flex',gap:'2px',marginTop:'6px'}},
+      data.map(p=>h('div',{key:p.h,style:{flex:1,textAlign:'center',fontSize:'9.5px',fontFamily:"'IBM Plex Mono',monospace",color:'#C2C2BF'}}, (Number.isInteger(p.h)&&(p.h-6)%4===0)?(p.h+'h'):'')));
+    const W=100,H=30,padT=3,padB=2.5;
+    const xs=i=>(i/(n-1))*W;
+    const ys=v=>H-padB-v*(H-padT-padB);
+    let line='';
+    data.forEach((p,i)=>{ line += (i?'L':'M')+xs(i).toFixed(2)+' '+ys(p.v).toFixed(2)+' '; });
+    const area = line + 'L'+W+' '+(H-padB)+' L0 '+(H-padB)+' Z';
+    const stroke = open?this.INK:'#DEDEDE';
+    const fill = open?'rgba(23,61,52,0.13)':'#F4F4F4';
+    const extra=[];
+    if(open && nowIdx>=0){
+      const lv=Math.max(0.05,Math.min(1.15,data[nowIdx].v*dev));
+      const cx=xs(nowIdx), cy=ys(lv);
+      extra.push(h('line',{key:'g',x1:cx,y1:cy,x2:cx,y2:H-padB,stroke:dv.barColor,strokeWidth:1,strokeDasharray:'1.5 1.5',vectorEffect:'non-scaling-stroke',opacity:0.7}));
+      extra.push(h('circle',{key:'d',cx:cx,cy:cy,r:2.6,fill:dv.barColor,stroke:'#fff',strokeWidth:1.4,vectorEffect:'non-scaling-stroke'}));
+    }
+    const chart = h('div',{style:{height:'30px',marginTop:'10px'}},
+      h('svg',{viewBox:'0 0 '+W+' '+H,preserveAspectRatio:'none',width:'100%',height:'30',style:{display:'block',overflow:'visible'}},
+        h('path',{d:area,fill:fill}),
+        h('path',{d:line,fill:'none',stroke:stroke,strokeWidth:1.6,strokeLinejoin:'round',strokeLinecap:'round',vectorEffect:'non-scaling-stroke'}),
+        extra));
+    return h('div',null, chart, labels);
+  }
+
+  gaugeEl(b){
+    const h = React.createElement;
+    const open = b.open;
+    const dv = this.liveDev(b);
+    const dev = (b.dev==null)?1:b.dev;
+    const data = this.genPeak(b,'sa');
+    const nowIdx = data.findIndex(p=>p.h===this.NOW_H);
+    const typ = nowIdx>=0 ? data[nowIdx].v : 0;
+    const lv = open ? Math.max(0.03,Math.min(1,typ*dev)) : 0;
+    const color = open ? dv.barColor : '#DEDEDE';
+    return h('div',{style:{position:'relative',height:'12px',borderRadius:'999px',background:'#E9E9E9'}},
+      h('div',{style:{position:'absolute',left:0,top:0,bottom:0,width:(lv*100).toFixed(1)+'%',background:color,borderRadius:'999px',transition:'width .35s ease'}}),
+      open ? h('div',{title:'üblich um diese Zeit',style:{position:'absolute',top:'-3px',bottom:'-3px',left:'calc('+(typ*100).toFixed(1)+'% - 1px)',width:'2px',background:this.META,borderRadius:'1px'}}) : null
+    );
+  }
+
+  favVM(b){
+    const fav=!!this.state.favs[b.id];
+    return { favChar: fav?'★':'☆', favStyle:{ font:'inherit', fontSize:'19px', lineHeight:1, background:'none', border:'none', cursor:'pointer', padding:'2px', color: fav?this.PURPLE:'#CFCFCC', marginLeft:'auto', flexShrink:0, transition:'color .15s' }, onFav:(e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.toggleFav(b.id); } };
+  }
+  favVMOverlay(b){
+    const fav=!!this.state.favs[b.id];
+    return { favChar: fav?'★':'☆', favStyle:{ font:'inherit', fontSize:'20px', lineHeight:1, background:'none', border:'none', borderRadius:'999px', cursor:'pointer', width:'38px', height:'38px', display:'inline-flex', alignItems:'center', justifyContent:'center', color: fav?this.PURPLE:'#8C8C8C', flexShrink:0, transition:'color .15s' }, onFav:(e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.toggleFav(b.id); } };
+  }
+  cardVM(b){
+    const hasTemp = b.temp!=null, open=b.open, f=this.favVM(b);
+    return {
+      key:b.id, name:b.name, typeLabel:this.typeLabel(b.type), note:b.note,
+      tempStr: hasTemp?this.fmt(b.temp):'–', hasTemp, tempColor:this.tempColor(b.temp),
+      statusLabel: open?'offen':'geschlossen', statusColor: open?this.PURPLE:this.META, statusDot: open?this.PURPLE:'#CFCFCC',
+      occWord: open?this.occWord(b.occ):'—', occWordColor: open?this.occWordColor(b.occ):'#CFCFCC', occSegs: this.occSegs(open?b.occ:-1),
+      guestStr: (open && b.visitors>0) ? this.fmtInt(b.visitors) : '—', guestColor: (open && b.visitors>0) ? this.INK : '#CFCFCC',
+      hoursStr: open ? b.hours : 'geschlossen', chartEl: this.chartEl(b), gaugeEl: this.gaugeEl(b),
+      isDetailed: (this.props.kartenVariante||'Kompakt')==='Übersicht', isCompact: (this.props.kartenVariante||'Kompakt')==='Kompakt',
+      open, devShort: this.liveDev(b).short, devColor: this.liveDev(b).color, devArrow: this.liveDev(b).arrow,
+      nowLabel: open ? 'jetzt 14 Uhr' : '',
+      cardStyle: this.cardStyle(open),
+      favChar:f.favChar, favStyle:f.favStyle, onFav:f.onFav,
+      tileBg: this.tileColor(b), tileCardStyle: this.tileCardStyle(this.tileColor(b), open),
+      tileFavChar: this.tileFavVM(b).favChar, tileFavStyle: this.tileFavVM(b).favStyle, tileGaugeEl: this.tileGaugeEl(b),
+      onOpen: ()=>{ this.setState({screen:'detail', currentId:b.id, weekday:'sa', period:'heute', hoursOpen:false, tempOpen:false, guestOpen:false}); try{window.scrollTo(0,0);}catch(e){} },
+    };
+  }
+
+  detailVM(b){
+    if(!b) return null;
+    const hasTemp = b.temp!=null, open=b.open, wd=this.state.weekday;
+    const dayNames={mo:'Montag',di:'Dienstag',mi:'Mittwoch',do:'Donnerstag',fr:'Freitag',sa:'Samstag',so:'Sonntag'};
+    const maxH=104;
+    const dv=this.liveDev(b);
+    const dev=(b.dev==null)?1:b.dev;
+    const peakBars = this.genPeak(b,wd).map(p=>{
+      const isNow = wd==='sa' && p.h===14 && open;
+      const tv=p.v;
+      let h, ghost;
+      if(isNow){
+        const lv=Math.max(0.05, Math.min(1.15, tv*dev));
+        h=Math.max(4, Math.round(lv*maxH));
+        const gh=Math.max(4, Math.round(tv*maxH));
+        ghost={ display:'block', position:'absolute', left:0, right:0, bottom:gh+'px', height:0, borderTop:'2px dotted '+this.META, zIndex:2, pointerEvents:'none' };
+      } else {
+        h=Math.max(4, Math.round(tv*maxH));
+        ghost={ display:'none' };
+      }
+      return {
+        key:p.h,
+        wrapStyle:{ flex:1, position:'relative', display:'flex', alignItems:'flex-end', height:'100%' },
+        ghostStyle: ghost,
+        style:{ width:'100%', height: h+'px', background: isNow?dv.barColor:'#E9E9E9', borderRadius:'3px 3px 0 0', transition:'height .3s ease' },
+        hourLabel: (p.h%3===0)?(''+p.h):'',
+      };
+    });
+    const weekend = wd==='sa'||wd==='so', f=this.favVMOverlay(b);
+    const period = this.state.period;
+    const hoursOpen = this.state.hoursOpen;
+    const dayOrder=[['mo','Montag'],['di','Dienstag'],['mi','Mittwoch'],['do','Donnerstag'],['fr','Freitag'],['sa','Samstag'],['so','Sonntag']];
+    const todayKey='sa';
+    return {
+      favChar:f.favChar, favStyle:f.favStyle, onFav:f.onFav,
+      name:b.name, typeLabel:this.typeLabel(b.type), note:b.note, address:b.address,
+      tempStr: hasTemp?this.fmt(b.temp):'–', hasTemp, tempColor: hasTemp ? '#000000' : this.META,
+      tempCursor: hasTemp ? 'pointer' : 'default',
+      tempOpen: this.state.tempOpen, toggleTemp: hasTemp ? this.toggleStat('temp') : (()=>{}),
+      tempChevron: this.state.tempOpen?'▴':'▾',
+      tempWeekList: hasTemp ? dayOrder.map(([k,l],i)=>{
+        const offsets=[-0.6,-0.3,0.1,0.4,0.6,0.4,0];
+        const val = Math.round((b.temp+offsets[i])*10)/10;
+        return { key:k, label:l,
+          temp: this.fmt(val)+'°',
+          rowStyle: { display:'flex', alignItems:'center', minHeight:'22px', lineHeight:'1.3', justifyContent:'space-between', gap:'10px', fontFamily:"'IBM Plex Mono',monospace", fontSize:'12px', borderRadius:'8px', padding:'5px 9px', margin:'0 -9px', background: k===todayKey ? this.hoursAccentColor(b.type) : 'transparent' },
+          labelStyle:{ color: k===todayKey?'#FFFFFF':'#8C8C8C', fontWeight: k===todayKey?700:500 },
+          hoursStyle:{ color: k===todayKey?'#FFFFFF':'#173D34', fontWeight: 600 },
+        };
+      }) : [],
+      guestSparkEl: this.guestSparkEl(b), tempSparkEl: this.tempSparkEl(b),
+      guestOpen: this.state.guestOpen, toggleGuest: this.toggleStat('guest'),
+      guestCardRef: (el)=>{ this._guestCardEl = el; },
+      guestWeekList: dayOrder.map(([k,l],i)=>{
+        const mult=[0.78,0.76,0.8,0.82,0.92,1.0,0.96][i];
+        const total = Math.round(b.pop*4200*mult);
+        return { key:k, label:l,
+          guests: this.fmtInt(total),
+          rowStyle: { display:'flex', alignItems:'center', minHeight:'22px', lineHeight:'1.3', justifyContent:'space-between', gap:'10px', fontFamily:"'IBM Plex Mono',monospace", fontSize:'12px', borderRadius:'8px', padding:'5px 9px', margin:'0 -9px', background: k===todayKey ? this.hoursAccentColor(b.type) : 'transparent' },
+          labelStyle:{ color: k===todayKey?'#FFFFFF':'#8C8C8C', fontWeight: k===todayKey?700:500 },
+          hoursStyle:{ color: k===todayKey?'#FFFFFF':'#173D34', fontWeight: 600 },
+        };
+      }),
+      statBg: '#F4F4F4', statLabelColor: '#8C8C8C',
+      statusLabel: open?'offen':'geschlossen', statusColor: this.META, statusDot: open?'#173D34':'#CFCFCC',
+      occLabel: open?this.occWord(b.occ):'—', occSegs: this.occSegs(open?b.occ:-1),
+      visitorsStr: open?this.fmtInt(b.visitors):'', hasVisitors: open && b.visitors>0, updated:'14:18',
+      guestStr: (open && b.visitors>0) ? this.fmtInt(b.visitors) : '—', guestSub: open ? this.occWord(b.occ) : 'geschlossen', guestColor: (open && b.visitors>0) ? '#000000' : '#CFCFCC',
+      hoursToday: open?b.hours:'heute geschlossen', season:b.season,
+      open, devArrow:dv.arrow, devLong:dv.long, devColor:dv.color, devBar:dv.barColor, showLive: open && wd==='sa', showDev: open && period!=='saison',
+      lastMeasured: hasTemp ? (open?'Gemessen heute 13:30':'Letzte Messung 11:00') : 'Keine aktuelle Messung',
+      hoursOpen, toggleHours: this.toggleStat('hours'),
+      tempCardRef: (el)=>{ this._tempCardEl = el; }, hoursCardRef: (el)=>{ this._hoursCardEl = el; },
+      hoursChevron: hoursOpen?'▴':'▾',
+      hoursCardBg: '#F4F4F4',
+      hoursCardBorder: hoursOpen ? '#E2E2E0' : 'transparent',
+      hoursWeekList: dayOrder.map(([k,l])=>({
+        key:k, label:l, hours: b.hours, isToday: k===todayKey,
+        rowStyle: { display:'flex', alignItems:'center', minHeight:'22px', lineHeight:'1.3', justifyContent:'space-between', gap:'10px', fontFamily:"'IBM Plex Mono',monospace", fontSize:'12px', borderRadius:'8px', padding:'5px 9px', margin:'0 -9px', background: k===todayKey ? this.hoursAccentColor(b.type) : 'transparent' },
+        labelStyle:{ color: k===todayKey?'#FFFFFF':'#8C8C8C', fontWeight: k===todayKey?700:500 },
+        hoursStyle:{ color: k===todayKey?'#FFFFFF':'#173D34', fontWeight: 600 },
+      })),
+      periodTabs: [['heute','Hüt',this.PURPLE,null],['woche','Die Wuche',this.INK,null],['sommer','Summer',this.ORANGE,'☀'],].concat(b.season==='ganzjährig'?[['winter','Winter',this.BLACK,'❄']]:[]).map(([k,l,c,icon])=>({ key:k, label: (icon && this.isMobileViewport()) ? icon : l, onClick:()=>this.setState({period:k}), style:this.periodTabStyle(period===k, c) })),
+      showWeekdayTabs: period==='woche',
+      wdRowRef: this._wdRowRef,
+      weekdayTabs: [['mo','Mäntig','Mä'],['di','Zistig','Zi'],['mi','Mittwuch','Mi'],['do','Dunstig','Du'],['fr','Friitg','Fr'],['sa','Samstig','Sa'],['so','Suntig','So']].map(([k,l,s])=>({ key:k, label:this.state.narrow?s:l, onClick:()=>this.setState({weekday:k}), style:this.wdStyle(wd===k, this.TYPE_COLOR[b.type]) })),
+      showResTabs: period==='heute',
+      zoomActive: this.state.chartZoomed, toggleChartZoom: ()=>this.setState(s=>({chartZoomed:!s.chartZoomed}), ()=>{ if(this.state.chartZoomed) this.scrollChartToNow(); }), zoomBtnStyle: this.wdSegStyle(this.state.chartZoomed, this.TYPE_COLOR[b.type]),
+      resTabs: [['Fein (15-Min)','15 Min'],['Stündlich','Std']].map(([k,l])=>({ key:k, label:l, onClick:()=>this.setState({chartRes:k}), style:this.wdSegStyle(this.getChartRes()===k, this.TYPE_COLOR[b.type]||this.INK) })),
+      peakBars, peakChartEl: this.peakChartEl(b, wd, period, this.state.chartZoomed),
+      peakNowLabel: (period==='sommer'||period==='winter') ? 'Saisonprofil' : period==='woche' ? (dayNames[wd] + ' · jetzt 14 Uhr') : 'Samstag · jetzt 14 Uhr',
+      peakCaption: weekend?'Wochenende – am Nachmittag am vollsten':'Werktags – ruhiger am Vormittag',
+      mapsGoogle: 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(b.name+' Zürich'),
+      mapsApple: 'https://maps.apple.com/?q='+encodeURIComponent(b.name+' Zürich'),
+    };
+  }
+
+  renderVals(){
+    const S=this.state, list=this.list();
+    const counts={alle:list.length, fluss:0, see:0, frei:0, halle:0};
+    list.forEach(b=>counts[b.type]++);
+    const favCount=list.filter(b=>S.favs[b.id]).length;
+    let filtered;
+    if(S.filter==='fav') filtered=list.filter(b=>S.favs[b.id]);
+    else if(S.filter==='alle') filtered=list;
+    else filtered=list.filter(b=>b.type===S.filter);
+    const cmp = {
+      warm:(a,b)=>(b.temp??-99)-(a.temp??-99),
+      ruhig:(a,b)=>((a.open?0:1)-(b.open?0:1)) || (a.occ-b.occ) || ((b.temp??-99)-(a.temp??-99)),
+      nah:(a,b)=>a.dist-b.dist,
+    }[S.sort];
+    filtered=[...filtered].sort(cmp);
+    const sortTabs=[['ruhig','Ruhigste'],['warm','Wärmste']].map(([k,l])=>({ key:k, label:l, onClick:()=>this.setState({sort:k}), style:this.tabStyle(S.sort===k) }));
+    const typeChips=[['alle','Alli'],['fluss','Fluss'],['see','See'],['frei','Frei'],['halle','Halle']].map(([k,l])=>({ key:k, label:l, count:counts[k], onClick:()=>this.setState({filter:k}), style:this.chipStyle(S.filter===k, k==='alle'?this.META:this.TYPE_COLOR[k]) }));
+    typeChips.unshift({ key:'fav', label:'★ Favorit', count:favCount, onClick:()=>this.setState({filter:'fav'}), style:this.chipStyle(S.filter==='fav', this.PURPLE) });
+    const totalVisitors = this.fmtInt(list.filter(b=>b.open).reduce((a,b)=>a+b.visitors,0));
+    const openCount = list.filter(b=>b.open).length;
+    return {
+      isHome:S.screen==='home', isDetail:S.screen==='detail',
+      todayLabel:'Samstig, 13. Juni', nowLabel:'14:20', updated:'14:18',
+      air:'26°', weatherWord:'sonnig', wind:'12', windDir:'NW', lakeTemp:'22,8°',
+      totalVisitors, openCount, totalCount: list.length,
+      sortTabs, typeChips,
+      resultCount:`${filtered.length} Badi${filtered.length===1?'':'s'} · ${filtered.filter(b=>b.open).length} von ${filtered.length} offen`,
+      badis: filtered.map(b=>this.cardVM(b)),
+      hasResults: filtered.length>0,
+      isEmpty: filtered.length===0,
+      emptyTitle: S.filter==='fav'?'Noch keine Favoriten':'Nichts gefunden',
+      emptyMsg: S.filter==='fav'?'Tippe den Stern auf einer Badi, um sie hier zu sammeln.':'Probier eine andere Sortierung oder einen anderen Filter.',
+      current: S.screen==='detail' ? this.detailVM(list.find(b=>b.id===S.currentId)) : null,
+      goBack: ()=>this.setState({screen:'home'}),
+      stop: (e)=>{ if(e&&e.stopPropagation) e.stopPropagation(); },
+    };
+  }
+}
+
+</script>
+</body>
+</html>

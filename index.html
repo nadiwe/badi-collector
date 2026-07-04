@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wasserziit — Zürich Badi Finder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:#E4E2E0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#173D34;}
+button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+a{text-decoration:none;color:inherit;}
+::selection{background:#6E3BF2;color:#fff;}
+@keyframes livepulse{0%,100%{opacity:1;}50%{opacity:.25;}}
+.pulse{animation:livepulse 2s ease-in-out infinite;}
+.card{transition:box-shadow .15s;}
+.card:hover{box-shadow:0 4px 22px rgba(23,61,52,.14)!important;}
+.tile-card{transition:box-shadow .15s;}
+.tile-card:hover{box-shadow:0 4px 22px rgba(23,61,52,.22)!important;}
+.chip{transition:all .12s;}
+.modal-scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);z-index:50;display:flex;align-items:center;justify-content:center;padding:clamp(0px,2vw,16px);overflow-y:auto;}
+.modal-sheet{background:#fff;border-radius:clamp(16px,4vw,28px);padding:clamp(16px,4vw,24px);box-shadow:0 4px 22px rgba(23,61,52,.12);width:100%;max-width:740px;display:flex;flex-direction:column;gap:0;max-height:calc(100dvh - 32px);overflow-y:auto;}
+.stat-card{flex:1;min-width:150px;padding:clamp(14px,3.5vw,20px) clamp(14px,3.5vw,22px);background:#F4F4F4;border-radius:20px;cursor:pointer;display:flex;flex-direction:column;transition:background .18s;}
+.stat-card:hover{background:#ECECEC;}
+.chart-scroll::-webkit-scrollbar{display:none;}
+.chart-scroll{scrollbar-width:none;}
+</style>
+</head>
+<body>
+<div id="app" style="min-height:100vh;background:#E4E2E0;padding:clamp(16px,3.5vw,40px);"></div>
+
+<script>
+// ── Design tokens ──────────────────────────────────────────────────────────
+const INK    = '#173D34';
+const PURPLE = '#6E3BF2';
+const ORANGE = '#F47B43';
+const BLACK  = '#000000';
+const META   = '#8C8C8C';
+
+const TYPE_COLOR = { fluss: PURPLE, see: INK, frei: ORANGE, halle: BLACK };
+const TYPE_LABEL = { fluss: 'Flussbad', see: 'Seebad', frei: 'Freibad', halle: 'Hallenbad' };
+
+// ── Venue metadata ─────────────────────────────────────────────────────────
+const VENUES = [
+  { uid:'BADI-1',   name:'Seebad Enge',                       type:'see',   tempUid:'seb6943', address:'Mythenquai 9, 8002 Zürich',              hours:'07:00–21:00', season:'Mai–Sep'   },
+  { uid:'SSD-10',   name:'Seebad Utoquai',                    type:'see',   tempUid:'seb6945', address:'Utoquai 50, 8008 Zürich',                hours:'07:00–21:00', season:'Mai–Sep'   },
+  { uid:'seb6946',  name:'Strandbad Mythenquai',              type:'see',   tempUid:'seb6946', address:'Mythenquai 95, 8002 Zürich',             hours:'09:00–20:00', season:'Mai–Sep'   },
+  { uid:'seb6947',  name:'Strandbad Tiefenbrunnen',           type:'see',   tempUid:'seb6947', address:'Bellerivestrasse 201, 8008 Zürich',      hours:'09:00–20:00', season:'Mai–Sep'   },
+  { uid:'seb6948',  name:'Strandbad Wollishofen',             type:'see',   tempUid:'seb6948', address:'Mythenquai 559, 8038 Zürich',            hours:'09:00–20:00', season:'Mai–Sep'   },
+  { uid:'flb6939',  name:'Flussbad Oberer Letten',            type:'fluss', tempUid:'flb6939', address:'Lettensteg 10, 8037 Zürich',             hours:'07:00–20:00', season:'Mai–Sep'   },
+  { uid:'flb6940',  name:'Flussbad Unterer Letten',           type:'fluss', tempUid:'flb6940', address:'Wasserwerkstrasse 141, 8037 Zürich',     hours:'07:00–20:00', season:'Mai–Sep'   },
+  { uid:'flb8803',  name:'Flussbad Unterer Letten (Flussteil)',type:'fluss',tempUid:'flb8803', address:'Wasserwerkstrasse 141, 8037 Zürich',     hours:'07:00–20:00', season:'Mai–Sep', note:'Flussteil' },
+  { uid:'flb6941',  name:'Frauenbad Stadthausquai',           type:'fluss', tempUid:'flb6941', address:'Stadthausquai 12, 8001 Zürich',          hours:'07:00–20:00', season:'Mai–Sep', note:'Nur Frauen' },
+  { uid:'LETZI-1',  name:'Freibad Letzigraben',               type:'frei',  tempUid:'fb002',   address:'Edelweissstrasse 5, 8048 Zürich',        hours:'09:00–21:30', season:'Mai–Sep', note:'Max-Frisch-Bad' },
+  { uid:'fb006',    name:'Freibad Allenmoos',                 type:'frei',  tempUid:'fb006',   address:'Ria-Schwarzwald-Weg 1, 8057 Zürich',     hours:'09:00–20:00', season:'Mai–Sep'   },
+  { uid:'fb008',    name:'Freibad Auhof',                     type:'frei',  tempUid:'fb008',   address:'Glaubtenstrasse 67, 8046 Zürich',        hours:'09:00–20:00', season:'Mai–Sep'   },
+  { uid:'fb012',    name:'Freibad Heuried',                   type:'frei',  tempUid:'fb012',   address:'Döltschiweg 130, 8055 Zürich',           hours:'09:00–20:00', season:'Mai–Sep'   },
+  { uid:'SSD-11',   name:'Freibad Seebach',                   type:'frei',  tempUid:'fb013',   address:'Hertensteinstrasse 119, 8052 Zürich',    hours:'09:00–20:00', season:'Mai–Sep'   },
+  { uid:'fb018',    name:'Freibad Zwischen den Hölzern',      type:'frei',  tempUid:'fb018',   address:'Goldbrunnenstrasse 119, 8055 Zürich',    hours:'09:00–20:00', season:'Mai–Sep'   },
+  { uid:'SSD-8',    name:'Josel-Areal',                       type:'frei',  tempUid:null,      address:'Zürich',                                 hours:'09:00–20:00', season:'Mai–Sep'   },
+  { uid:'SSD-2',    name:'Hallenbad Bläsi',                   type:'halle', tempUid:null,      address:'Hofwiesenstrasse 280, 8057 Zürich',      hours:'07:00–21:30', season:'Ganzjährig'},
+  { uid:'SSD-3',    name:'Hallenbad Bungertwies',             type:'halle', tempUid:null,      address:'Kronenstrasse 18, 8006 Zürich',          hours:'07:00–21:30', season:'Ganzjährig'},
+  { uid:'SSD-4',    name:'Hallenbad City',                    type:'halle', tempUid:null,      address:'Sihlstrasse 71, 8001 Zürich',            hours:'06:30–21:00', season:'Ganzjährig'},
+  { uid:'SSD-6',    name:'Hallenbad Leimbach',                type:'halle', tempUid:null,      address:'Leimbachstrasse 200, 8041 Zürich',       hours:'07:00–21:30', season:'Ganzjährig'},
+  { uid:'SSD-7',    name:'Hallenbad Oerlikon',                type:'halle', tempUid:null,      address:'Wallisellenstrasse 100, 8050 Zürich',    hours:'07:00–21:00', season:'Ganzjährig'},
+  { uid:'SSD-5',    name:'Wärmebad Käferberg',                type:'halle', tempUid:null,      address:'Emil-Klöti-Strasse 21, 8037 Zürich',     hours:'08:00–20:00', season:'Ganzjährig'},
+];
+
+const VENUE_MAP = Object.fromEntries(VENUES.map(v => [v.uid, v]));
+
+// ── State ──────────────────────────────────────────────────────────────────
+let S = {
+  filter: 'alle',
+  sort: 'ruhig',
+  currentUid: null,
+  favs: {},
+  period: 'heute',
+  weekday: todayWd(),
+  guestOpen: false,
+  tempOpen: false,
+  hoursOpen: false,
+  chartZoomed: false,
+};
+
+// ── Data ───────────────────────────────────────────────────────────────────
+let AW = {};     // uid → {slots:{Werktag:[],Wochenende:[],Feiertag:[]}, messtage_echt, ...}
+let LIVE = null; // {timestamp, venues:{uid:{currentfill,freespace,maxspace,temperatureWater,openClosed}}}
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function todayWd() {
+  const d = new Date().getDay(); // 0=Sun
+  return ['so','mo','di','mi','do','fr','sa'][d];
+}
+
+function isWeekend(wd) { return wd === 'sa' || wd === 'so'; }
+
+function dayTypeFor(wd) { return isWeekend(wd) ? 'Wochenende' : 'Werktag'; }
+
+function numFmt(n) {
+  if (n == null || n < 0) return '–';
+  return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "’");
+}
+
+function nowHHMM() {
+  const d = new Date();
+  return d.getHours() * 60 + d.getMinutes();
+}
+
+function hhmm(s) { // "08:30" → minutes
+  const [h, m] = s.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function slotsFor(uid, dayType) {
+  const b = AW[uid];
+  if (!b) return [];
+  return (b.slots[dayType] || []).filter(s => s.auslastung != null);
+}
+
+function nearestSlot(slots, nowMin) {
+  if (!slots.length) return null;
+  return slots.reduce((best, s) => {
+    const d = Math.abs(hhmm(s.zeit) - nowMin);
+    const bd = Math.abs(hhmm(best.zeit) - nowMin);
+    return d < bd ? s : best;
+  });
+}
+
+function computeDev(uid) {
+  const live = LIVE?.venues?.[uid];
+  if (!live || live.currentfill == null || !live.maxspace) return null;
+  const dayType = dayTypeFor(S.weekday);
+  const slots = slotsFor(uid, dayType);
+  if (!slots.length) return null;
+  const slot = nearestSlot(slots, nowHHMM());
+  if (!slot || !slot.auslastung) return null;
+  const typical = slot.auslastung;
+  const current = (live.currentfill / live.maxspace) * 100;
+  return current / typical;
+}
+
+function devInfo(uid) {
+  const live = LIVE?.venues?.[uid];
+  const isOpen = live?.openClosed === 'offen';
+  if (!isOpen) return { arrow:'', short:'geschlossen', color: META, barColor:'#DEDEDE' };
+  const dev = computeDev(uid);
+  if (dev == null) return { arrow:'≈', short:'etwa wie sonst', color: META, barColor: META };
+  const pct = Math.round(Math.abs(dev - 1) * 100);
+  if (dev >= 1.10) return { arrow:'▲', short: pct + '% voller als sonst', color: ORANGE, barColor: ORANGE };
+  if (dev <= 0.90) return { arrow:'▼', short: pct + '% ruhiger als sonst', color: INK,    barColor: INK    };
+  return { arrow:'≈', short:'etwa wie sonst', color: META, barColor: META };
+}
+
+function occPct(uid) {
+  const live = LIVE?.venues?.[uid];
+  if (!live || live.currentfill == null || !live.maxspace) return Infinity;
+  return live.currentfill / live.maxspace;
+}
+
+function maxTemp(uid) {
+  const v = VENUE_MAP[uid];
+  const live = LIVE?.venues?.[uid];
+  const t = live?.temperatureWater;
+  return (t && !isNaN(parseFloat(t))) ? parseFloat(t) : -Infinity;
+}
+
+// ── SVG chart helpers ──────────────────────────────────────────────────────
+function sparklineSVG(uid, open) {
+  const dayType = dayTypeFor(todayWd());
+  const slots = slotsFor(uid, dayType);
+  if (!slots.length) return '';
+  const vals = slots.map(s => s.auslastung);
+  const max = Math.max(...vals, 0.001);
+  const norm = vals.map(v => v / max);
+  const nowMin = nowHHMM();
+  const nowIdx = slots.reduce((bi, s, i) => {
+    return Math.abs(hhmm(s.zeit) - nowMin) < Math.abs(hhmm(slots[bi].zeit) - nowMin) ? i : bi;
+  }, 0);
+  const color = open ? (TYPE_COLOR[VENUE_MAP[uid]?.type] || INK) : '#DEDEDE';
+  const n = norm.length;
+  const W = 100, H = 30, padB = 2;
+  const xs = i => (n > 1 ? (i / (n - 1)) * W : W / 2);
+  const ys = v => H - padB - Math.max(0.05, v) * (H - 4);
+  let line = '';
+  norm.forEach((v, i) => { line += (i ? 'L' : 'M') + xs(i).toFixed(1) + ' ' + ys(v).toFixed(1) + ' '; });
+  const area = line + 'L' + W + ' ' + H + ' L0 ' + H + ' Z';
+  const dot = open && nowIdx >= 0 ? `<circle cx="${xs(nowIdx).toFixed(1)}" cy="${ys(norm[nowIdx]).toFixed(1)}" r="2.5" fill="${color}" stroke="#fff" stroke-width="1.4" vector-effect="non-scaling-stroke"/>` : '';
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="100%" height="30" style="display:block;overflow:visible">
+    <path d="${area}" fill="${color}" opacity="0.12"/>
+    <path d="${line.trim()}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+    ${dot}
+  </svg>`;
+}
+
+function detailBarChart(uid, dayType, periodColor) {
+  const slots = slotsFor(uid, dayType);
+  if (!slots.length) return '<div style="height:116px;display:flex;align-items:center;justify-content:center;color:#8C8C8C;font-family:\'IBM Plex Mono\',monospace;font-size:11px;">Noch keine Daten</div>';
+  const vals = slots.map(s => s.auslastung);
+  const max = Math.max(...vals, 0.001);
+  const norm = vals.map(v => v / max);
+  const nowMin = nowHHMM();
+  const nowIdx = dayType === dayTypeFor(todayWd()) ? slots.reduce((bi, s, i) =>
+    Math.abs(hhmm(s.zeit) - nowMin) < Math.abs(hhmm(slots[bi].zeit) - nowMin) ? i : bi, 0) : -1;
+  const n = norm.length;
+  const W = 100, H = 34, gap = n > 12 ? 0.3 : 0.8;
+  const bw = (W / n) - gap;
+  const xs = i => i * (W / n) + gap / 2;
+  const ys = v => H - 2 - Math.max(0.04, v) * (H - 4);
+
+  // Grid lines
+  const gridLines = [0, 0.33, 0.67, 1].map(f => {
+    const gy = ys(f);
+    return `<line x1="0" x2="${W}" y1="${gy.toFixed(1)}" y2="${gy.toFixed(1)}" stroke="#ECECE9" stroke-width="0.5" vector-effect="non-scaling-stroke"/>`;
+  }).join('');
+
+  const bars = norm.map((v, i) => {
+    const isNow = i === nowIdx;
+    const y = ys(v);
+    const fill = isNow ? periodColor : periodColor + '38';
+    return `<rect x="${xs(i).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.6, (H - 2) - y).toFixed(1)}" rx="${Math.min(1.4, bw * 0.25).toFixed(1)}" fill="${fill}"/>`;
+  }).join('');
+
+  // x-axis labels (show every ~4 labels max)
+  const step = Math.max(1, Math.ceil(n / 6));
+  const labels = slots.map((s, i) => {
+    const show = i % step === 0 || i === n - 1;
+    return `<div style="flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#ADADA9;overflow:hidden;">${show ? s.zeit : ''}</div>`;
+  }).join('');
+
+  return `
+    <div style="position:relative;height:116px;">
+      <div style="height:100%;margin-left:0;">
+        <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="100%" height="100%" style="display:block;overflow:visible">
+          ${gridLines}${bars}
+        </svg>
+      </div>
+    </div>
+    <div style="display:flex;gap:2px;margin-top:7px;">${labels}</div>`;
+}
+
+// ── Filter / sort helpers ─────────────────────────────────────────────────
+function filteredVenues() {
+  let list = VENUES.slice();
+  if (S.filter === 'fav') list = list.filter(v => S.favs[v.uid]);
+  else if (S.filter !== 'alle') list = list.filter(v => v.type === S.filter);
+
+  if (S.sort === 'ruhig') {
+    list.sort((a, b) => occPct(a.uid) - occPct(b.uid));
+  } else {
+    list.sort((a, b) => maxTemp(b.uid) - maxTemp(a.uid));
+  }
+  return list;
+}
+
+function chipCounts() {
+  const counts = { alle: VENUES.length, fluss: 0, see: 0, frei: 0, halle: 0, fav: 0 };
+  VENUES.forEach(v => {
+    counts[v.type]++;
+    if (S.favs[v.uid]) counts.fav++;
+  });
+  return counts;
+}
+
+// ── Render: chips ─────────────────────────────────────────────────────────
+function renderChips() {
+  const counts = chipCounts();
+  const chips = [
+    { key:'fav',   label:'★ Favorit', color: PURPLE },
+    { key:'alle',  label:'Alli',      color: INK    },
+    { key:'fluss', label:'Fluss',     color: PURPLE },
+    { key:'see',   label:'See',       color: INK    },
+    { key:'frei',  label:'Frei',      color: ORANGE },
+    { key:'halle', label:'Halle',     color: BLACK  },
+  ];
+  return chips.map(c => {
+    const active = S.filter === c.key;
+    const bg = active ? c.color : 'transparent';
+    const col = active ? '#fff' : c.color;
+    return `<button class="chip" onclick="setFilter('${c.key}')"
+      style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;letter-spacing:.03em;padding:7px 15px;border-radius:999px;border:1.5px solid ${c.color};background:${bg};color:${col};display:inline-flex;align-items:center;gap:6px;white-space:nowrap;">
+      ${c.label}<span style="opacity:.6;">${counts[c.key]}</span>
+    </button>`;
+  }).join('');
+}
+
+function renderSortTabs() {
+  return ['ruhig','warm'].map(s => {
+    const active = S.sort === s;
+    const label = s === 'ruhig' ? 'Ruhigste' : 'Wärmste';
+    return `<button class="chip" onclick="setSort('${s}')"
+      style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;letter-spacing:.02em;padding:7px 15px;border-radius:999px;border:1.5px solid ${INK};background:${active ? INK : 'transparent'};color:${active ? '#fff' : INK};white-space:nowrap;">
+      ${label}
+    </button>`;
+  }).join('');
+}
+
+// ── Render: Übersicht card ────────────────────────────────────────────────
+function renderCard(v) {
+  const live = LIVE?.venues?.[v.uid];
+  const isOpen = live?.openClosed === 'offen';
+  const noLive = !live;
+  const fill = live?.currentfill;
+  const maxspace = live?.maxspace;
+  const temp = live?.temperatureWater;
+  const hasTemp = temp != null && temp !== '';
+  const guestStr = fill != null ? numFmt(fill) : '–';
+  const guestColor = isOpen ? INK : META;
+  const statusColor = isOpen ? '#2A9D63' : META;
+  const statusDot = isOpen ? '#2A9D63' : '#CFCFCC';
+  const statusLabel = isOpen ? 'offen' : (noLive ? '–' : 'geschlossen');
+  const tempStr = hasTemp ? temp + '°' : '–';
+  const dev = devInfo(v.uid);
+  const fav = !!S.favs[v.uid];
+  const bg = isOpen ? '#F4F4F4' : '#F7F7F6';
+  const opacity = isOpen ? 1 : 0.62;
+  const sparkline = sparklineSVG(v.uid, isOpen);
+  const typeAccent = TYPE_COLOR[v.type];
+
+  return `<div class="card" onclick="openDetail('${v.uid}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')openDetail('${v.uid}')"
+    style="text-align:left;background:${bg};border:none;border-radius:22px;padding:16px 17px;cursor:pointer;width:100%;font:inherit;color:${INK};display:block;opacity:${opacity};box-shadow:0 2px 12px rgba(23,61,52,.06);">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;">
+      <div style="min-width:0;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:${META};font-weight:600;">${TYPE_LABEL[v.type]}</span>
+          ${v.note ? `<span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:${META};">· ${v.note}</span>` : ''}
+        </div>
+        <div style="font-family:'Outfit',sans-serif;font-size:19px;font-weight:600;letter-spacing:-.01em;margin-top:8px;line-height:1.15;color:${INK};">${v.name}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:${guestColor};font-size:44px;">${guestStr}</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:${META};margin-top:9px;font-weight:600;">Gäste jetzt</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;">
+      <span style="display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;color:${statusColor};">
+        <i class="${isOpen ? 'pulse' : ''}" style="width:7px;height:7px;border-radius:50%;background:${statusDot};display:inline-block;flex-shrink:0;"></i>${statusLabel}
+      </span>
+      <div style="display:flex;align-items:center;gap:11px;flex-shrink:0;">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:${hasTemp ? INK : META};">${tempStr}</span>
+        <button onclick="event.stopPropagation();toggleFav('${v.uid}')" aria-label="Favorit"
+          style="font-size:19px;line-height:1;background:none;border:none;cursor:pointer;padding:2px;color:${fav ? PURPLE : '#CFCFCC'};transition:color .15s;">${fav ? '★' : '☆'}</button>
+      </div>
+    </div>
+    <div style="margin-top:15px;padding-top:13px;border-top:1px solid #DEDEDE;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:${META};font-weight:700;white-space:nowrap;">Auslastung heute</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${statusColor};white-space:nowrap;flex-shrink:0;">${v.hours}</span>
+      </div>
+      <div style="margin-top:8px;">${sparkline || '<div style="height:30px;background:#F0F0EE;border-radius:4px;"></div>'}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px;">
+        <span style="display:inline-flex;align-items:center;gap:5px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:${dev.color};">
+          <span style="font-size:9px;line-height:1;">${dev.arrow}</span>${dev.short}
+        </span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:500;color:${META};">
+          ${isOpen ? `<span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:10px;border-top:2px dotted #B5B5B5;display:inline-block;"></span>üblich</span>` : ''}
+        </span>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Render: detail modal ──────────────────────────────────────────────────
+function renderDetail() {
+  const v = VENUE_MAP[S.currentUid];
+  if (!v) return '';
+  const live = LIVE?.venues?.[v.uid];
+  const isOpen = live?.openClosed === 'offen';
+  const fill = live?.currentfill;
+  const temp = live?.temperatureWater;
+  const hasTemp = temp != null && temp !== '';
+  const fav = !!S.favs[v.uid];
+  const typeColor = TYPE_COLOR[v.type];
+  const statusColor = isOpen ? '#2A9D63' : META;
+  const statusDot = isOpen ? '#2A9D63' : '#CFCFCC';
+  const guestColor = isOpen ? INK : META;
+
+  // Period tabs
+  const periods = [
+    { key:'heute', label:'Hüt',       color: PURPLE },
+    { key:'woche', label:'Die Wuche', color: INK    },
+  ];
+  const periodTabs = periods.map(p => {
+    const active = S.period === p.key;
+    return `<button onclick="setPeriod('${p.key}')"
+      style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.02em;padding:9px 16px;border-radius:999px;border:${active ? 'none' : '1.5px solid ' + p.color};background:${active ? p.color : 'transparent'};color:${active ? '#fff' : p.color};cursor:pointer;flex-shrink:0;white-space:nowrap;transition:all .12s;">
+      ${p.label}
+    </button>`;
+  }).join('');
+
+  // Weekday tabs (only for "woche" period)
+  const wdEntries = [
+    {k:'mo',l:'Mäntig'}, {k:'di',l:'Zistig'}, {k:'mi',l:'Mittwuch'},
+    {k:'do',l:'Dunstig'}, {k:'fr',l:'Friitg'}, {k:'sa',l:'Samstig'}, {k:'so',l:'Suntig'},
+  ];
+  const weekdayTabs = wdEntries.map(w => {
+    const active = S.weekday === w.k;
+    return `<button onclick="setWeekday('${w.k}')"
+      style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.01em;padding:0 8px;height:34px;border-radius:999px;border:${active ? 'none' : '1.5px solid ' + INK};background:${active ? INK : 'transparent'};color:${active ? '#fff' : INK};cursor:pointer;flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:all .12s;min-width:0;">
+      ${w.l}
+    </button>`;
+  }).join('');
+
+  // Chart
+  const chartDayType = S.period === 'heute' ? dayTypeFor(todayWd()) : dayTypeFor(S.weekday);
+  const chartColor = S.period === 'heute' ? PURPLE : INK;
+  const chart = detailBarChart(v.uid, chartDayType, chartColor);
+
+  // Stat cards
+  const statBg = '#F4F4F4';
+
+  // Guest weekly comparison
+  const guestList = wdEntries.map(w => {
+    const dt = dayTypeFor(w.k);
+    const slots = slotsFor(v.uid, dt);
+    const peak = slots.length ? Math.max(...slots.map(s => s.auslastung)) : null;
+    const today = todayWd() === w.k;
+    const liveVal = today && fill != null ? numFmt(fill) : (peak != null && live?.maxspace ? numFmt(Math.round(peak / 100 * live.maxspace)) : '–');
+    const isToday = todayWd() === w.k;
+    const accentBg = isToday ? typeColor : 'transparent';
+    const accentCol = isToday ? '#fff' : INK;
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-radius:8px;background:${accentBg};">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${isToday ? 600 : 400};color:${isToday ? '#fff' : INK};">${w.l}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${isToday ? '#fff' : META};">${liveVal}</span>
+    </div>`;
+  }).join('');
+
+  // Temp weekly comparison (just show same temp for all days since we only have live)
+  const tempList = wdEntries.map(w => {
+    const isToday = todayWd() === w.k;
+    const tVal = isToday && hasTemp ? temp + '°' : '–';
+    const accentBg = isToday ? typeColor : 'transparent';
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-radius:8px;background:${accentBg};">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${isToday ? 600 : 400};color:${isToday ? '#fff' : INK};">${w.l}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${isToday ? '#fff' : META};">${tVal}</span>
+    </div>`;
+  }).join('');
+
+  // Hours weekly
+  const hoursList = wdEntries.map(w => {
+    const isToday = todayWd() === w.k;
+    const accentBg = isToday ? typeColor : 'transparent';
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-radius:8px;background:${accentBg};">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${isToday ? 600 : 400};color:${isToday ? '#fff' : INK};">${w.l}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${isToday ? '#fff' : META};">${v.hours}</span>
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="modal-scrim" onclick="closeDetail(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;">
+        <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:${META};font-weight:600;">${TYPE_LABEL[v.type]}</div>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;color:${statusColor};">
+            <i style="width:6px;height:6px;border-radius:50%;background:${statusDot};display:inline-block;"></i>${isOpen ? 'offen' : 'geschlossen'}
+            <span style="color:${META};">· ${v.season}</span>
+          </span>
+        </div>
+        <button onclick="S.currentUid=null;render()" style="font-family:'IBM Plex Mono',monospace;font-size:20px;line-height:1;font-weight:600;color:${INK};background:none;border:none;cursor:pointer;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">×</button>
+      </div>
+
+      <div style="display:flex;align-items:baseline;gap:10px;margin-top:8px;flex-wrap:wrap;">
+        <h1 style="font-family:'Outfit',sans-serif;font-size:clamp(24px,4vw,36px);font-weight:600;letter-spacing:-.01em;line-height:1.05;color:${INK};">${v.name}</h1>
+        <button onclick="toggleFav('${v.uid}')" aria-label="Favorit"
+          style="font-size:20px;line-height:1;background:none;border:none;cursor:pointer;padding:2px;color:${fav ? PURPLE : '#CFCFCC'};transition:color .15s;flex-shrink:0;">${fav ? '★' : '☆'}</button>
+      </div>
+      ${v.note ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:${META};margin-top:6px;">${v.note}</div>` : ''}
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:${META};margin-top:6px;">${v.address}</div>
+
+      <!-- Stat cards -->
+      <div style="margin-top:clamp(16px,4vw,24px);display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;">
+        <!-- Gäste -->
+        <div class="stat-card" onclick="toggleStat('guest')" id="sc-guest">
+          <div style="margin-top:auto;">
+            <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:${guestColor};font-size:clamp(32px,8vw,48px);">${fill != null ? numFmt(fill) : '–'}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">Gäste jetzt</div>
+          </div>
+          ${S.guestOpen ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">${guestList}</div>` : ''}
+        </div>
+
+        <!-- Temperatur -->
+        <div class="stat-card" onclick="toggleStat('temp')" id="sc-temp" style="cursor:${hasTemp ? 'pointer' : 'default'};">
+          <div style="margin-top:auto;">
+            <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:${hasTemp ? INK : META};font-size:clamp(32px,8vw,48px);">${hasTemp ? temp + '°' : '–'}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">Wassertemperatur</div>
+          </div>
+          ${S.tempOpen && hasTemp ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">${tempList}</div>` : ''}
+        </div>
+
+        <!-- Öffnungszeiten -->
+        ${isOpen ? `
+        <div class="stat-card" onclick="toggleStat('hours')" id="sc-hours">
+          <div style="margin-top:auto;">
+            <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.95;color:${BLACK};font-size:clamp(18px,4vw,26px);white-space:nowrap;">${v.hours}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">Öffnigszite</div>
+          </div>
+          ${S.hoursOpen ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">${hoursList}</div>` : ''}
+        </div>` : ''}
+      </div>
+
+      <!-- Chart section -->
+      <div style="margin-top:clamp(18px,4vw,28px);">
+        <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;letter-spacing:-.005em;color:${INK};text-transform:uppercase;">Wie voll isch es</div>
+        <div style="display:flex;gap:6px;margin-top:clamp(10px,3vw,16px);flex-wrap:wrap;align-items:center;justify-content:space-between;">
+          <div style="display:flex;gap:6px;">${periodTabs}</div>
+        </div>
+        ${S.period === 'woche' ? `<div style="display:flex;gap:4px;margin-top:12px;">${weekdayTabs}</div>` : ''}
+        <div style="margin-top:clamp(12px,3vw,20px);">${chart}</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:${META};margin-top:12px;">
+          ${AW[v.uid] ? `Basierend auf ${AW[v.uid].messtage_echt} echten Messtage${AW[v.uid].messtage_echt !== 1 ? 'n' : ''} (${AW[v.uid].erste_messung} – ${AW[v.uid].letzte_messung})` : 'Noch keine Auswertungsdaten'}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Main render ────────────────────────────────────────────────────────────
+function render() {
+  const list = filteredVenues();
+  const liveTs = LIVE?.timestamp;
+  const d = new Date();
+  const dateLabel = d.toLocaleDateString('de-CH', { weekday: 'long', day: 'numeric', month: 'long' });
+  const timeLabel = liveTs ? liveTs.slice(11, 16) : d.toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' });
+
+  const cards = list.map(renderCard).join('');
+  const isEmpty = list.length === 0;
+
+  const html = `
+    <div style="max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:22px;">
+
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;">
+        <div>
+          <h1 style="font-family:'Outfit',sans-serif;font-size:clamp(28px,4vw,40px);font-weight:600;letter-spacing:-.01em;line-height:.95;color:${INK};">Wasserziit</h1>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:${META};margin-top:8px;letter-spacing:.03em;">
+            Stand ${dateLabel}${liveTs ? ', ' + timeLabel + ' Uhr' : ''}
+          </div>
+        </div>
+      </div>
+
+      <section style="background:#FFFFFF;border-radius:28px;padding:22px;box-shadow:0 4px 22px rgba(23,61,52,.08);display:flex;flex-direction:column;gap:16px;">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:space-between;">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">${renderChips()}</div>
+          <div style="display:flex;gap:6px;">${renderSortTabs()}</div>
+        </div>
+
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:${META};">
+          ${list.length} Badis · ${list.filter(v => LIVE?.venues?.[v.uid]?.openClosed === 'offen').length} offen
+        </div>
+
+        ${isEmpty ? `
+          <div style="padding:44px 10px 54px;text-align:center;">
+            <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:600;color:${INK};">Keni Badis gfunde</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:${META};margin-top:10px;line-height:1.6;">Probier en andere Filter ode füeg Favoriten hinzue.</div>
+          </div>` : `
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;">
+            ${cards}
+          </div>`}
+      </section>
+
+      <footer style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding-top:14px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.04em;color:${META};line-height:1.7;max-width:640px;">
+          <div>Wassertemperatur &amp; Status — Sportamt Stadt Zürich</div>
+          <div style="margin-top:4px;">Besucherzahlen — Crowdmonitor, badi-public.crowdmonitor.ch:9591/api</div>
+          <div style="margin-top:4px;">Durchschnittliche Auslastung selber erhoben &amp; berechnet aus gesammelten Live-Daten, nicht offiziell.</div>
+          <div style="margin-top:4px;">Saisonal Mai–Sep (Frei-/Fluss-/Seebäder), Hallenbäder ganzjährig. Privates, nicht-kommerzielles Projekt.</div>
+        </div>
+        <a href="https://www.stadt-zuerich.ch/stzh/bathdatadownload" target="_blank" rel="noopener"
+          style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:${INK};text-decoration:underline;text-underline-offset:3px;white-space:nowrap;flex-shrink:0;">
+          stadt-zuerich.ch ↗
+        </a>
+      </footer>
+    </div>
+
+    ${S.currentUid ? renderDetail() : ''}
+  `;
+
+  document.getElementById('app').innerHTML = html;
+}
+
+// ── Actions ────────────────────────────────────────────────────────────────
+function setFilter(f) { S.filter = f; render(); }
+function setSort(s)   { S.sort = s; render(); }
+function setPeriod(p) { S.period = p; render(); }
+function setWeekday(w){ S.weekday = w; render(); }
+
+function openDetail(uid) {
+  S.currentUid = uid;
+  S.guestOpen = false;
+  S.tempOpen = false;
+  S.hoursOpen = false;
+  S.period = 'heute';
+  render();
+  document.querySelector('.modal-scrim')?.scrollTo(0, 0);
+}
+
+function closeDetail(e) {
+  S.currentUid = null;
+  render();
+}
+
+function toggleFav(uid) {
+  if (S.favs[uid]) delete S.favs[uid]; else S.favs[uid] = true;
+  try { localStorage.setItem('wasserzeit_favs', JSON.stringify(S.favs)); } catch(e) {}
+  render();
+}
+
+function toggleStat(which) {
+  // Paired expand: guest and temp expand together if in same row
+  const guestEl = document.getElementById('sc-guest');
+  const tempEl  = document.getElementById('sc-temp');
+  const hoursEl = document.getElementById('sc-hours');
+
+  let group = [which];
+  try {
+    const els = { guest: guestEl, temp: tempEl, hours: hoursEl };
+    const clickedEl = els[which];
+    if (clickedEl) {
+      const clickedTop = Math.round(clickedEl.getBoundingClientRect().top);
+      group = Object.keys(els).filter(k => els[k] && Math.round(els[k].getBoundingClientRect().top) === clickedTop);
+    }
+  } catch(e) {}
+
+  const next = !S[which + 'Open'];
+  group.forEach(k => { S[k + 'Open'] = next; });
+  render();
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+try {
+  const saved = localStorage.getItem('wasserzeit_favs');
+  if (saved) S.favs = JSON.parse(saved) || {};
+} catch(e) {}
+
+render(); // show skeleton
+
+const base = document.location.pathname.replace(/\/$/, '');
+
+Promise.all([
+  fetch(base + '/auswertung/auswertung.json').then(r => r.ok ? r.json() : null).catch(() => null),
+  fetch(base + '/data/live.json').then(r => r.ok ? r.json() : null).catch(() => null),
+]).then(([aw, live]) => {
+  if (aw?.badis) {
+    AW = Object.fromEntries(aw.badis.map(b => [b.uid, b]));
+  }
+  LIVE = live;
+  render();
+
+  // Auto-refresh live data every 10 minutes
+  setInterval(() => {
+    fetch(base + '/data/live.json').then(r => r.ok ? r.json() : null).catch(() => null).then(live => {
+      if (live) { LIVE = live; render(); }
+    });
+  }, 10 * 60 * 1000);
+});
+</script>
+</body>
+</html>
