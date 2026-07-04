@@ -642,22 +642,39 @@ try {
 
 render(); // show skeleton
 
-const base = document.location.pathname.replace(/\/$/, '');
+// Relative zur aktuellen Seite — funktioniert auf GitHub Pages und lokal
+const BASE = new URL('.', document.baseURI).href;
+
+function parseLive(raw) {
+  if (!raw) return null;
+  // Stellt sicher dass numerische Felder wirklich Zahlen sind
+  const venues = {};
+  for (const [uid, v] of Object.entries(raw.venues || {})) {
+    venues[uid] = {
+      currentfill:      (v.currentfill      != null && v.currentfill      !== '') ? Number(v.currentfill)      : null,
+      freespace:        (v.freespace         != null && v.freespace         !== '') ? Number(v.freespace)         : null,
+      maxspace:         (v.maxspace          != null && v.maxspace          !== '') ? Number(v.maxspace)          : null,
+      temperatureWater: (v.temperatureWater  != null && v.temperatureWater  !== '') ? Number(v.temperatureWater)  : null,
+      openClosed:       v.openClosed,
+    };
+  }
+  return { timestamp: raw.timestamp, venues };
+}
 
 Promise.all([
-  fetch(base + '/auswertung/auswertung.json').then(r => r.ok ? r.json() : null).catch(() => null),
-  fetch(base + '/data/live.json').then(r => r.ok ? r.json() : null).catch(() => null),
+  fetch(BASE + 'auswertung/auswertung.json').then(r => r.ok ? r.json() : null).catch(() => null),
+  fetch(BASE + 'data/live.json').then(r => r.ok ? r.json() : null).catch(() => null),
 ]).then(([aw, live]) => {
   if (aw?.badis) {
     AW = Object.fromEntries(aw.badis.map(b => [b.uid, b]));
   }
-  LIVE = live;
+  LIVE = parseLive(live);
   render();
 
   // Auto-refresh live data every 10 minutes
   setInterval(() => {
-    fetch(base + '/data/live.json').then(r => r.ok ? r.json() : null).catch(() => null).then(live => {
-      if (live) { LIVE = live; render(); }
+    fetch(BASE + 'data/live.json').then(r => r.ok ? r.json() : null).catch(() => null).then(live => {
+      if (live) { LIVE = parseLive(live); render(); }
     });
   }, 10 * 60 * 1000);
 });
