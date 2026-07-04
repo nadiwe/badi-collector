@@ -296,67 +296,75 @@ function renderSortTabs() {
   }).join('');
 }
 
-// ── Render: Übersicht card ────────────────────────────────────────────────
+// ── Tile gauge SVG (weiße Balken auf farbigem Hintergrund) ───────────────
+function tileGaugeSVG(uid, open) {
+  const dayType = dayTypeFor(todayWd());
+  const slots = slotsFor(uid, dayType);
+  if (!slots.length) return '<div style="height:34px;"></div>';
+  const vals = slots.map(s => s.auslastung);
+  const max = Math.max(...vals, 0.001);
+  const norm = vals.map(v => v / max);
+  const nowMin = nowHHMM();
+  const nowIdx = open ? slots.reduce((bi, s, i) =>
+    Math.abs(hhmm(s.zeit) - nowMin) < Math.abs(hhmm(slots[bi].zeit) - nowMin) ? i : bi, 0) : -1;
+  const n = norm.length;
+  const gap = n > 12 ? 0.3 : 0.7;
+  const bw = (100 / n) - gap;
+  const xs = i => i * (100 / n) + gap / 2;
+  const bars = norm.map((v, i) => {
+    const isNow = open && i === nowIdx;
+    const h = Math.max(4, v * 100);
+    const fill = isNow ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.28)';
+    return `<div style="flex:1;height:${h.toFixed(1)}%;background:${fill};border-radius:2px 2px 0 0;position:relative;">
+      ${isNow ? `<div style="position:absolute;left:0;right:0;bottom:${(v*100).toFixed(1)}%;height:0;border-top:2px dotted rgba(255,255,255,.5);"></div>` : ''}
+    </div>`;
+  }).join('');
+  return `<div style="display:flex;align-items:flex-end;gap:${gap}px;height:34px;">${bars}</div>`;
+}
+
+// ── Render: Kompakt-Kachel (farbiger Hintergrund) ─────────────────────────
 function renderCard(v) {
   const live = LIVE?.venues?.[v.uid];
   const isOpen = live?.openClosed === 'offen';
   const noLive = !live;
   const fill = live?.currentfill;
-  const maxspace = live?.maxspace;
   const temp = live?.temperatureWater;
   const hasTemp = temp != null && temp !== '';
   const guestStr = fill != null ? numFmt(fill) : '–';
-  const guestColor = isOpen ? INK : META;
-  const statusColor = isOpen ? '#2A9D63' : META;
-  const statusDot = isOpen ? '#2A9D63' : '#CFCFCC';
   const statusLabel = isOpen ? 'offen' : (noLive ? '–' : 'geschlossen');
   const tempStr = hasTemp ? temp + '°' : '–';
   const dev = devInfo(v.uid);
   const fav = !!S.favs[v.uid];
-  const bg = isOpen ? '#F4F4F4' : '#F7F7F6';
-  const opacity = isOpen ? 1 : 0.62;
-  const sparkline = sparklineSVG(v.uid, isOpen);
-  const typeAccent = TYPE_COLOR[v.type];
+  const bg = isOpen ? (TYPE_COLOR[v.type] || INK) : '#4A4A4A';
+  const opacity = isOpen ? 1 : 0.68;
+  const gauge = tileGaugeSVG(v.uid, isOpen);
 
-  return `<div class="card" onclick="openDetail('${v.uid}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')openDetail('${v.uid}')"
-    style="text-align:left;background:${bg};border:none;border-radius:22px;padding:16px 17px;cursor:pointer;width:100%;font:inherit;color:${INK};display:block;opacity:${opacity};box-shadow:0 2px 12px rgba(23,61,52,.06);">
+  return `<div class="tile-card" onclick="openDetail('${v.uid}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')openDetail('${v.uid}')"
+    style="text-align:left;background:${bg};border:none;border-radius:22px;padding:16px 17px;cursor:pointer;width:100%;font:inherit;color:#fff;display:block;opacity:${opacity};box-shadow:0 2px 12px rgba(23,61,52,.10);">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;">
       <div style="min-width:0;">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:${META};font-weight:600;">${TYPE_LABEL[v.type]}</span>
-          ${v.note ? `<span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:${META};">· ${v.note}</span>` : ''}
-        </div>
-        <div style="font-family:'Outfit',sans-serif;font-size:19px;font-weight:600;letter-spacing:-.01em;margin-top:8px;line-height:1.15;color:${INK};">${v.name}</div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.8);font-weight:600;">${TYPE_LABEL[v.type]}</span>
+        <div style="font-family:'Outfit',sans-serif;font-size:19px;font-weight:600;letter-spacing:-.01em;margin-top:6px;line-height:1.15;color:#fff;">${v.name}</div>
       </div>
-      <div style="text-align:right;flex-shrink:0;">
-        <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:${guestColor};font-size:44px;">${guestStr}</div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:${META};margin-top:9px;font-weight:600;">Gäste jetzt</div>
-      </div>
+      <button onclick="event.stopPropagation();toggleFav('${v.uid}')" aria-label="Favorit"
+        style="font-size:19px;line-height:1;background:none;border:none;cursor:pointer;padding:2px;color:${fav ? '#fff' : 'rgba(255,255,255,.4)'};transition:color .15s;flex-shrink:0;margin-left:auto;">${fav ? '★' : '☆'}</button>
     </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;">
-      <span style="display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;color:${statusColor};">
-        <i class="${isOpen ? 'pulse' : ''}" style="width:7px;height:7px;border-radius:50%;background:${statusDot};display:inline-block;flex-shrink:0;"></i>${statusLabel}
-      </span>
-      <div style="display:flex;align-items:center;gap:11px;flex-shrink:0;">
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:${hasTemp ? INK : META};">${tempStr}</span>
-        <button onclick="event.stopPropagation();toggleFav('${v.uid}')" aria-label="Favorit"
-          style="font-size:19px;line-height:1;background:none;border:none;cursor:pointer;padding:2px;color:${fav ? PURPLE : '#CFCFCC'};transition:color .15s;">${fav ? '★' : '☆'}</button>
-      </div>
+    <div style="display:flex;align-items:baseline;gap:10px;margin-top:18px;">
+      <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;color:#fff;line-height:1;font-size:40px;">${guestStr}</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.75);">Gäste jetzt</div>
     </div>
-    <div style="margin-top:15px;padding-top:13px;border-top:1px solid #DEDEDE;">
+    <div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;color:#fff;">
+      <i class="${isOpen ? 'pulse' : ''}" style="width:7px;height:7px;border-radius:50%;background:#fff;display:inline-block;flex-shrink:0;"></i>
+      ${statusLabel}<span style="color:rgba(255,255,255,.6);font-weight:500;"> · ${tempStr} Wasser</span>
+    </div>
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.22);">
       <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;">
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:${META};font-weight:700;white-space:nowrap;">Auslastung heute</span>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${statusColor};white-space:nowrap;flex-shrink:0;">${v.hours}</span>
-      </div>
-      <div style="margin-top:8px;">${sparkline || '<div style="height:30px;background:#F0F0EE;border-radius:4px;"></div>'}</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px;">
-        <span style="display:inline-flex;align-items:center;gap:5px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:${dev.color};">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.75);font-weight:700;">Auslastung jetzt</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#fff;">
           <span style="font-size:9px;line-height:1;">${dev.arrow}</span>${dev.short}
         </span>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:500;color:${META};">
-          ${isOpen ? `<span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:10px;border-top:2px dotted #B5B5B5;display:inline-block;"></span>üblich</span>` : ''}
-        </span>
       </div>
+      <div style="margin-top:11px;">${gauge}</div>
     </div>
   </div>`;
 }
@@ -489,15 +497,14 @@ function renderDetail() {
           ${S.tempOpen && hasTemp ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">${tempList}</div>` : ''}
         </div>
 
-        <!-- Öffnungszeiten -->
-        ${isOpen ? `
+        <!-- Öffnungszeiten (immer anzeigen) -->
         <div class="stat-card" onclick="toggleStat('hours')" id="sc-hours">
           <div style="margin-top:auto;">
             <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.95;color:${BLACK};font-size:clamp(18px,4vw,26px);white-space:nowrap;">${v.hours}</div>
             <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">Öffnigszite</div>
           </div>
           ${S.hoursOpen ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">${hoursList}</div>` : ''}
-        </div>` : ''}
+        </div>
       </div>
 
       <!-- Chart section -->
