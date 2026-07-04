@@ -633,13 +633,14 @@ function renderDetail() {
   // Stat cards
   const statBg = '#F4F4F4';
 
-  // Guest weekly comparison
+  // Guest weekly comparison — for today: live count; for other days: typical at current time
   const guestList = wdEntries.map(w => {
     const dt = dayTypeFor(w.k);
     const slots = slotsFor(v.uid, dt);
-    const peak = slots.length ? Math.max(...slots.map(s => s.auslastung)) : null;
+    const typSlot = slots.length ? nearestSlot(slots, nowHHMM()) : null;
     const today = todayWd() === w.k;
-    const liveVal = today && fill != null ? numFmt(fill) : (peak != null && live?.maxspace ? numFmt(Math.round(peak / 100 * live.maxspace)) : '–');
+    const typGuests = typSlot && live?.maxspace ? Math.round(Math.min(typSlot.auslastung, 100) / 100 * live.maxspace) : null;
+    const liveVal = today && fill != null ? numFmt(fill) : (typGuests != null ? '≈ ' + numFmt(typGuests) : '–');
     const isToday = todayWd() === w.k;
     const accentBg = isToday ? typeColor : 'transparent';
     const accentCol = isToday ? '#fff' : INK;
@@ -892,9 +893,13 @@ function parseLive(raw) {
   return { timestamp: raw.timestamp, venues };
 }
 
+function fetchLive() {
+  return fetch(BASE + 'data/live.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null);
+}
+
 Promise.all([
   fetch(BASE + 'auswertung/auswertung.json').then(r => r.ok ? r.json() : null).catch(() => null),
-  fetch(BASE + 'data/live.json').then(r => r.ok ? r.json() : null).catch(() => null),
+  fetchLive(),
 ]).then(([aw, live]) => {
   if (aw?.badis) {
     AW = Object.fromEntries(aw.badis.map(b => [b.uid, b]));
@@ -902,12 +907,12 @@ Promise.all([
   LIVE = parseLive(live);
   render();
 
-  // Auto-refresh live data every 10 minutes
+  // Auto-refresh live data every 5 minutes
   setInterval(() => {
-    fetch(BASE + 'data/live.json').then(r => r.ok ? r.json() : null).catch(() => null).then(live => {
+    fetchLive().then(live => {
       if (live) { LIVE = parseLive(live); render(); }
     });
-  }, 10 * 60 * 1000);
+  }, 5 * 60 * 1000);
 });
 </script>
 </body>
