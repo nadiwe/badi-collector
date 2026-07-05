@@ -105,6 +105,10 @@ let S = {
   chartRes: '15min',
 };
 
+// Render während Touch unterdrücken damit iOS-Scroll-Geste nicht unterbrochen wird
+let _touchActive  = false;
+let _renderQueued = false;
+
 // ── Data ───────────────────────────────────────────────────────────────────
 let AW = {};     // uid → {slots:{Werktag:[],Wochenende:[],Feiertag:[]}, messtage_echt, ...}
 let LIVE = null; // {timestamp, venues:{uid:{currentfill,freespace,maxspace,temperatureWater,openClosed}}}
@@ -847,6 +851,10 @@ function renderDetail() {
 
 // ── Main render ────────────────────────────────────────────────────────────
 function render() {
+  // Wenn der User gerade den Chart scrollt: DOM nicht zerstören, später nachholen
+  if (_touchActive) { _renderQueued = true; return; }
+  _renderQueued = false;
+
   const list = filteredVenues();
   const liveTs = LIVE?.timestamp;
   const d = new Date();
@@ -924,16 +932,32 @@ function render() {
     setTimeout(() => {
       const scroller = document.getElementById('chart-scroll');
       if (!scroller) return;
+
       if (S._chartScrollLeft >= 0) {
         scroller.scrollLeft = S._chartScrollLeft;
       } else {
         const nowBar = scroller.querySelector('[data-now="true"]');
-        if (!nowBar) return;
-        const sr = scroller.getBoundingClientRect();
-        const br = nowBar.getBoundingClientRect();
-        S._chartScrollLeft = Math.max(0, br.left - sr.left - scroller.clientWidth / 2 + br.width / 2);
-        scroller.scrollLeft = S._chartScrollLeft;
+        if (nowBar) {
+          const sr = scroller.getBoundingClientRect();
+          const br = nowBar.getBoundingClientRect();
+          S._chartScrollLeft = Math.max(0, br.left - sr.left - scroller.clientWidth / 2 + br.width / 2);
+          scroller.scrollLeft = S._chartScrollLeft;
+        }
       }
+
+      // Scroll-Position laufend in S._chartScrollLeft speichern
+      scroller.addEventListener('scroll', () => {
+        S._chartScrollLeft = scroller.scrollLeft;
+      }, { passive: true });
+
+      // Render während Touch blockieren, danach nachholen
+      scroller.addEventListener('touchstart', () => { _touchActive = true; }, { passive: true });
+      const onTouchEnd = () => {
+        _touchActive = false;
+        if (_renderQueued) render();
+      };
+      scroller.addEventListener('touchend',    onTouchEnd, { passive: true });
+      scroller.addEventListener('touchcancel', onTouchEnd, { passive: true });
     }, 0);
   }
 
@@ -979,6 +1003,8 @@ function openDetail(uid) {
 
 function closeDetail(e) {
   S.currentUid = null;
+  _touchActive  = false;
+  _renderQueued = false;
   document.body.style.overflow = '';
   render();
 }
