@@ -372,6 +372,10 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
   const maxV    = Math.max(...vals.filter(v => v != null), 0.001);
   const norm    = vals.map(v => v != null ? v / maxV : null);
 
+  // Letzter Slot mit echten Daten → wird hervorgehoben (nur für «heute»)
+  const lastDataIdx = isToday ? vals.reduce((li, v, i) => v != null ? i : li, -1) : -1;
+
+  // Für Auto-Scroll: zeitlich nächster Slot zum jetzigen Zeitpunkt
   const nowIdx = isToday ? slots.reduce((bi, s, i) =>
     Math.abs(hhmm(s.zeit) - nowMin) < Math.abs(hhmm(slots[bi].zeit) - nowMin) ? i : bi, 0) : -1;
 
@@ -405,9 +409,10 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
 
   const bars = norm.map((v, i) => {
     if (v === null) return '';
-    const isNow = i === nowIdx;
+    const isLatest = i === lastDataIdx;
+    const isNow    = i === nowIdx;
     const y    = ys(v);
-    const fill = isNow ? periodColor : periodColor + '38';
+    const fill = isLatest ? periodColor : periodColor + '38';
     return `<rect${isNow ? ' data-now="true"' : ''} x="${xs(i).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.6, (H - 2) - y).toFixed(1)}" rx="${Math.min(1.4, bw * 0.25).toFixed(1)}" fill="${fill}"/>`;
   }).join('');
 
