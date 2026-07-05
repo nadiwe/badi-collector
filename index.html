@@ -396,7 +396,7 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
     return `
     <div style="position:relative;margin-left:${yAxisW}px;">
       ${yAxisEl}
-      <div id="chart-scroll" style="width:100%;overflow-x:auto;overflow-y:hidden;">
+      <div id="chart-scroll" style="width:100%;overflow-x:auto;overflow-y:hidden;touch-action:pan-x;">
         <div style="width:${relW}%;">
           ${svgEl}
           <div style="position:relative;height:16px;margin-top:7px;">${makeLabels(slots)}</div>
