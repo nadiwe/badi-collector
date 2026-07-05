@@ -330,8 +330,8 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
     return `<rect x="${xs(i).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.6, (H - 2) - y).toFixed(1)}" rx="${Math.min(1.4, bw * 0.25).toFixed(1)}" fill="${fill}"/>`;
   }).join('');
 
-  // Zoomed: alle Labels sichtbar; normal: ~alle 2h bei 15min, ~6 Labels bei 1h
-  const step = zoomed ? 1 : (res === '15min' ? 8 : Math.max(1, Math.ceil(n / 6)));
+  // Zoomed: alle Labels; 15min normal: alle 2h (step=8); 1h normal: jede 2. Stunde (step=2)
+  const step = zoomed ? 1 : (res === '15min' ? 8 : 2);
 
   // Absolut positionierte Labels damit sie nicht abgeschnitten werden
   const labelFz = zoomed ? '10px' : '9px';
@@ -341,8 +341,9 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
     return `<span style="position:absolute;left:${pct.toFixed(1)}%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:${labelFz};color:#ADADA9;white-space:nowrap;">${s.zeit}</span>`;
   }).join('');
 
+  const chartH = zoomed ? 200 : 116;
   return `
-    <div style="position:relative;height:116px;">
+    <div style="position:relative;height:${chartH}px;">
       <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="100%" height="100%" style="display:block;overflow:visible">
         ${gridLines}${bars}
       </svg>
