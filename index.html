@@ -372,32 +372,30 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
     return `<rect${isNow ? ' data-now="true"' : ''} x="${xs(i).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.6, (H - 2) - y).toFixed(1)}" rx="${Math.min(1.4, bw * 0.25).toFixed(1)}" fill="${fill}"/>`;
   }).join('');
 
-  // Ohne Zoom: ~6 Labels; Zoom 1h: jede Stunde; Zoom 15min: jede 15 Minuten (step=1)
+  // Labels: Zoom → jeder Balken; kein Zoom → ~6 Labels
   const step = zoomed ? 1 : Math.max(1, Math.ceil(n / 6));
 
+  // Label-Position: linker Rand des Balkens (i/n * 100%), kein translateX
   function makeLabels(arr) {
     return arr.map((s, i) => {
-      if (!(i % step === 0 || i === arr.length - 1)) return '';
-      const pct = (i + 0.5) / arr.length * 100;
-      return `<span style="position:absolute;left:${pct.toFixed(1)}%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:${labelFz};color:#ADADA9;white-space:nowrap;">${s.zeit}</span>`;
+      if (i % step !== 0) return '';
+      const pct = (i / arr.length * 100).toFixed(1);
+      return `<span style="position:absolute;left:${pct}%;font-family:'IBM Plex Mono',monospace;font-size:${labelFz};color:#ADADA9;white-space:nowrap;">${s.zeit}</span>`;
     }).join('');
   }
 
-  // Y-axis: absolutely positioned to the LEFT of the chart area, sharing the same parent top.
-  // margin-left:${yAxisW}px on parent makes room; y-axis at left:-${yAxisW}px.
   const yAxisEl = `<div style="position:absolute;left:-${yAxisW}px;top:0;width:${yAxisW - 4}px;height:${chartH}px;">${yAxis}</div>`;
   const svgEl   = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="100%" height="${chartH}" style="display:block;overflow:visible;">${gridLines}${bars}</svg>`;
 
-  if (zoomed && res === '15min') {
-    // Each 15min bar = same pixel width as a 1h bar → inner div width = n/n1h × 100%
-    const slots1h = filterToHours(groupByHour(slotsFor(uid, dayType)));
-    const n1h     = Math.max(slots1h.length, 1);
-    const relW    = Math.round(n / n1h * 100);
+  if (zoomed) {
+    // Feste Mindestbreite pro Balken → zuverlässiger Scroll unabhängig vom Container
+    const barPx   = 64;
+    const minW    = n * barPx;
     return `
     <div style="position:relative;margin-left:${yAxisW}px;">
       ${yAxisEl}
-      <div id="chart-scroll" style="width:100%;overflow-x:auto;overflow-y:hidden;touch-action:pan-x;">
-        <div style="width:${relW}%;">
+      <div id="chart-scroll" style="overflow-x:auto;overflow-y:hidden;touch-action:pan-x;">
+        <div style="min-width:${minW}px;">
           ${svgEl}
           <div style="position:relative;height:16px;margin-top:7px;">${makeLabels(slots)}</div>
         </div>
