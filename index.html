@@ -926,20 +926,27 @@ function render() {
     }, 0);
   }
 
-  // iOS-Fix: vertikalen Scroll des Modals blockieren wenn horizontal gescrollt wird
+  // iOS-Fix: vertikalen Scroll des Modals via CSS sperren sobald horizontale Geste erkannt
   setTimeout(() => {
     const scroller = document.getElementById('chart-scroll');
-    if (!scroller) return;
-    let startX = 0, startY = 0;
+    const sheet    = document.querySelector('.modal-sheet');
+    if (!scroller || !sheet) return;
+    let startX = 0, startY = 0, locked = false;
+    const unlock = () => { sheet.style.overflowY = ''; locked = false; };
     scroller.addEventListener('touchstart', e => {
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
+      locked = false;
     }, { passive: true });
     scroller.addEventListener('touchmove', e => {
+      if (locked) return;
       const dx = Math.abs(e.touches[0].clientX - startX);
       const dy = Math.abs(e.touches[0].clientY - startY);
-      if (dx > dy) e.preventDefault();
-    }, { passive: false });
+      if (dx < 3 && dy < 3) return;
+      if (dx > dy) { locked = true; sheet.style.overflowY = 'hidden'; }
+    }, { passive: true });
+    scroller.addEventListener('touchend',    unlock, { passive: true });
+    scroller.addEventListener('touchcancel', unlock, { passive: true });
   }, 0);
 
   // Temperatur- und Öffnungszeiten-Kachel auf gleiche Höhe bringen
