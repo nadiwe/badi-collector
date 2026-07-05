@@ -433,8 +433,10 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
     const isLatest = i === lastDataIdx;
     const isNow    = i === nowIdx;
     const y    = ys(v);
-    const fill = isLatest ? periodColor : periodColor + '38';
-    return `<rect${isNow ? ' data-now="true"' : ''} x="${xs(i).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.6, (H - 2) - y).toFixed(1)}" rx="${Math.min(1.4, bw * 0.25).toFixed(1)}" fill="${fill}"/>`;
+    const fill = isLatest ? periodColor : periodColor + '26';
+    const cx   = (xs(i) + bw / 2).toFixed(1);
+    const dot  = isLatest ? `<circle cx="${cx}" cy="${(y - 1.8).toFixed(1)}" r="1.4" fill="${periodColor}"/>` : '';
+    return `<rect${isNow ? ' data-now="true"' : ''} x="${xs(i).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.6, (H - 2) - y).toFixed(1)}" rx="${Math.min(1.4, bw * 0.25).toFixed(1)}" fill="${fill}"/>${dot}`;
   }).join('');
 
   // Label-Position: linker Rand des Balkens (i/n * 100%)
