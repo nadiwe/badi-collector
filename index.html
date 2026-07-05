@@ -910,18 +910,30 @@ function render() {
     ${S.currentUid ? renderDetail() : ''}
   `;
 
+  // Scroll-Position vor Neuaufbau sichern (nur wenn kein expliziter Reset gewünscht)
+  if (S.chartZoomed && S._chartScrollLeft === undefined) S._chartScrollLeft = -1;
+  const prevScrollLeft = document.getElementById('chart-scroll')?.scrollLeft ?? -1;
+  if (S.chartZoomed && prevScrollLeft >= 0 && S._chartScrollLeft !== -1) {
+    S._chartScrollLeft = prevScrollLeft;
+  }
+
   document.getElementById('app').innerHTML = html;
 
-  // Auto-scroll zum "jetzt"-Balken
+  // Scroll-Position wiederherstellen oder zum "jetzt"-Balken scrollen
   if (S.chartZoomed && S.currentUid) {
     setTimeout(() => {
       const scroller = document.getElementById('chart-scroll');
       if (!scroller) return;
-      const nowBar = scroller.querySelector('[data-now="true"]');
-      if (!nowBar) return;
-      const sr = scroller.getBoundingClientRect();
-      const br = nowBar.getBoundingClientRect();
-      scroller.scrollLeft = Math.max(0, br.left - sr.left + scroller.scrollLeft - scroller.clientWidth / 2 + br.width / 2);
+      if (S._chartScrollLeft >= 0) {
+        scroller.scrollLeft = S._chartScrollLeft;
+      } else {
+        const nowBar = scroller.querySelector('[data-now="true"]');
+        if (!nowBar) return;
+        const sr = scroller.getBoundingClientRect();
+        const br = nowBar.getBoundingClientRect();
+        S._chartScrollLeft = Math.max(0, br.left - sr.left - scroller.clientWidth / 2 + br.width / 2);
+        scroller.scrollLeft = S._chartScrollLeft;
+      }
     }, 0);
   }
 
@@ -948,6 +960,7 @@ function toggleChartZoom(){ S.chartZoomed = !S.chartZoomed; render(); }
 function setChartMode(mode) {
   if (mode === 'overview') { S.chartZoomed = false; }
   else { S.chartZoomed = true; S.chartRes = mode; }
+  S._chartScrollLeft = -1; // beim Moduswechsel zum "jetzt"-Balken springen
   render();
 }
 
