@@ -313,8 +313,8 @@ function sparklineSVG(uid, open) {
 function detailBarChart(uid, dayType, periodColor, zoomed, res) {
   let slots = slotsFor(uid, dayType);
   if (!slots.length) return '<div style="height:116px;display:flex;align-items:center;justify-content:center;color:#8C8C8C;font-family:\'IBM Plex Mono\',monospace;font-size:11px;">Noch keine Daten</div>';
-  // 1h-Modus: Stunden-Durchschnitt; 15min und Übersicht: Rohdaten
-  if (zoomed && res === '1h') slots = groupByHour(slots);
+  // 1h und Übersicht: Stunden-Durchschnitt; 15min: Rohdaten
+  if (!zoomed || res === '1h') slots = groupByHour(slots);
 
   // Auf Öffnungszeiten einschränken
   const meta = VENUE_MAP[uid];
@@ -374,15 +374,11 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
   }).join('');
 
   // Label-Position: linker Rand des Balkens (i/n * 100%)
+  // Übersicht: jeden 2. Stunden-Bar (= alle 2 Std); Zoom: jeden Bar
+  const labelStep = zoomed ? 1 : 2;
   function makeLabels(arr) {
     return arr.map((s, i) => {
-      if (zoomed) {
-        // Zoom: jeder Balken bekommt ein Label
-      } else {
-        // Übersicht: nur gerade Stunden (08:00, 10:00, 12:00 …)
-        const [h, m] = s.zeit.split(':').map(Number);
-        if (!(m === 0 && h % 2 === 0)) return '';
-      }
+      if (i % labelStep !== 0) return '';
       const pct = (i / arr.length * 100).toFixed(1);
       return `<span style="position:absolute;left:${pct}%;font-family:'IBM Plex Mono',monospace;font-size:${labelFz};color:#ADADA9;white-space:nowrap;">${s.zeit}</span>`;
     }).join('');
@@ -392,8 +388,8 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
   const svgEl   = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="100%" height="${chartH}" style="display:block;overflow:visible;">${gridLines}${bars}</svg>`;
 
   if (zoomed) {
-    // Feste Mindestbreite pro Balken → zuverlässiger Scroll
-    const minW = n * 64;
+    // Mindestbreite: immer > Container (mind. 900px total oder 80px pro Bar)
+    const minW = Math.max(n * 80, 900);
     return `
     <div style="position:relative;margin-left:${yAxisW}px;">
       ${yAxisEl}
