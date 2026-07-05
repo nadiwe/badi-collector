@@ -292,24 +292,26 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
   if (!slots.length) return '<div style="height:116px;display:flex;align-items:center;justify-content:center;color:#8C8C8C;font-family:\'IBM Plex Mono\',monospace;font-size:11px;">Noch keine Daten</div>';
   if (res === '1h') slots = groupByHour(slots);
 
-  const isToday = dayType === dayTypeFor(todayWd());
-  const nowMin  = nowHHMM();
-
-  // Zoom = enges Zeitfenster um jetzt (nur heute): ±1h bei 15min, ±3h bei 1h
-  let displaySlots = slots;
-  if (zoomed && isToday) {
-    const win = res === '1h' ? 180 : 60;
-    const filtered = slots.filter(s => Math.abs(hhmm(s.zeit) - nowMin) <= win);
-    if (filtered.length >= 3) displaySlots = filtered;
+  // Auf Öffnungszeiten der Badi einschränken
+  const meta = VENUE_MAP[uid];
+  if (meta?.hours) {
+    const parts = meta.hours.split(/[–-]/);
+    if (parts.length === 2) {
+      const oMin = hhmm(parts[0].trim()), cMin = hhmm(parts[1].trim());
+      const within = slots.filter(s => hhmm(s.zeit) >= oMin && hhmm(s.zeit) <= cMin);
+      if (within.length >= 3) slots = within;
+    }
   }
 
-  const n    = displaySlots.length;
-  const vals = displaySlots.map(s => s.auslastung);
-  const maxV = Math.max(...vals, 0.001);
-  const norm = vals.map(v => v / maxV);
+  const isToday = dayType === dayTypeFor(todayWd());
+  const nowMin  = nowHHMM();
+  const n       = slots.length;
+  const vals    = slots.map(s => s.auslastung);
+  const maxV    = Math.max(...vals, 0.001);
+  const norm    = vals.map(v => v / maxV);
 
-  const nowIdx = isToday ? displaySlots.reduce((bi, s, i) =>
-    Math.abs(hhmm(s.zeit) - nowMin) < Math.abs(hhmm(displaySlots[bi].zeit) - nowMin) ? i : bi, 0) : -1;
+  const nowIdx = isToday ? slots.reduce((bi, s, i) =>
+    Math.abs(hhmm(s.zeit) - nowMin) < Math.abs(hhmm(slots[bi].zeit) - nowMin) ? i : bi, 0) : -1;
 
   const H   = 34;
   const W   = 100;
@@ -330,12 +332,13 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
     return `<rect x="${xs(i).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.6, (H - 2) - y).toFixed(1)}" rx="${Math.min(1.4, bw * 0.25).toFixed(1)}" fill="${fill}"/>`;
   }).join('');
 
-  // Zoomed: alle Labels; 15min normal: alle 2h (step=8); 1h normal: jede 2. Stunde (step=2)
-  const step = zoomed ? 1 : (res === '15min' ? 8 : 2);
+  // Ohne Zoom: ~6 Labels; Mit Zoom: jede Stunde (15min) resp. jede Stunde (1h)
+  const step = zoomed
+    ? (res === '15min' ? 4 : 1)
+    : Math.max(1, Math.ceil(n / 6));
 
-  // Absolut positionierte Labels damit sie nicht abgeschnitten werden
   const labelFz = zoomed ? '10px' : '9px';
-  const labelItems = displaySlots.map((s, i) => {
+  const labelItems = slots.map((s, i) => {
     if (!(i % step === 0 || i === n - 1)) return '';
     const pct = n > 1 ? (i / (n - 1) * 100) : 50;
     return `<span style="position:absolute;left:${pct.toFixed(1)}%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:${labelFz};color:#ADADA9;white-space:nowrap;">${s.zeit}</span>`;
