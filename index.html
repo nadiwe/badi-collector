@@ -781,7 +781,7 @@ function renderDetail() {
             <span style="color:${META};">· ${v.season}</span>
           </span>
         </div>
-        <button onclick="S.currentUid=null;render()" style="font-family:'IBM Plex Mono',monospace;font-size:20px;line-height:1;font-weight:600;color:${INK};background:none;border:none;cursor:pointer;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">×</button>
+        <button onclick="closeDetail(event)" style="font-family:'IBM Plex Mono',monospace;font-size:20px;line-height:1;font-weight:600;color:${INK};background:none;border:none;cursor:pointer;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">×</button>
       </div>
 
       <div style="display:flex;align-items:baseline;gap:10px;margin-top:8px;flex-wrap:wrap;">
@@ -912,33 +912,35 @@ function render() {
 
   document.getElementById('app').innerHTML = html;
 
-  // Auto-scroll to "now" bar + manueller Touch-Scroll (iOS-kompatibel)
+  // Chart-Scroll: translateX statt scrollLeft (iOS Safari ignoriert scrollLeft auf overflow:hidden)
   if (S.chartZoomed && S.currentUid) {
     setTimeout(() => {
       const scroller = document.getElementById('chart-scroll');
       if (!scroller) return;
+      const inner = scroller.firstElementChild;
+      if (!inner) return;
 
-      // Auto-scroll zum "jetzt"-Balken
-      const nowBar = scroller.querySelector('[data-now="true"]');
+      let offsetX = 0;
+      const maxOffset = () => Math.max(0, inner.offsetWidth - scroller.offsetWidth);
+      const applyOffset = x => {
+        offsetX = Math.max(0, Math.min(maxOffset(), x));
+        inner.style.transform = `translateX(-${offsetX}px)`;
+      };
+
+      // Auto-scroll zum "jetzt"-Balken (offsetLeft ist transform-unabhängig)
+      const nowBar = inner.querySelector('[data-now="true"]');
       if (nowBar) {
-        const sr  = scroller.getBoundingClientRect();
-        const br  = nowBar.getBoundingClientRect();
-        const barLeft = br.left - sr.left + scroller.scrollLeft;
-        scroller.scrollLeft = Math.max(0, barLeft - scroller.clientWidth / 2 + br.width / 2);
+        applyOffset(nowBar.offsetLeft - scroller.offsetWidth / 2 + nowBar.offsetWidth / 2);
       }
 
-      // Manueller Touch-Scroll: overflow-x:hidden + scrollLeft via JS
-      // → iOS kann die Geste nicht klauen, kein Snap-back
-      let startX = 0, startScroll = 0;
+      // Manueller Touch-Scroll via transform (kein nativer iOS-Scroll, kein Snap-back)
+      let startX = 0, startOffset = 0;
       scroller.addEventListener('touchstart', e => {
         startX      = e.touches[0].clientX;
-        startScroll = scroller.scrollLeft;
+        startOffset = offsetX;
       }, { passive: true });
       scroller.addEventListener('touchmove', e => {
-        const dx = startX - e.touches[0].clientX;
-        const inner = scroller.firstElementChild;
-        const maxScroll = inner ? Math.max(0, inner.offsetWidth - scroller.offsetWidth) : 0;
-        scroller.scrollLeft = Math.max(0, Math.min(maxScroll, startScroll + dx));
+        applyOffset(startOffset + (startX - e.touches[0].clientX));
       }, { passive: true });
     }, 0);
   }
@@ -977,12 +979,14 @@ function openDetail(uid) {
   S.period = 'heute';
   S.chartZoomed = false;
   S.chartRes = '15min';
+  document.body.style.overflow = 'hidden';
   render();
   document.querySelector('.modal-scrim')?.scrollTo(0, 0);
 }
 
 function closeDetail(e) {
   S.currentUid = null;
+  document.body.style.overflow = '';
   render();
 }
 
