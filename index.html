@@ -757,10 +757,10 @@ function renderDetail() {
       <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:${META};margin-top:6px;">${v.address}</div>
 
       <!-- Stat cards -->
-      <div style="margin-top:clamp(16px,4vw,24px);display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;">
+      <div style="margin-top:clamp(16px,4vw,24px);display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;">
         ${hasGuests ? `<!-- Gäste -->
         <div class="stat-card" onclick="toggleStat('guest')" id="sc-guest">
-          <div style="margin-top:auto;">
+          <div>
             <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:${guestColor};font-size:clamp(32px,8vw,48px);">${fill != null ? numFmt(fill) : '–'}</div>
             <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">Gäste jetzt</div>
           </div>
@@ -770,7 +770,7 @@ function renderDetail() {
         <!-- Temperatur (Halle: nur anzeigen wenn fixe Beckendaten vorhanden) -->
         ${isHalle && !hasTemp ? '' : `
         <div class="stat-card" onclick="${hasTemp ? "toggleStat('temp')" : ''}" id="sc-temp" style="cursor:${hasTemp ? 'pointer' : 'default'};">
-          <div style="margin-top:auto;">
+          <div>
             <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:${hasTemp ? BLACK : META};font-size:clamp(32px,8vw,48px);">${displayTemp}</div>
             <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">${isHalle ? 'Beckentemperatur' : 'Wassertemperatur'}</div>
           </div>
@@ -779,7 +779,7 @@ function renderDetail() {
 
         <!-- Öffnungszeiten (immer anzeigen) -->
         <div class="stat-card" onclick="toggleStat('hours')" id="sc-hours">
-          <div style="margin-top:auto;">
+          <div>
             <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.95;color:${BLACK};font-size:clamp(18px,4vw,26px);white-space:nowrap;">${v.hours}</div>
             <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">Öffnigszite</div>
           </div>
