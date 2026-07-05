@@ -573,7 +573,7 @@ function renderDetail() {
   const typeColor = TYPE_COLOR[v.type];
   const statusColor = isOpen ? '#2A9D63' : META;
   const statusDot = isOpen ? '#2A9D63' : '#CFCFCC';
-  const guestColor = isOpen ? INK : META;
+  const guestColor = isOpen ? typeColor : META;
 
   // Period tabs — Winter nur für Ganzjahres-Badis
   const isYearRound = v.season === 'Ganzjährig';
@@ -656,6 +656,12 @@ function renderDetail() {
   // Stat cards
   const statBg = '#F4F4F4';
 
+  // Typischer Wert für heute zur aktuellen Zeit (für Sekundäranzeige in der Gäste-Karte)
+  const todaySlots  = slotsFor(v.uid, dayTypeFor(todayWd()));
+  const typSlotNow  = todaySlots.length ? nearestSlot(todaySlots, nowHHMM()) : null;
+  const typNow      = (typSlotNow && live?.maxspace)
+    ? Math.round(Math.min(typSlotNow.auslastung, 100) / 100 * live.maxspace) : null;
+
   // Guest weekly comparison — for today: live count; for other days: typical at current time
   const guestList = wdEntries.map(w => {
     const dt = dayTypeFor(w.k);
@@ -723,6 +729,7 @@ function renderDetail() {
           <div style="margin-top:auto;">
             <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:${guestColor};font-size:clamp(32px,8vw,48px);">${fill != null ? numFmt(fill) : '–'}</div>
             <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">Gäste jetzt</div>
+            ${typNow != null ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:${META};margin-top:5px;">≈ ${numFmt(typNow)} typisch heute</div>` : ''}
           </div>
           ${S.guestOpen ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">${guestList}</div>` : ''}
         </div>` : ''}
