@@ -427,7 +427,7 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
     return `
     <div style="position:relative;margin-left:${yAxisW}px;">
       ${yAxisEl}
-      <div id="chart-scroll" style="overflow-x:hidden;overflow-y:hidden;touch-action:none;">
+      <div id="chart-scroll" style="overflow-x:scroll;overflow-y:hidden;touch-action:pan-x;-webkit-overflow-scrolling:touch;">
         <div style="min-width:${minW}px;">
           ${svgEl}
           <div style="position:relative;height:16px;margin-top:7px;">${makeLabels(slots)}</div>
@@ -912,36 +912,16 @@ function render() {
 
   document.getElementById('app').innerHTML = html;
 
-  // Chart-Scroll: translateX statt scrollLeft (iOS Safari ignoriert scrollLeft auf overflow:hidden)
+  // Auto-scroll zum "jetzt"-Balken
   if (S.chartZoomed && S.currentUid) {
     setTimeout(() => {
       const scroller = document.getElementById('chart-scroll');
       if (!scroller) return;
-      const inner = scroller.firstElementChild;
-      if (!inner) return;
-
-      let offsetX = 0;
-      const maxOffset = () => Math.max(0, inner.offsetWidth - scroller.offsetWidth);
-      const applyOffset = x => {
-        offsetX = Math.max(0, Math.min(maxOffset(), x));
-        inner.style.transform = `translateX(-${offsetX}px)`;
-      };
-
-      // Auto-scroll zum "jetzt"-Balken (offsetLeft ist transform-unabhängig)
-      const nowBar = inner.querySelector('[data-now="true"]');
-      if (nowBar) {
-        applyOffset(nowBar.offsetLeft - scroller.offsetWidth / 2 + nowBar.offsetWidth / 2);
-      }
-
-      // Manueller Touch-Scroll via transform (kein nativer iOS-Scroll, kein Snap-back)
-      let startX = 0, startOffset = 0;
-      scroller.addEventListener('touchstart', e => {
-        startX      = e.touches[0].clientX;
-        startOffset = offsetX;
-      }, { passive: true });
-      scroller.addEventListener('touchmove', e => {
-        applyOffset(startOffset + (startX - e.touches[0].clientX));
-      }, { passive: true });
+      const nowBar = scroller.querySelector('[data-now="true"]');
+      if (!nowBar) return;
+      const sr = scroller.getBoundingClientRect();
+      const br = nowBar.getBoundingClientRect();
+      scroller.scrollLeft = Math.max(0, br.left - sr.left + scroller.scrollLeft - scroller.clientWidth / 2 + br.width / 2);
     }, 0);
   }
 
