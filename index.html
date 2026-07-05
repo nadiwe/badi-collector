@@ -24,8 +24,6 @@ a{text-decoration:none;color:inherit;}
 .modal-sheet{background:#fff;border-radius:clamp(16px,4vw,28px);padding:clamp(16px,4vw,24px);box-shadow:0 4px 22px rgba(23,61,52,.12);width:100%;max-width:740px;display:flex;flex-direction:column;gap:0;max-height:calc(100dvh - 32px);overflow-y:auto;}
 .stat-card{flex:1;min-width:150px;padding:clamp(14px,3.5vw,20px) clamp(14px,3.5vw,22px);background:#F4F4F4;border-radius:20px;cursor:pointer;display:flex;flex-direction:column;transition:background .18s;}
 .stat-card:hover{background:#ECECEC;}
-.chart-scroll::-webkit-scrollbar{display:none;}
-.chart-scroll{scrollbar-width:none;}
 </style>
 </head>
 <body>
@@ -293,20 +291,32 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
   let slots = slotsFor(uid, dayType);
   if (!slots.length) return '<div style="height:116px;display:flex;align-items:center;justify-content:center;color:#8C8C8C;font-family:\'IBM Plex Mono\',monospace;font-size:11px;">Noch keine Daten</div>';
   if (res === '1h') slots = groupByHour(slots);
-  const vals = slots.map(s => s.auslastung);
-  const max = Math.max(...vals, 0.001);
-  const norm = vals.map(v => v / max);
-  const nowMin = nowHHMM();
-  const nowIdx = dayType === dayTypeFor(todayWd()) ? slots.reduce((bi, s, i) =>
-    Math.abs(hhmm(s.zeit) - nowMin) < Math.abs(hhmm(slots[bi].zeit) - nowMin) ? i : bi, 0) : -1;
-  const n = norm.length;
-  const H = 34;
-  const barPx = 20;
-  const W    = zoomed ? n * barPx : 100;
-  const gap  = zoomed ? 3 : (n > 12 ? 0.3 : 0.8);
-  const bw   = zoomed ? barPx - gap : (W / n) - gap;
-  const xs   = i => i * (W / n) + gap / 2;
-  const ys   = v => H - 2 - Math.max(0.04, v) * (H - 4);
+
+  const isToday = dayType === dayTypeFor(todayWd());
+  const nowMin  = nowHHMM();
+
+  // Zoom = ±2h Zeitfenster um jetzt (nur heute)
+  let displaySlots = slots;
+  if (zoomed && isToday) {
+    const win = res === '1h' ? 180 : 120;
+    const filtered = slots.filter(s => Math.abs(hhmm(s.zeit) - nowMin) <= win);
+    if (filtered.length >= 3) displaySlots = filtered;
+  }
+
+  const n    = displaySlots.length;
+  const vals = displaySlots.map(s => s.auslastung);
+  const maxV = Math.max(...vals, 0.001);
+  const norm = vals.map(v => v / maxV);
+
+  const nowIdx = isToday ? displaySlots.reduce((bi, s, i) =>
+    Math.abs(hhmm(s.zeit) - nowMin) < Math.abs(hhmm(displaySlots[bi].zeit) - nowMin) ? i : bi, 0) : -1;
+
+  const H   = 34;
+  const W   = 100;
+  const gap = n > 12 ? 0.3 : 0.8;
+  const bw  = (W / n) - gap;
+  const xs  = i => i * (W / n) + gap / 2;
+  const ys  = v => H - 2 - Math.max(0.04, v) * (H - 4);
 
   const gridLines = [0, 0.33, 0.67, 1].map(f => {
     const gy = ys(f);
@@ -315,43 +325,28 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
 
   const bars = norm.map((v, i) => {
     const isNow = i === nowIdx;
-    const y = ys(v);
+    const y    = ys(v);
     const fill = isNow ? periodColor : periodColor + '38';
-    return `<rect${isNow ? ' data-now="true"' : ''} x="${xs(i).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.6, (H - 2) - y).toFixed(1)}" rx="${Math.min(1.4, bw * 0.25).toFixed(1)}" fill="${fill}"/>`;
+    return `<rect x="${xs(i).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.6, (H - 2) - y).toFixed(1)}" rx="${Math.min(1.4, bw * 0.25).toFixed(1)}" fill="${fill}"/>`;
   }).join('');
 
-  const step = zoomed
-    ? (res === '1h' ? 1 : 4)
-    : Math.max(1, Math.ceil(n / 6));
-  const labels = slots.map((s, i) => {
-    const show = zoomed ? (i % step === 0 || i === n - 1) : (i % step === 0 || i === n - 1);
-    return zoomed
-      ? `<div style="width:${barPx}px;flex-shrink:0;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#ADADA9;overflow:hidden;">${show ? s.zeit : ''}</div>`
-      : `<div style="flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#ADADA9;overflow:hidden;">${show ? s.zeit : ''}</div>`;
+  // Zoomed: alle Labels sichtbar; normal: ~alle 2h bei 15min, ~6 Labels bei 1h
+  const step = zoomed ? 1 : (res === '15min' ? 8 : Math.max(1, Math.ceil(n / 6)));
+
+  // Absolut positionierte Labels damit sie nicht abgeschnitten werden
+  const labelItems = displaySlots.map((s, i) => {
+    if (!(i % step === 0 || i === n - 1)) return '';
+    const pct = n > 1 ? (i / (n - 1) * 100) : 50;
+    return `<span style="position:absolute;left:${pct.toFixed(1)}%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:9px;color:#ADADA9;white-space:nowrap;">${s.zeit}</span>`;
   }).join('');
 
-  if (zoomed) {
-    return `
-    <div id="chart-scroll" style="overflow-x:auto;overflow-y:hidden;">
-      <div style="width:${W}px;">
-        <div style="height:116px;">
-          <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="${W}" height="100%" style="display:block;overflow:visible">
-            ${gridLines}${bars}
-          </svg>
-        </div>
-        <div style="display:flex;margin-top:7px;">${labels}</div>
-      </div>
-    </div>`;
-  }
   return `
     <div style="position:relative;height:116px;">
-      <div style="height:100%;margin-left:0;">
-        <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="100%" height="100%" style="display:block;overflow:visible">
-          ${gridLines}${bars}
-        </svg>
-      </div>
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="100%" height="100%" style="display:block;overflow:visible">
+        ${gridLines}${bars}
+      </svg>
     </div>
-    <div style="display:flex;gap:2px;margin-top:7px;">${labels}</div>`;
+    <div style="position:relative;height:16px;margin-top:7px;">${labelItems}</div>`;
 }
 
 function seasonChart(uid, half, color) {
@@ -793,15 +788,6 @@ function render() {
 
   document.getElementById('app').innerHTML = html;
 
-  if (S.chartZoomed && S.currentUid) {
-    setTimeout(() => {
-      const el = document.getElementById('chart-scroll');
-      if (el) {
-        const nowBar = el.querySelector('[data-now="true"]');
-        if (nowBar) el.scrollLeft = Math.max(0, nowBar.offsetLeft - el.clientWidth / 2 + nowBar.offsetWidth / 2);
-      }
-    }, 0);
-  }
 }
 
 // ── Actions ────────────────────────────────────────────────────────────────
