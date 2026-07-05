@@ -112,6 +112,7 @@ let _renderQueued = false;
 // ── Data ───────────────────────────────────────────────────────────────────
 let AW = {};     // uid → {slots:{Werktag:[],Wochenende:[],Feiertag:[]}, messtage_echt, ...}
 let LIVE = null; // {timestamp, venues:{uid:{currentfill,freespace,maxspace,temperatureWater,openClosed}}}
+let HEUTE_SLOTS = {}; // uid → [{zeit:"HH:MM", auslastung:pct}] — heutige Istdaten aus CSV
 let TEMP_CACHE = {};         // tempUid → [{zeit, temp}]
 let TEMP_CSV_LOADING = false;
 let TEMP_CSV_DONE    = false;
@@ -155,6 +156,7 @@ function computeIsOpen(uid) {
 }
 
 function slotsFor(uid, dayType) {
+  if (dayType === 'Heute') return HEUTE_SLOTS[uid] || [];
   const b = AW[uid];
   if (!b) return [];
   return (b.slots[dayType] || []).filter(s => s.auslastung != null);
@@ -365,7 +367,7 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
     }
   }
 
-  const isToday = dayType === dayTypeFor(todayWd());
+  const isToday = dayType === 'Heute' || dayType === dayTypeFor(todayWd());
   const nowMin  = nowHHMM();
 
   // Aktuellen Live-Wert als Balken einfügen (nur heute, nur wenn Live-Daten vorhanden)
@@ -719,7 +721,7 @@ function renderDetail() {
   if (S.period === 'sommer' || S.period === 'winter') {
     chart = seasonChart(v.uid, S.period, S.period === 'sommer' ? ORANGE : BLACK);
   } else {
-    const chartDayType = S.period === 'heute' ? dayTypeFor(todayWd()) : dayTypeFor(S.weekday);
+    const chartDayType = S.period === 'heute' ? 'Heute' : dayTypeFor(S.weekday);
     const chartColor = S.period === 'heute' ? PURPLE : INK;
     chart = detailBarChart(v.uid, chartDayType, chartColor, S.chartZoomed, S.chartRes);
   }
@@ -1093,6 +1095,27 @@ function fetchLive() {
   return fetch(BASE + 'data/live.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null);
 }
 
+async function loadHeuteSlots() {
+  const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Zurich' }); // "2026-07-05"
+  try {
+    const r = await fetch(BASE + 'data/besucher/' + currentWeekFile() + '.csv?t=' + Date.now());
+    if (!r.ok) return;
+    const lines = (await r.text()).trim().split('\n').slice(1); // header überspringen
+    const next = {};
+    for (const line of lines) {
+      const [timestamp, uid, , currentfill, , maxspace] = line.split(',');
+      if (!timestamp?.startsWith(today)) continue;
+      if (!VENUE_MAP[uid]) continue;
+      const ms = parseFloat(maxspace), cf = parseFloat(currentfill);
+      if (!ms || isNaN(cf)) continue;
+      const zeit = timestamp.slice(11, 16); // "HH:MM"
+      if (!next[uid]) next[uid] = [];
+      next[uid].push({ zeit, auslastung: cf / ms * 100 });
+    }
+    HEUTE_SLOTS = next;
+  } catch(e) {}
+}
+
 async function fetchBesucherWS() {
   return new Promise((resolve, reject) => {
     try {
@@ -1227,6 +1250,7 @@ async function refreshTemps() {
 Promise.all([
   fetch(BASE + 'auswertung/auswertung.json').then(r => r.ok ? r.json() : null).catch(() => null),
   Promise.allSettled([fetchBesucherWS(), loadTemps()]),
+  loadHeuteSlots(),
 ]).then(([aw, [wsRes]]) => {
   if (aw?.badis) AW = Object.fromEntries(aw.badis.map(b => [b.uid, b]));
   if (wsRes.status === 'fulfilled') {
@@ -1244,13 +1268,18 @@ Promise.all([
   // Temperaturen alle 2 Minuten neu laden (nur HTTP möglich)
   setInterval(refreshTemps, 2 * 60 * 1000);
 
+  // Heutige CSV-Messdaten alle 15 Minuten aktualisieren
+  setInterval(() => loadHeuteSlots().then(() => render()), 15 * 60 * 1000);
+
   // "vor X Min" Label jede Minute aktualisieren
   setInterval(() => render(), 60 * 1000);
 }).catch(() => {
   // Fallback: statische live.json
   fetchLive().then(live => { LIVE = parseLive(live); render(); });
   connectWS();
+  loadHeuteSlots();
   setInterval(refreshTemps, 2 * 60 * 1000);
+  setInterval(() => loadHeuteSlots().then(() => render()), 15 * 60 * 1000);
   setInterval(() => render(), 60 * 1000);
 });
 </script>
