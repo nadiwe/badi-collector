@@ -771,8 +771,8 @@ function renderDetail() {
   }).join('');
 
   return `
-  <div class="modal-scrim" onclick="closeDetail(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
+  <div class="modal-scrim" onclick="closeDetail(event)" style="${S.chartZoomed ? 'overflow-y:hidden;' : ''}">
+    <div class="modal-sheet" onclick="event.stopPropagation()" style="${S.chartZoomed ? 'overflow-y:hidden;' : ''}">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;">
         <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;">
           <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:${META};font-weight:600;">${TYPE_LABEL[v.type]}</div>
@@ -926,28 +926,6 @@ function render() {
     }, 0);
   }
 
-  // iOS-Fix: vertikalen Scroll des Modals via CSS sperren sobald horizontale Geste erkannt
-  setTimeout(() => {
-    const scroller = document.getElementById('chart-scroll');
-    const sheet    = document.querySelector('.modal-sheet');
-    if (!scroller || !sheet) return;
-    let startX = 0, startY = 0, locked = false;
-    const unlock = () => { sheet.style.overflowY = ''; locked = false; };
-    scroller.addEventListener('touchstart', e => {
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-      locked = false;
-    }, { passive: true });
-    scroller.addEventListener('touchmove', e => {
-      if (locked) return;
-      const dx = Math.abs(e.touches[0].clientX - startX);
-      const dy = Math.abs(e.touches[0].clientY - startY);
-      if (dx < 3 && dy < 3) return;
-      if (dx > dy) { locked = true; sheet.style.overflowY = 'hidden'; }
-    }, { passive: true });
-    scroller.addEventListener('touchend',    unlock, { passive: true });
-    scroller.addEventListener('touchcancel', unlock, { passive: true });
-  }, 0);
 
   // Temperatur- und Öffnungszeiten-Kachel auf gleiche Höhe bringen
   setTimeout(() => {
