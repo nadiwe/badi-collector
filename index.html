@@ -346,13 +346,17 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
 
   const chartH  = zoomed ? 200 : 116;
   const labelFz = zoomed ? '10px' : '9px';
-  const yAxisW  = 32; // left margin for y-axis labels
 
-  // Y-Achse: Labels at the 4 grid lines, positioned to match the SVG grid exactly.
-  // Both the y-axis div and the SVG share the same parent → same top anchor → same height → ys(f)/H*100% = same %.
+  // Y-Achse: absolute Gästezahl wenn maxspace bekannt, sonst Prozent als Fallback
+  const liveMaxspace = LIVE?.venues?.[uid]?.maxspace;
+  const absMax  = liveMaxspace != null ? Math.round(maxV / 100 * liveMaxspace) : null;
+  const yAxisW  = absMax != null && absMax >= 1000 ? 42 : 32;
+
   const yAxis = [1, 0.67, 0.33, 0].map(f => {
     const topPct = (ys(f) / H * 100).toFixed(1);
-    const val    = f === 0 ? '0%' : Math.round(Math.min(100, maxV * f)) + '%';
+    const val = absMax != null
+      ? (f === 0 ? '0' : numFmt(Math.round(f * absMax)))
+      : (f === 0 ? '0%' : Math.round(Math.min(100, maxV * f)) + '%');
     return `<span style="position:absolute;top:${topPct}%;right:0;transform:translateY(-50%);font-family:'IBM Plex Mono',monospace;font-size:8px;color:#ADADA9;line-height:1;white-space:nowrap;">${val}</span>`;
   }).join('');
 
