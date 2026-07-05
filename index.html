@@ -888,6 +888,18 @@ function render() {
       scroller.scrollLeft = Math.max(0, barLeft - scroller.clientWidth / 2 + br.width / 2);
     }, 0);
   }
+
+  // Temperatur- und Öffnungszeiten-Kachel auf gleiche Höhe bringen
+  setTimeout(() => {
+    const tempEl  = document.getElementById('sc-temp');
+    const hoursEl = document.getElementById('sc-hours');
+    if (!tempEl || !hoursEl) return;
+    tempEl.style.minHeight  = '';
+    hoursEl.style.minHeight = '';
+    const h = Math.max(tempEl.offsetHeight, hoursEl.offsetHeight);
+    tempEl.style.minHeight  = h + 'px';
+    hoursEl.style.minHeight = h + 'px';
+  }, 0);
 }
 
 // ── Actions ────────────────────────────────────────────────────────────────
