@@ -347,6 +347,20 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
     }
   }
 
+  // Für 15min-Modus: Sentinel-Nullpunkte an Öffnungs-/Schliesszeit damit X-Achse vollen Tag zeigt
+  if (zoomed && res === '15min') {
+    const p = openingParts();
+    if (p && slots.length) {
+      const oMin = hhmm(p[0]), cMin = hhmm(p[1]);
+      const extra = [];
+      if (hhmm(slots[0].zeit) > oMin)
+        extra.push({ zeit: p[0], auslastung: null });
+      if (hhmm(slots[slots.length - 1].zeit) < cMin)
+        extra.push({ zeit: p[1], auslastung: null });
+      if (extra.length) slots = [...slots, ...extra].sort((a, b) => hhmm(a.zeit) - hhmm(b.zeit));
+    }
+  }
+
   const isToday = dayType === dayTypeFor(todayWd());
   const nowMin  = nowHHMM();
   const n       = slots.length;
@@ -911,6 +925,22 @@ function render() {
       scroller.scrollLeft = Math.max(0, barLeft - scroller.clientWidth / 2 + br.width / 2);
     }, 0);
   }
+
+  // iOS-Fix: vertikalen Scroll des Modals blockieren wenn horizontal gescrollt wird
+  setTimeout(() => {
+    const scroller = document.getElementById('chart-scroll');
+    if (!scroller) return;
+    let startX = 0, startY = 0;
+    scroller.addEventListener('touchstart', e => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+    scroller.addEventListener('touchmove', e => {
+      const dx = Math.abs(e.touches[0].clientX - startX);
+      const dy = Math.abs(e.touches[0].clientY - startY);
+      if (dx > dy) e.preventDefault();
+    }, { passive: false });
+  }, 0);
 
   // Temperatur- und Öffnungszeiten-Kachel auf gleiche Höhe bringen
   setTimeout(() => {
