@@ -427,7 +427,7 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
     return `
     <div style="position:relative;margin-left:${yAxisW}px;">
       ${yAxisEl}
-      <div id="chart-scroll" style="overflow-x:auto;overflow-y:hidden;touch-action:pan-x;">
+      <div id="chart-scroll" style="overflow-x:hidden;overflow-y:hidden;touch-action:none;">
         <div style="min-width:${minW}px;">
           ${svgEl}
           <div style="position:relative;height:16px;margin-top:7px;">${makeLabels(slots)}</div>
@@ -912,17 +912,34 @@ function render() {
 
   document.getElementById('app').innerHTML = html;
 
-  // Auto-scroll to "now" bar in zoom modes
+  // Auto-scroll to "now" bar + manueller Touch-Scroll (iOS-kompatibel)
   if (S.chartZoomed && S.currentUid) {
     setTimeout(() => {
       const scroller = document.getElementById('chart-scroll');
       if (!scroller) return;
+
+      // Auto-scroll zum "jetzt"-Balken
       const nowBar = scroller.querySelector('[data-now="true"]');
-      if (!nowBar) return;
-      const sr  = scroller.getBoundingClientRect();
-      const br  = nowBar.getBoundingClientRect();
-      const barLeft = br.left - sr.left + scroller.scrollLeft;
-      scroller.scrollLeft = Math.max(0, barLeft - scroller.clientWidth / 2 + br.width / 2);
+      if (nowBar) {
+        const sr  = scroller.getBoundingClientRect();
+        const br  = nowBar.getBoundingClientRect();
+        const barLeft = br.left - sr.left + scroller.scrollLeft;
+        scroller.scrollLeft = Math.max(0, barLeft - scroller.clientWidth / 2 + br.width / 2);
+      }
+
+      // Manueller Touch-Scroll: overflow-x:hidden + scrollLeft via JS
+      // → iOS kann die Geste nicht klauen, kein Snap-back
+      let startX = 0, startScroll = 0;
+      scroller.addEventListener('touchstart', e => {
+        startX      = e.touches[0].clientX;
+        startScroll = scroller.scrollLeft;
+      }, { passive: true });
+      scroller.addEventListener('touchmove', e => {
+        const dx = startX - e.touches[0].clientX;
+        const inner = scroller.firstElementChild;
+        const maxScroll = inner ? Math.max(0, inner.offsetWidth - scroller.offsetWidth) : 0;
+        scroller.scrollLeft = Math.max(0, Math.min(maxScroll, startScroll + dx));
+      }, { passive: true });
     }, 0);
   }
 
