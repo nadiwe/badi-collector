@@ -29,7 +29,7 @@ BESUCHER_IDS = {
 
 # Temperaturen — poiids aus der Stadt-Zürich-API (ohne Hallenbad Altstetten)
 TEMPERATUREN_IDS = {
-    "flb6939", "flb6940", "flb8803", "flb6941",
+    "flb6938", "flb6939", "flb6940", "flb8803", "flb6941", "flb6942",
     "fb002",
     "fb006", "fb008", "fb012", "fb013", "fb018",
     "seb6943",
@@ -135,6 +135,13 @@ def collect_temperaturen() -> dict:
     return snapshot
 
 
+# Venues nur in der XML-API (keine Besucherzahlen via Crowdmonitor)
+_XML_ONLY_IDS = {
+    "flb6938": "flb6938",  # Flussbad Au-Höngg
+    "flb6942": "flb6942",  # Männerbad Schanzengraben
+}
+
+
 def generate_live_json(besucher: dict, temperaturen: dict, timestamp: str) -> None:
     venues: dict = {}
     for uid in BESUCHER_IDS:
@@ -147,6 +154,17 @@ def generate_live_json(besucher: dict, temperaturen: dict, timestamp: str) -> No
             "currentfill":      b.get("currentfill"),
             "freespace":        b.get("freespace"),
             "maxspace":         b.get("maxspace"),
+            "temperatureWater": t.get("temperatureWater"),
+            "openClosed":       t.get("openClosed"),
+        }
+    for uid, temp_uid in _XML_ONLY_IDS.items():
+        t = temperaturen.get(temp_uid, {})
+        if not t:
+            continue
+        venues[uid] = {
+            "currentfill":      None,
+            "freespace":        None,
+            "maxspace":         None,
             "temperatureWater": t.get("temperatureWater"),
             "openClosed":       t.get("openClosed"),
         }

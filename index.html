@@ -47,10 +47,12 @@ const VENUES = [
   { uid:'seb6946',  name:'Strandbad Mythenquai',              type:'see',   tempUid:'seb6946', address:'Mythenquai 95, 8002 Zürich',             hours:'09:00–20:00', season:'Mai–Sep'   },
   { uid:'seb6947',  name:'Strandbad Tiefenbrunnen',           type:'see',   tempUid:'seb6947', address:'Bellerivestrasse 201, 8008 Zürich',      hours:'09:00–20:00', season:'Mai–Sep'   },
   { uid:'seb6948',  name:'Strandbad Wollishofen',             type:'see',   tempUid:'seb6948', address:'Mythenquai 559, 8038 Zürich',            hours:'09:00–20:00', season:'Mai–Sep'   },
+  { uid:'flb6938',  name:'Flussbad Au-Höngg',                  type:'fluss', tempUid:'flb6938', address:'Föhrenbühlweg 5, 8049 Zürich',           hours:'07:00–20:00', season:'Mai–Sep'   },
   { uid:'flb6939',  name:'Flussbad Oberer Letten',            type:'fluss', tempUid:'flb6939', address:'Lettensteg 10, 8037 Zürich',             hours:'07:00–20:00', season:'Mai–Sep'   },
   { uid:'flb6940',  name:'Flussbad Unterer Letten',           type:'fluss', tempUid:'flb6940', address:'Wasserwerkstrasse 141, 8037 Zürich',     hours:'07:00–20:00', season:'Mai–Sep'   },
   { uid:'flb8803',  name:'Flussbad Unterer Letten (Flussteil)',type:'fluss',tempUid:'flb8803', address:'Wasserwerkstrasse 141, 8037 Zürich',     hours:'07:00–20:00', season:'Mai–Sep', note:'Flussteil' },
   { uid:'flb6941',  name:'Frauenbad Stadthausquai',           type:'fluss', tempUid:'flb6941', address:'Stadthausquai 12, 8001 Zürich',          hours:'07:00–20:00', season:'Mai–Sep', note:'Nur Frauen' },
+  { uid:'flb6942',  name:'Männerbad Schanzengraben',          type:'fluss', tempUid:'flb6942', address:'Kanonengasse 20, 8004 Zürich',           hours:'07:00–20:00', season:'Mai–Sep', note:'Nur Männer' },
   { uid:'LETZI-1',  name:'Freibad Letzigraben',               type:'frei',  tempUid:'fb002',   address:'Edelweissstrasse 5, 8048 Zürich',        hours:'09:00–21:30', season:'Mai–Sep', note:'Max-Frisch-Bad' },
   { uid:'fb006',    name:'Freibad Allenmoos',                 type:'frei',  tempUid:'fb006',   address:'Ria-Schwarzwald-Weg 1, 8057 Zürich',     hours:'09:00–20:00', season:'Mai–Sep'   },
   { uid:'fb008',    name:'Freibad Auhof',                     type:'frei',  tempUid:'fb008',   address:'Glaubtenstrasse 67, 8046 Zürich',        hours:'09:00–20:00', season:'Mai–Sep'   },
@@ -292,16 +294,17 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
   if (!slots.length) return '<div style="height:116px;display:flex;align-items:center;justify-content:center;color:#8C8C8C;font-family:\'IBM Plex Mono\',monospace;font-size:11px;">Noch keine Daten</div>';
   if (res === '1h') slots = groupByHour(slots);
 
-  // Auf Öffnungszeiten der Badi einschränken
+  // Auf Öffnungszeiten einschränken
   const meta = VENUE_MAP[uid];
-  if (meta?.hours) {
+  function filterToHours(arr) {
+    if (!meta?.hours) return arr;
     const parts = meta.hours.split(/[–-]/);
-    if (parts.length === 2) {
-      const oMin = hhmm(parts[0].trim()), cMin = hhmm(parts[1].trim());
-      const within = slots.filter(s => hhmm(s.zeit) >= oMin && hhmm(s.zeit) <= cMin);
-      if (within.length >= 3) slots = within;
-    }
+    if (parts.length !== 2) return arr;
+    const oMin = hhmm(parts[0].trim()), cMin = hhmm(parts[1].trim());
+    const f = arr.filter(s => hhmm(s.zeit) >= oMin && hhmm(s.zeit) <= cMin);
+    return f.length >= 3 ? f : arr;
   }
+  slots = filterToHours(slots);
 
   const isToday = dayType === dayTypeFor(todayWd());
   const nowMin  = nowHHMM();
@@ -315,10 +318,22 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
 
   const H   = 34;
   const W   = 100;
-  const gap = n > 12 ? 0.3 : 0.8;
+  const gap = n > 20 ? 0.3 : 0.8;
   const bw  = (W / n) - gap;
   const xs  = i => i * (W / n) + gap / 2;
   const ys  = v => H - 2 - Math.max(0.04, v) * (H - 4);
+
+  const chartH  = zoomed ? 200 : 116;
+  const labelFz = zoomed ? '10px' : '9px';
+  const yAxisW  = 32; // left margin for y-axis labels
+
+  // Y-Achse: Labels at the 4 grid lines, positioned to match the SVG grid exactly.
+  // Both the y-axis div and the SVG share the same parent → same top anchor → same height → ys(f)/H*100% = same %.
+  const yAxis = [1, 0.67, 0.33, 0].map(f => {
+    const topPct = (ys(f) / H * 100).toFixed(1);
+    const val    = f === 0 ? '0%' : Math.round(Math.min(100, maxV * f)) + '%';
+    return `<span style="position:absolute;top:${topPct}%;right:0;transform:translateY(-50%);font-family:'IBM Plex Mono',monospace;font-size:8px;color:#ADADA9;line-height:1;white-space:nowrap;">${val}</span>`;
+  }).join('');
 
   const gridLines = [0, 0.33, 0.67, 1].map(f => {
     const gy = ys(f);
@@ -329,29 +344,48 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
     const isNow = i === nowIdx;
     const y    = ys(v);
     const fill = isNow ? periodColor : periodColor + '38';
-    return `<rect x="${xs(i).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.6, (H - 2) - y).toFixed(1)}" rx="${Math.min(1.4, bw * 0.25).toFixed(1)}" fill="${fill}"/>`;
+    return `<rect${isNow ? ' data-now="true"' : ''} x="${xs(i).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.6, (H - 2) - y).toFixed(1)}" rx="${Math.min(1.4, bw * 0.25).toFixed(1)}" fill="${fill}"/>`;
   }).join('');
 
-  // Ohne Zoom: ~6 Labels; Mit Zoom: jede Stunde (15min) resp. jede Stunde (1h)
-  const step = zoomed
-    ? (res === '15min' ? 4 : 1)
-    : Math.max(1, Math.ceil(n / 6));
+  // Ohne Zoom: ~6 Labels; Zoom 1h: jede Stunde; Zoom 15min: jede Stunde (step=4)
+  const step = zoomed ? (res === '15min' ? 4 : 1) : Math.max(1, Math.ceil(n / 6));
 
-  const labelFz = zoomed ? '10px' : '9px';
-  const labelItems = slots.map((s, i) => {
-    if (!(i % step === 0 || i === n - 1)) return '';
-    const pct = n > 1 ? (i / (n - 1) * 100) : 50;
-    return `<span style="position:absolute;left:${pct.toFixed(1)}%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:${labelFz};color:#ADADA9;white-space:nowrap;">${s.zeit}</span>`;
-  }).join('');
+  function makeLabels(arr) {
+    return arr.map((s, i) => {
+      if (!(i % step === 0 || i === arr.length - 1)) return '';
+      const pct = arr.length > 1 ? (i / (arr.length - 1) * 100) : 50;
+      return `<span style="position:absolute;left:${pct.toFixed(1)}%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:${labelFz};color:#ADADA9;white-space:nowrap;">${s.zeit}</span>`;
+    }).join('');
+  }
 
-  const chartH = zoomed ? 200 : 116;
+  // Y-axis: absolutely positioned to the LEFT of the chart area, sharing the same parent top.
+  // margin-left:${yAxisW}px on parent makes room; y-axis at left:-${yAxisW}px.
+  const yAxisEl = `<div style="position:absolute;left:-${yAxisW}px;top:0;width:${yAxisW - 4}px;height:${chartH}px;">${yAxis}</div>`;
+  const svgEl   = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="100%" height="${chartH}" style="display:block;overflow:visible;">${gridLines}${bars}</svg>`;
+
+  if (zoomed && res === '15min') {
+    // Each 15min bar = same pixel width as a 1h bar → inner div width = n/n1h × 100%
+    const slots1h = filterToHours(groupByHour(slotsFor(uid, dayType)));
+    const n1h     = Math.max(slots1h.length, 1);
+    const relW    = Math.round(n / n1h * 100);
+    return `
+    <div style="position:relative;margin-left:${yAxisW}px;">
+      ${yAxisEl}
+      <div id="chart-scroll" style="width:100%;overflow-x:auto;overflow-y:hidden;">
+        <div style="width:${relW}%;">
+          ${svgEl}
+          <div style="position:relative;height:16px;margin-top:7px;">${makeLabels(slots)}</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
   return `
-    <div style="position:relative;height:${chartH}px;">
-      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="100%" height="100%" style="display:block;overflow:visible">
-        ${gridLines}${bars}
-      </svg>
-    </div>
-    <div style="position:relative;height:16px;margin-top:7px;">${labelItems}</div>`;
+    <div style="position:relative;margin-left:${yAxisW}px;">
+      ${yAxisEl}
+      ${svgEl}
+      <div style="position:relative;height:16px;margin-top:7px;">${makeLabels(slots)}</div>
+    </div>`;
 }
 
 function seasonChart(uid, half, color) {
@@ -482,8 +516,9 @@ function renderCard(v) {
   const noLive = !live;
   const fill = live?.currentfill;
   const temp = live?.temperatureWater;
-  const hasTemp = temp != null && temp !== '';
-  const guestStr = fill != null ? numFmt(fill) : '–';
+  const hasTemp    = temp != null && temp !== '';
+  const hasGuests  = live?.maxspace != null;
+  const guestStr   = fill != null ? numFmt(fill) : '–';
   const statusLabel = isOpen ? 'offen' : (noLive ? '–' : 'geschlossen');
   const tempStr = hasTemp ? temp + '°' : '–';
   const dev = devInfo(v.uid);
@@ -502,14 +537,16 @@ function renderCard(v) {
       <button onclick="event.stopPropagation();toggleFav('${v.uid}')" aria-label="Favorit"
         style="font-size:19px;line-height:1;background:none;border:none;cursor:pointer;padding:2px;color:${fav ? '#fff' : 'rgba(255,255,255,.4)'};transition:color .15s;flex-shrink:0;margin-left:auto;">${fav ? '★' : '☆'}</button>
     </div>
+    ${hasGuests ? `
     <div style="display:flex;align-items:baseline;gap:10px;margin-top:18px;">
       <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;color:#fff;line-height:1;font-size:40px;">${guestStr}</div>
       <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.75);">Gäste jetzt</div>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;color:#fff;">
+    </div>` : ''}
+    <div style="display:flex;align-items:center;gap:8px;margin-top:${hasGuests ? 8 : 18}px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;color:#fff;">
       <i class="${isOpen ? 'pulse' : ''}" style="width:7px;height:7px;border-radius:50%;background:#fff;display:inline-block;flex-shrink:0;"></i>
       ${statusLabel}<span style="color:rgba(255,255,255,.6);font-weight:500;"> · ${tempStr} Wasser</span>
     </div>
+    ${hasGuests ? `
     <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.22);">
       <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;">
         <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.75);font-weight:700;">Auslastung jetzt</span>
@@ -518,7 +555,7 @@ function renderCard(v) {
         </span>
       </div>
       <div style="margin-top:11px;">${gauge}</div>
-    </div>
+    </div>` : ''}
   </div>`;
 }
 
@@ -530,7 +567,8 @@ function renderDetail() {
   const isOpen = computeIsOpen(v.uid);
   const fill = live?.currentfill;
   const temp = live?.temperatureWater;
-  const hasTemp = temp != null && temp !== '';
+  const hasTemp   = temp != null && temp !== '';
+  const hasGuests = live?.maxspace != null;
   const fav = !!S.favs[v.uid];
   const typeColor = TYPE_COLOR[v.type];
   const statusColor = isOpen ? '#2A9D63' : META;
@@ -680,14 +718,14 @@ function renderDetail() {
 
       <!-- Stat cards -->
       <div style="margin-top:clamp(16px,4vw,24px);display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;">
-        <!-- Gäste -->
+        ${hasGuests ? `<!-- Gäste -->
         <div class="stat-card" onclick="toggleStat('guest')" id="sc-guest">
           <div style="margin-top:auto;">
             <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:${guestColor};font-size:clamp(32px,8vw,48px);">${fill != null ? numFmt(fill) : '–'}</div>
             <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">Gäste jetzt</div>
           </div>
           ${S.guestOpen ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">${guestList}</div>` : ''}
-        </div>
+        </div>` : ''}
 
         <!-- Temperatur -->
         <div class="stat-card" onclick="toggleStat('temp')" id="sc-temp" style="cursor:${hasTemp ? 'pointer' : 'default'};">
@@ -708,7 +746,7 @@ function renderDetail() {
         </div>
       </div>
 
-      <!-- Chart section -->
+      ${hasGuests ? `<!-- Chart section -->
       <div style="margin-top:clamp(18px,4vw,28px);">
         <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;letter-spacing:-.005em;color:${INK};text-transform:uppercase;">Wie voll isch es</div>
         <div style="display:flex;gap:6px;margin-top:clamp(10px,3vw,16px);flex-wrap:wrap;align-items:center;justify-content:space-between;">
@@ -721,7 +759,7 @@ function renderDetail() {
         <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:${META};margin-top:12px;">
           ${AW[v.uid] ? `Basierend auf ${AW[v.uid].messtage_echt} echten Messtage${AW[v.uid].messtage_echt !== 1 ? 'n' : ''} (${AW[v.uid].erste_messung} – ${AW[v.uid].letzte_messung})` : 'Noch keine Auswertungsdaten'}
         </div>
-      </div>
+      </div>` : ''}
     </div>
   </div>`;
 }
@@ -793,6 +831,19 @@ function render() {
 
   document.getElementById('app').innerHTML = html;
 
+  // Auto-scroll to "now" bar in 15min zoom mode
+  if (S.chartZoomed && S.chartRes === '15min' && S.currentUid) {
+    setTimeout(() => {
+      const scroller = document.getElementById('chart-scroll');
+      if (!scroller) return;
+      const nowBar = scroller.querySelector('[data-now="true"]');
+      if (!nowBar) return;
+      const sr  = scroller.getBoundingClientRect();
+      const br  = nowBar.getBoundingClientRect();
+      const barLeft = br.left - sr.left + scroller.scrollLeft;
+      scroller.scrollLeft = Math.max(0, barLeft - scroller.clientWidth / 2 + br.width / 2);
+    }, 0);
+  }
 }
 
 // ── Actions ────────────────────────────────────────────────────────────────
@@ -909,18 +960,21 @@ async function fetchTemperaturenLive() {
   return { byUid, byName };
 }
 
-async function fetchLiveRT() {
-  const [wsRes, tempRes] = await Promise.allSettled([fetchBesucherWS(), fetchTemperaturenLive()]);
-  if (wsRes.status !== 'fulfilled') throw new Error('WebSocket failed');
-  const { byUid = {}, byName = {} } = tempRes.status === 'fulfilled' ? tempRes.value : {};
+// ── Live-Daten: persistente WebSocket-Verbindung ───────────────────────────
+let _temps      = { byUid: {}, byName: {} };
+let _lastWsData = null;
+let _ws         = null;
+let _wsTimer    = null;
+
+function buildLiveFromWS(wsArray) {
   const ts = new Date().toLocaleString('sv-SE', { timeZone: 'Europe/Zurich' });
   const venues = {};
-  for (const bad of wsRes.value) {
+  const { byUid, byName } = _temps;
+  for (const bad of wsArray) {
     const uid = bad.uid;
     if (!uid || !VENUE_MAP[uid]) continue;
     const v = VENUE_MAP[uid];
     const tempUid = v.tempUid || uid;
-    // Prefer Stadt-Zürich XML (by poiid, then by name), then WebSocket field as last resort
     const t = byUid[tempUid] || byName[v.name] || {};
     const wsTemp = bad.temperatureWater != null ? String(bad.temperatureWater) : null;
     venues[uid] = {
@@ -931,26 +985,110 @@ async function fetchLiveRT() {
       openClosed:       t.openClosed ?? bad.openClosed ?? null,
     };
   }
+  // Venues nur in der XML-API (keine Besucherzahlen, aber Temperatur + Status)
+  for (const v of VENUES) {
+    if (venues[v.uid]) continue;
+    const tempUid = v.tempUid;
+    if (!tempUid) continue;
+    const t = byUid[tempUid] || byName[v.name] || {};
+    if (!t.temperatureWater && !t.openClosed) continue;
+    venues[v.uid] = {
+      currentfill: null, freespace: null, maxspace: null,
+      temperatureWater: t.temperatureWater || null,
+      openClosed:       t.openClosed       || null,
+    };
+  }
   return { timestamp: ts, venues };
 }
 
-const getLive = () => fetchLiveRT().catch(() => fetchLive());
+function _wsReconnect(delay) {
+  clearTimeout(_wsTimer);
+  _wsTimer = setTimeout(connectWS, delay);
+}
 
+function connectWS() {
+  if (_ws) { try { _ws.close(); } catch(e) {} _ws = null; }
+  try {
+    const ws = _ws = new WebSocket('wss://badi-public.crowdmonitor.ch:9591/api');
+    _wsReconnect(20000); // Verbindungs-Timeout
+    ws.onopen = () => ws.send('');
+    ws.onmessage = e => {
+      _wsReconnect(60000); // wenn 60s keine neue Nachricht kommt → reconnect
+      try {
+        _lastWsData = JSON.parse(e.data);
+        LIVE = parseLive(buildLiveFromWS(_lastWsData));
+        render();
+      } catch(err) {}
+    };
+    ws.onerror = () => _wsReconnect(30000);
+    ws.onclose = () => _wsReconnect(30000);
+  } catch(e) {
+    _wsReconnect(30000);
+  }
+}
+
+// Temperaturen aus live.json lesen (gleiche Origin → kein CORS-Problem).
+// Wird als Fallback genutzt wenn die Stadt-Zürich-API CORS-geblockt ist.
+async function fetchTempsFromCache() {
+  const live = await fetchLive();
+  if (!live?.venues) return { byUid: {}, byName: {} };
+  const byUid = {}, byName = {};
+  for (const [uid, v] of Object.entries(live.venues)) {
+    const meta = VENUE_MAP[uid];
+    if (!meta) continue;
+    const temp   = v.temperatureWater != null ? String(v.temperatureWater) : null;
+    const status = v.openClosed || null;
+    if (!temp && !status) continue;
+    const entry = { temperatureWater: temp, openClosed: status };
+    byUid[uid] = entry;
+    if (meta.tempUid) byUid[meta.tempUid] = entry;
+    byName[meta.name] = entry;
+  }
+  return { byUid, byName };
+}
+
+async function loadTemps() {
+  try {
+    _temps = await fetchTemperaturenLive(); // XML-API (scheitert im Browser wegen CORS)
+  } catch(e) {
+    _temps = await fetchTempsFromCache();   // Fallback: live.json (gleiche Origin)
+  }
+}
+
+async function refreshTemps() {
+  await loadTemps();
+  if (_lastWsData) { LIVE = parseLive(buildLiveFromWS(_lastWsData)); render(); }
+}
+
+// ── Startup ────────────────────────────────────────────────────────────────
 Promise.all([
   fetch(BASE + 'auswertung/auswertung.json').then(r => r.ok ? r.json() : null).catch(() => null),
-  getLive(),
-]).then(([aw, live]) => {
-  if (aw?.badis) {
-    AW = Object.fromEntries(aw.badis.map(b => [b.uid, b]));
+  Promise.allSettled([fetchBesucherWS(), loadTemps()]),
+]).then(([aw, [wsRes]]) => {
+  if (aw?.badis) AW = Object.fromEntries(aw.badis.map(b => [b.uid, b]));
+  if (wsRes.status === 'fulfilled') {
+    _lastWsData = wsRes.value;
+    LIVE = parseLive(buildLiveFromWS(_lastWsData));
+  } else {
+    // WS gescheitert → live.json laden
+    fetchLive().then(live => { LIVE = parseLive(live); render(); });
   }
-  LIVE = parseLive(live);
   render();
 
-  // Auto-refresh every 5 minutes
-  setInterval(async () => {
-    const live = await getLive();
-    if (live) { LIVE = parseLive(live); render(); }
-  }, 5 * 60 * 1000);
+  // Persistente WS-Verbindung (reconnect bei Trennung, Update bei neuen Daten)
+  connectWS();
+
+  // Temperaturen alle 2 Minuten neu laden (nur HTTP möglich)
+  setInterval(refreshTemps, 2 * 60 * 1000);
+
+  // "vor X Min" Label jede Minute aktualisieren
+  setInterval(() => render(), 60 * 1000);
+}).catch(() => {
+  // Fallback: statische live.json
+  fetchLive().then(live => { LIVE = parseLive(live); render(); });
+  connectWS();
+  setInterval(refreshTemps, 2 * 60 * 1000);
+  setInterval(() => render(), 60 * 1000);
 });
 </script>
 </body>
