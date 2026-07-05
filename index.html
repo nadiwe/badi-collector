@@ -539,7 +539,7 @@ function renderCard(v) {
   const temp = live?.temperatureWater;
   const hasTemp    = temp != null && temp !== '';
   const hasGuests  = live?.maxspace != null;
-  const guestStr   = fill != null ? numFmt(fill) : '–';
+  const guestStr   = fill != null ? numFmt(fill) : 'Keine Daten';
   const statusLabel = isOpen ? 'offen' : (noLive ? '–' : 'geschlossen');
   const tempStr = hasTemp ? temp + '°' : '–';
   const dev = devInfo(v.uid);
@@ -558,12 +558,11 @@ function renderCard(v) {
       <button onclick="event.stopPropagation();toggleFav('${v.uid}')" aria-label="Favorit"
         style="font-size:19px;line-height:1;background:none;border:none;cursor:pointer;padding:2px;color:${fav ? '#fff' : 'rgba(255,255,255,.4)'};transition:color .15s;flex-shrink:0;margin-left:auto;">${fav ? '★' : '☆'}</button>
     </div>
-    ${hasGuests ? `
     <div style="display:flex;align-items:baseline;gap:10px;margin-top:18px;">
-      <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;color:#fff;line-height:1;font-size:40px;">${guestStr}</div>
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.75);">Gäste jetzt</div>
-    </div>` : ''}
-    <div style="display:flex;align-items:center;gap:8px;margin-top:${hasGuests ? 8 : 18}px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;color:#fff;">
+      <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;color:${fill != null ? '#fff' : 'rgba(255,255,255,.55)'};line-height:1;font-size:${fill != null ? '40px' : '18px'};">${guestStr}</div>
+      ${fill != null ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.75);">Gäste jetzt</div>` : ''}
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;color:#fff;">
       <i class="${isOpen ? 'pulse' : ''}" style="width:7px;height:7px;border-radius:50%;background:#fff;display:inline-block;flex-shrink:0;"></i>
       ${statusLabel}<span style="color:rgba(255,255,255,.6);font-weight:500;"> · ${tempStr} Wasser</span>
     </div>
@@ -758,32 +757,36 @@ function renderDetail() {
 
       <!-- Stat cards -->
       <div style="margin-top:clamp(16px,4vw,24px);display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;">
-        ${hasGuests ? `<!-- Gäste -->
-        <div class="stat-card" onclick="toggleStat('guest')" id="sc-guest">
+        <!-- Gäste (immer anzeigen) -->
+        <div class="stat-card" onclick="${hasGuests ? "toggleStat('guest')" : ''}" id="sc-guest" style="${hasGuests ? '' : 'cursor:default;'}">
           <div>
-            <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:${guestColor};font-size:clamp(32px,8vw,48px);">${fill != null ? numFmt(fill) : '–'}</div>
+            ${fill != null
+              ? `<div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:${guestColor};font-size:clamp(32px,8vw,48px);">${numFmt(fill)}</div>`
+              : `<div style="font-family:'Outfit',sans-serif;font-weight:500;letter-spacing:-.01em;line-height:1.1;color:${META};font-size:clamp(16px,4vw,22px);">Keine Daten</div>`
+            }
             <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">Gäste jetzt</div>
           </div>
-          ${S.guestOpen ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">${guestList}</div>` : ''}
-        </div>` : ''}
+          ${S.guestOpen && hasGuests ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">${guestList}</div>` : ''}
+        </div>
 
-        <!-- Temperatur (Halle: nur anzeigen wenn fixe Beckendaten vorhanden) -->
-        ${isHalle && !hasTemp ? '' : `
-        <div class="stat-card" onclick="${hasTemp ? "toggleStat('temp')" : ''}" id="sc-temp" style="cursor:${hasTemp ? 'pointer' : 'default'};">
-          <div>
-            <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:${hasTemp ? BLACK : META};font-size:clamp(32px,8vw,48px);">${displayTemp}</div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">${isHalle ? 'Beckentemperatur' : 'Wassertemperatur'}</div>
-          </div>
-          ${S.tempOpen && hasTemp ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">${isHalle ? halleTempList : tempList}</div>` : ''}
-        </div>`}
+        <!-- Temperatur + Öffnungszeiten: gemeinsamer Sub-Container damit beide gleich hoch sind -->
+        <div style="display:flex;gap:10px;flex:2;min-width:300px;align-items:stretch;">
+          ${isHalle && !hasTemp ? '' : `
+          <div class="stat-card" onclick="${hasTemp ? "toggleStat('temp')" : ''}" id="sc-temp" style="cursor:${hasTemp ? 'pointer' : 'default'};flex:1;">
+            <div>
+              <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:${hasTemp ? BLACK : META};font-size:clamp(32px,8vw,48px);">${displayTemp}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">${isHalle ? 'Beckentemperatur' : 'Wassertemperatur'}</div>
+            </div>
+            ${S.tempOpen && hasTemp ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">${isHalle ? halleTempList : tempList}</div>` : ''}
+          </div>`}
 
-        <!-- Öffnungszeiten (immer anzeigen) -->
-        <div class="stat-card" onclick="toggleStat('hours')" id="sc-hours" style="align-self:stretch;">
-          <div>
-            <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.95;color:${BLACK};font-size:clamp(18px,4vw,26px);white-space:nowrap;">${v.hours}</div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">Öffnigszite</div>
+          <div class="stat-card" onclick="toggleStat('hours')" id="sc-hours" style="flex:1;">
+            <div>
+              <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.95;color:${BLACK};font-size:clamp(18px,4vw,26px);white-space:nowrap;">${v.hours}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">Öffnigszite</div>
+            </div>
+            ${S.hoursOpen ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">${hoursList}</div>` : ''}
           </div>
-          ${S.hoursOpen ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">${hoursList}</div>` : ''}
         </div>
       </div>
 
