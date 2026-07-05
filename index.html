@@ -318,22 +318,41 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
 
   // Auf Öffnungszeiten einschränken
   const meta = VENUE_MAP[uid];
-  function filterToHours(arr) {
-    if (!meta?.hours) return arr;
+  function openingParts() {
+    if (!meta?.hours) return null;
     const parts = meta.hours.split(/[–-]/);
-    if (parts.length !== 2) return arr;
-    const oMin = hhmm(parts[0].trim()), cMin = hhmm(parts[1].trim());
+    return parts.length === 2 ? parts.map(p => p.trim()) : null;
+  }
+  function filterToHours(arr) {
+    const p = openingParts();
+    if (!p) return arr;
+    const oMin = hhmm(p[0]), cMin = hhmm(p[1]);
     const f = arr.filter(s => hhmm(s.zeit) >= oMin && hhmm(s.zeit) <= cMin);
     return f.length >= 3 ? f : arr;
   }
   slots = filterToHours(slots);
 
+  // Für 1h-aggregierte Modi: fehlende Stunden bis Schliesszeit auffüllen
+  if (!zoomed || res === '1h') {
+    const p = openingParts();
+    if (p) {
+      const oH = parseInt(p[0]), cH = parseInt(p[1]);
+      const existing = new Set(slots.map(s => parseInt(s.zeit)));
+      const extra = [];
+      for (let h = oH; h <= cH; h++) {
+        if (!existing.has(h))
+          extra.push({ zeit: String(h).padStart(2, '0') + ':00', auslastung: null });
+      }
+      if (extra.length) slots = [...slots, ...extra].sort((a, b) => hhmm(a.zeit) - hhmm(b.zeit));
+    }
+  }
+
   const isToday = dayType === dayTypeFor(todayWd());
   const nowMin  = nowHHMM();
   const n       = slots.length;
   const vals    = slots.map(s => s.auslastung);
-  const maxV    = Math.max(...vals, 0.001);
-  const norm    = vals.map(v => v / maxV);
+  const maxV    = Math.max(...vals.filter(v => v != null), 0.001);
+  const norm    = vals.map(v => v != null ? v / maxV : null);
 
   const nowIdx = isToday ? slots.reduce((bi, s, i) =>
     Math.abs(hhmm(s.zeit) - nowMin) < Math.abs(hhmm(slots[bi].zeit) - nowMin) ? i : bi, 0) : -1;
@@ -367,6 +386,7 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
   }).join('');
 
   const bars = norm.map((v, i) => {
+    if (v === null) return '';
     const isNow = i === nowIdx;
     const y    = ys(v);
     const fill = isNow ? periodColor : periodColor + '38';
