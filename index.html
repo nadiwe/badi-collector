@@ -378,7 +378,7 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
   function makeLabels(arr) {
     return arr.map((s, i) => {
       if (!(i % step === 0 || i === arr.length - 1)) return '';
-      const pct = arr.length > 1 ? (i / (arr.length - 1) * 100) : 50;
+      const pct = (i + 0.5) / arr.length * 100;
       return `<span style="position:absolute;left:${pct.toFixed(1)}%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:${labelFz};color:#ADADA9;white-space:nowrap;">${s.zeit}</span>`;
     }).join('');
   }
