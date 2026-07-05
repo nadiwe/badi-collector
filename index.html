@@ -367,6 +367,25 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
 
   const isToday = dayType === dayTypeFor(todayWd());
   const nowMin  = nowHHMM();
+
+  // Aktuellen Live-Wert als Balken einfügen (nur heute, nur wenn Live-Daten vorhanden)
+  if (isToday) {
+    const lv = LIVE?.venues?.[uid];
+    if (lv?.currentfill != null && lv?.maxspace) {
+      const nowPct = parseFloat(lv.currentfill) / lv.maxspace * 100;
+      const d = new Date();
+      const liveZeit = (!zoomed || res === '1h')
+        ? String(d.getHours()).padStart(2, '0') + ':00'
+        : String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+      const existIdx = slots.findIndex(s => s.zeit === liveZeit);
+      if (existIdx >= 0) {
+        slots[existIdx] = { zeit: liveZeit, auslastung: nowPct };
+      } else {
+        slots = [...slots, { zeit: liveZeit, auslastung: nowPct }]
+          .sort((a, b) => hhmm(a.zeit) - hhmm(b.zeit));
+      }
+    }
+  }
   const n       = slots.length;
   const vals    = slots.map(s => s.auslastung);
   const maxV    = Math.max(...vals.filter(v => v != null), 0.001);
