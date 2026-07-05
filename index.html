@@ -73,7 +73,6 @@ const VENUE_MAP = Object.fromEntries(VENUES.map(v => [v.uid, v]));
 // ── State ──────────────────────────────────────────────────────────────────
 let S = {
   filter: 'alle',
-  sort: 'ruhig',
   currentUid: null,
   favs: {},
   period: 'heute',
@@ -170,18 +169,6 @@ function devInfo(uid) {
   return { arrow:'≈', short:'etwa wie sonst', color: META, barColor: META };
 }
 
-function occPct(uid) {
-  const live = LIVE?.venues?.[uid];
-  if (!live || live.currentfill == null || !live.maxspace) return Infinity;
-  return live.currentfill / live.maxspace;
-}
-
-function maxTemp(uid) {
-  const v = VENUE_MAP[uid];
-  const live = LIVE?.venues?.[uid];
-  const t = live?.temperatureWater;
-  return (t && !isNaN(parseFloat(t))) ? parseFloat(t) : -Infinity;
-}
 
 // ── Temp CSV helpers ───────────────────────────────────────────────────────
 function currentWeekFile() {
@@ -427,11 +414,6 @@ function filteredVenues() {
   if (S.filter === 'fav') list = list.filter(v => S.favs[v.uid]);
   else if (S.filter !== 'alle') list = list.filter(v => v.type === S.filter);
 
-  if (S.sort === 'ruhig') {
-    list.sort((a, b) => occPct(a.uid) - occPct(b.uid));
-  } else {
-    list.sort((a, b) => maxTemp(b.uid) - maxTemp(a.uid));
-  }
   return list;
 }
 
@@ -466,16 +448,6 @@ function renderChips() {
   }).join('');
 }
 
-function renderSortTabs() {
-  return ['ruhig','warm'].map(s => {
-    const active = S.sort === s;
-    const label = s === 'ruhig' ? 'Ruhigste' : 'Wärmste';
-    return `<button class="chip" onclick="setSort('${s}')"
-      style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;letter-spacing:.02em;padding:7px 15px;border-radius:999px;border:1.5px solid ${INK};background:${active ? INK : 'transparent'};color:${active ? '#fff' : INK};white-space:nowrap;">
-      ${label}
-    </button>`;
-  }).join('');
-}
 
 // ── Tile gauge SVG (weiße Balken auf farbigem Hintergrund) ───────────────
 function tileGaugeSVG(uid, open) {
@@ -784,9 +756,8 @@ function render() {
       </div>
 
       <section style="background:#FFFFFF;border-radius:28px;padding:22px;box-shadow:0 4px 22px rgba(23,61,52,.08);display:flex;flex-direction:column;gap:16px;">
-        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:space-between;">
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">${renderChips()}</div>
-          <div style="display:flex;gap:6px;">${renderSortTabs()}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          ${renderChips()}
         </div>
 
         <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:${META};">
@@ -835,7 +806,6 @@ function render() {
 
 // ── Actions ────────────────────────────────────────────────────────────────
 function setFilter(f)     { S.filter = f; render(); }
-function setSort(s)       { S.sort = s; render(); }
 function setPeriod(p)     { S.period = p; render(); }
 function setWeekday(w)    { S.weekday = w; render(); }
 function setChartRes(res) { S.chartRes = res; render(); }
