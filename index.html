@@ -695,6 +695,7 @@ function renderCard(v) {
   const hasGuests  = live?.maxspace != null;
   const guestStr   = fill != null ? numFmt(fill) : 'Keine Daten';
   const inRevision = isInRevision(v.uid);
+  const revision   = REVISIONEN[v.uid] || null;
   const closing = closingTime(v.uid);
   const statusLabel = inRevision
     ? 'Revision'
@@ -728,7 +729,10 @@ function renderCard(v) {
       <i class="${isOpen ? 'pulse' : ''}" style="width:7px;height:7px;border-radius:50%;background:#fff;display:inline-block;flex-shrink:0;"></i>
       ${statusLabel}<span style="color:rgba(255,255,255,.6);font-weight:500;"> · ${tempStr} Wasser</span>
     </div>
-    ${!inRevision && hasGuests ? `
+    ${inRevision && revision ? `
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.22);">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:rgba(255,255,255,.6);">${fmtRevDate(revision.von)} – ${fmtRevDate(revision.bis)}</div>
+    </div>` : !inRevision && hasGuests ? `
     <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.22);">
       <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;">
         <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.75);font-weight:700;">Auslastung</span>
