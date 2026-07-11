@@ -100,6 +100,7 @@ const VENUES = [
   { uid:'SSD-11',   name:'Freibad Seebach',                   type:'frei',  lat:47.4241, lng:8.5402, tempUid:'fb013',   address:'Hertensteinstrasse 119, 8052 Zürich',    hours:'09:00–20:00', season:'Mai–Sep'   },
   { uid:'fb018',    name:'Freibad Zwischen den Hölzern',      type:'frei',  lat:47.3651, lng:8.5005, tempUid:'fb018',   address:'Goldbrunnenstrasse 119, 8055 Zürich',    hours:'09:00–20:00', season:'Mai–Sep'   },
   { uid:'SSD-8',    name:'Josel-Areal',                       type:'frei',  lat:47.3813, lng:8.5201, tempUid:null,      address:'Zürich',                                 hours:'09:00–20:00', season:'Mai–Sep'   },
+  { uid:'DOLDER-1', name:'Freibad Dolder',                    type:'frei',  lat:47.3790, lng:8.5694, tempUid:null,      address:'Gsteigstrasse 84, 8044 Zürich',          hours:'09:00–20:00', season:'Mai–Sep'   },
   // Hallenbäder
   { uid:'SSD-2',    name:'Hallenbad Bläsi',                   type:'halle', lat:47.4072, lng:8.5448, tempUid:null,      address:'Hofwiesenstrasse 280, 8057 Zürich',      hours:'07:00–21:00', season:'Ganzjährig', defaultTemp:29 },
   { uid:'SSD-3',    name:'Hallenbad Bungertwies',             type:'halle', lat:47.3878, lng:8.5388, tempUid:null,      address:'Kronenstrasse 18, 8006 Zürich',          hours:'07:00–21:00', season:'Ganzjährig', defaultTemp:29 },
@@ -684,7 +685,7 @@ function renderCard(v) {
     ${hasGuests ? `
     <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.22);">
       <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;">
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.75);font-weight:700;">Auslastung jetzt</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.75);font-weight:700;">Auslastung</span>
         <span style="display:inline-flex;align-items:center;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#fff;">
           <span style="font-size:9px;line-height:1;">${dev.arrow}</span>${dev.short}
         </span>
