@@ -698,19 +698,22 @@ function renderCard(v) {
   const isOpen = computeIsOpen(v.uid);
   const noLive = !live;
   const fill = live?.currentfill;
-  const temp = live?.temperatureWater;
-  const hasTemp    = temp != null && temp !== '';
+  const liveTemp = live?.temperatureWater;
+  const hallePoolTemp = v.type === 'halle' ? HALLE_TEMPS[v.uid]?.[0]?.temp : null;
+  const temp = (liveTemp != null && liveTemp !== '') ? liveTemp : null;
+  const hasTemp = temp != null || hallePoolTemp != null;
   const hasGuests  = live?.maxspace != null;
   const guestStr   = fill != null ? numFmt(fill) : 'Keine Daten';
   const inRevision = isInRevision(v.uid);
   const revision   = REVISIONEN[v.uid] || null;
   const closing = closingTime(v.uid);
+  const hasHoursData = hoursForDay(v.uid, todayWd()) != null;
   const statusLabel = inRevision
     ? 'Revision'
     : isOpen
       ? (closing ? 'offen bis ' + closing : 'offen')
-      : (noLive ? '–' : 'geschlossen');
-  const tempStr = hasTemp ? parseFloat(temp) + '°' : '–';
+      : (noLive && !hasHoursData ? '–' : 'geschlossen');
+  const tempStr = temp != null ? parseFloat(temp) + '°' : hallePoolTemp != null ? hallePoolTemp + '°' : '–';
   const dev = devInfo(v.uid);
   const fav = !!S.favs[v.uid];
   const bg = isOpen ? (TYPE_COLOR[v.type] || INK) : '#4A4A4A';
