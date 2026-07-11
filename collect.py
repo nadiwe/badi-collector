@@ -31,7 +31,7 @@ BESUCHER_IDS = {
 TEMPERATUREN_IDS = {
     "flb6938", "flb6939", "flb6940", "flb8803", "flb6941", "flb6942",
     "fb002",
-    "fb006", "fb008", "fb012", "fb013", "fb018",
+    "fb006", "fb008", "fb012", "fb013", "fb016", "fb018",
     "seb6943",
     "seb6945",
     "seb6946", "seb6947", "seb6948",
@@ -137,8 +137,9 @@ def collect_temperaturen() -> dict:
 
 # Venues nur in der XML-API (keine Besucherzahlen via Crowdmonitor)
 _XML_ONLY_IDS = {
-    "flb6938": "flb6938",  # Flussbad Au-Höngg
-    "flb6942": "flb6942",  # Männerbad Schanzengraben
+    "flb6938":   "flb6938",   # Flussbad Au-Höngg
+    "flb6942":   "flb6942",   # Männerbad Schanzengraben
+    "DOLDER-1":  "fb016",     # Freibad Dolder
 }
 
 
