@@ -988,9 +988,6 @@ function renderDetail() {
         ${S.period === 'woche' ? `<div style="display:flex;gap:4px;margin-top:12px;">${weekdayTabs}</div>` : ''}
         <div style="margin-top:clamp(12px,3vw,20px);">${chart}</div>
         ${tempHistSection}
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:${META};margin-top:12px;">
-          ${AW[v.uid] ? `Basierend auf ${AW[v.uid].messtage_echt} echten Messtage${AW[v.uid].messtage_echt !== 1 ? 'n' : ''} (${AW[v.uid].erste_messung} – ${AW[v.uid].letzte_messung})` : 'Noch keine Auswertungsdaten'}
-        </div>
       </div>` : ''}
     </div>
   </div>`;
