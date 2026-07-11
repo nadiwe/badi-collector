@@ -936,7 +936,8 @@ function renderDetail() {
 
       <!-- Stat cards -->
       <div style="margin-top:clamp(16px,4vw,24px);display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;">
-        <!-- Gäste (immer anzeigen) -->
+        <!-- Gäste (nur wenn Zählung vorhanden) -->
+        ${fill != null || hasGuests ? `
         <div class="stat-card" onclick="${hasGuests ? "toggleStat('guest')" : ''}" id="sc-guest" style="${hasGuests ? '' : 'cursor:default;'}">
           <div>
             ${fill != null
@@ -946,7 +947,7 @@ function renderDetail() {
             <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">Gäste jetzt</div>
           </div>
           ${S.guestOpen && hasGuests ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">${guestList}</div>` : ''}
-        </div>
+        </div>` : ''}
 
         <!-- Temperatur + Öffnungszeiten: gemeinsamer Sub-Container damit beide gleich hoch sind -->
         <div style="display:flex;gap:10px;flex:2;min-width:300px;align-items:stretch;">
