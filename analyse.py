@@ -80,6 +80,28 @@ def _strip_csv_safe(value: str) -> str:
     return value[1:] if value.startswith("'") else value
 
 
+def load_revisionen(path: str = "data/revisionen.json") -> set:
+    """Gibt ein Set von (uid, date)-Paaren zurück, die Revisionstage sind."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            entries = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return set()
+    result = set()
+    for e in entries:
+        try:
+            von = date.fromisoformat(e["von"])
+            bis = date.fromisoformat(e["bis"])
+            uid = e["uid"]
+            d = von
+            while d <= bis:
+                result.add((uid, d))
+                d += timedelta(days=1)
+        except (KeyError, ValueError):
+            continue
+    return result
+
+
 def load_data(data_dir: str = "data/besucher") -> list:
     rows = []
     for path in sorted(glob.glob(f"{data_dir}/*.csv")):
@@ -338,6 +360,14 @@ def main():
     if not rows:
         print("Keine Daten in data/ gefunden.")
         return
+
+    revision_days = load_revisionen()
+    if revision_days:
+        n_before = len(rows)
+        rows = [r for r in rows if (r["uid"], r["date"]) not in revision_days]
+        n_rev = n_before - len(rows)
+        if n_rev:
+            print(f"  Revisionstage ausgeschlossen: {n_rev} Messwerte\n")
 
     open_d         = _open_days(rows)
     in_season_gaps = _find_in_season_gaps(rows, open_d)

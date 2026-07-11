@@ -162,6 +162,7 @@ let _mapBasemap = 'gray';
 let AW = {};     // uid → {slots:{Werktag:[],Wochenende:[],Feiertag:[]}, messtage_echt, ...}
 let LIVE = null; // {timestamp, venues:{uid:{currentfill,freespace,maxspace,temperatureWater,openClosed}}}
 let HEUTE_SLOTS = {}; // uid → [{zeit:"HH:MM", auslastung:pct}] — heutige Istdaten aus CSV
+let REVISIONEN  = {}; // uid → {von:"YYYY-MM-DD", bis:"YYYY-MM-DD", name}
 let TEMP_CACHE = {};         // tempUid → [{zeit, temp}]
 let TEMP_CSV_LOADING = false;
 let TEMP_CSV_DONE    = false;
@@ -192,6 +193,7 @@ function hhmm(s) { // "08:30" → minutes
 }
 
 function computeIsOpen(uid) {
+  if (isInRevision(uid)) return false;
   const live = LIVE?.venues?.[uid];
   const v = VENUE_MAP[uid];
   // Öffnungszeiten sind zuverlässiger als API-Status (der bei voller Kapazität
@@ -214,6 +216,22 @@ function closingTime(uid) {
   if (!v?.hours) return null;
   const parts = v.hours.split(/[–-]/);
   return parts.length === 2 ? parts[1].trim() : null;
+}
+
+function isInRevision(uid) {
+  const r = REVISIONEN[uid];
+  if (!r) return false;
+  const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Zurich' });
+  return today >= r.von && today <= r.bis;
+}
+
+async function loadRevisionen() {
+  try {
+    const res = await fetch(BASE + 'data/revisionen.json?t=' + Date.now());
+    if (!res.ok) return;
+    const list = await res.json();
+    REVISIONEN = Object.fromEntries(list.map(r => [r.uid, r]));
+  } catch(e) {}
 }
 
 function slotsFor(uid, dayType) {
@@ -247,6 +265,7 @@ function computeDev(uid) {
 
 function devInfo(uid) {
   const live = LIVE?.venues?.[uid];
+  if (isInRevision(uid)) return { arrow:'', short:'Revision', color: META, barColor:'#DEDEDE' };
   const isOpen = computeIsOpen(uid);
   if (!isOpen) return { arrow:'', short:'geschlossen', color: META, barColor:'#DEDEDE' };
   const dev = computeDev(uid);
@@ -669,10 +688,13 @@ function renderCard(v) {
   const hasTemp    = temp != null && temp !== '';
   const hasGuests  = live?.maxspace != null;
   const guestStr   = fill != null ? numFmt(fill) : 'Keine Daten';
+  const inRevision = isInRevision(v.uid);
   const closing = closingTime(v.uid);
-  const statusLabel = isOpen
-    ? (closing ? 'offen bis ' + closing : 'offen')
-    : (noLive ? '–' : 'geschlossen');
+  const statusLabel = inRevision
+    ? 'Revision'
+    : isOpen
+      ? (closing ? 'offen bis ' + closing : 'offen')
+      : (noLive ? '–' : 'geschlossen');
   const tempStr = hasTemp ? parseFloat(temp) + '°' : '–';
   const dev = devInfo(v.uid);
   const fav = !!S.favs[v.uid];
@@ -873,7 +895,7 @@ function renderDetail() {
         <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;">
           <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:${META};font-weight:600;">${TYPE_LABEL[v.type]}</div>
           <span style="display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;color:${statusColor};">
-            <i style="width:6px;height:6px;border-radius:50%;background:${statusDot};display:inline-block;"></i>${isOpen ? (closingTime(v.uid) ? 'offen bis ' + closingTime(v.uid) : 'offen') : 'geschlossen'}
+            <i style="width:6px;height:6px;border-radius:50%;background:${statusDot};display:inline-block;"></i>${isInRevision(v.uid) ? 'Revision' : isOpen ? (closingTime(v.uid) ? 'offen bis ' + closingTime(v.uid) : 'offen') : 'geschlossen'}
             <span style="color:${META};">· ${v.season}</span>
           </span>
         </div>
@@ -1442,6 +1464,7 @@ Promise.all([
   fetch(BASE + 'auswertung/auswertung.json').then(r => r.ok ? r.json() : null).catch(() => null),
   Promise.allSettled([fetchBesucherWS(), loadTemps()]),
   loadHeuteSlots(),
+  loadRevisionen(),
 ]).then(([aw, [wsRes]]) => {
   if (aw?.badis) AW = Object.fromEntries(aw.badis.map(b => [b.uid, b]));
   if (wsRes.status === 'fulfilled') {
@@ -1469,6 +1492,7 @@ Promise.all([
   fetchLive().then(live => { LIVE = parseLive(live); render(); });
   connectWS();
   loadHeuteSlots();
+  loadRevisionen();
   setInterval(refreshTemps, 2 * 60 * 1000);
   setInterval(() => loadHeuteSlots().then(() => render()), 15 * 60 * 1000);
   setInterval(() => render(), 60 * 1000);
