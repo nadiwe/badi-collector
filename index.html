@@ -103,7 +103,8 @@ const VENUES = [
   { uid:'SSD-8',    name:'Josel-Areal',                       type:'frei',  lat:47.3813, lng:8.5201, tempUid:null,      address:'Zürich',                                 hours:'09:00–20:00', season:'Mai–Sep'   },
   { uid:'DOLDER-1', name:'Freibad Dolder',                    type:'frei',  lat:47.3790, lng:8.5694, tempUid:'fb016',   address:'Gsteigstrasse 84, 8044 Zürich',          hours:'09:00–20:00', season:'Mai–Sep'   },
   // Hallenbäder
-  { uid:'SSD-1',    name:'Hallenbad Altstetten',              type:'halle', lat:47.3821, lng:8.4898, tempUid:null,      address:'Rautistrasse 62, 8047 Zürich',           hours:'07:00–21:00', season:'Ganzjährig', defaultTemp:29 },
+  { uid:'SSD-1',    name:'Hallenbad Altstetten',              type:'halle', lat:47.3821, lng:8.4898, tempUid:null,      address:'Rautistrasse 62, 8047 Zürich',           hours:'06:00–21:00', season:'Ganzjährig', defaultTemp:29,
+    hoursPerDay:{ mo:'06:00–21:00', di:'08:00–21:00', mi:'06:00–21:00', do:'08:00–21:00', fr:'06:00–21:00', sa:'08:00–18:00', so:'08:00–18:00' } },
   { uid:'SSD-2',    name:'Hallenbad Bläsi',                   type:'halle', lat:47.4019, lng:8.5350, tempUid:null,      address:'Hofwiesenstrasse 280, 8057 Zürich',      hours:'07:00–21:00', season:'Ganzjährig', defaultTemp:29 },
   { uid:'SSD-3',    name:'Hallenbad Bungertwies',             type:'halle', lat:47.3878, lng:8.5388, tempUid:null,      address:'Kronenstrasse 18, 8006 Zürich',          hours:'07:00–21:00', season:'Ganzjährig', defaultTemp:29 },
   { uid:'SSD-4',    name:'Hallenbad City',                    type:'halle', lat:47.3721, lng:8.5329, tempUid:null,      address:'Sihlstrasse 71, 8001 Zürich',            hours:'06:30–21:00', season:'Ganzjährig', defaultTemp:28 },
@@ -194,14 +195,19 @@ function hhmm(s) { // "08:30" → minutes
   return h * 60 + m;
 }
 
+function hoursForDay(uid, wd) {
+  const v = VENUE_MAP[uid];
+  return v?.hoursPerDay?.[wd] ?? v?.hours ?? null;
+}
+
 function computeIsOpen(uid) {
   if (isInRevision(uid)) return false;
   const live = LIVE?.venues?.[uid];
-  const v = VENUE_MAP[uid];
+  const h = hoursForDay(uid, todayWd());
   // Öffnungszeiten sind zuverlässiger als API-Status (der bei voller Kapazität
   // oder Daten-Lag fälschlicherweise "geschlossen" meldet)
-  if (v?.hours) {
-    const parts = v.hours.split(/[–-]/);
+  if (h) {
+    const parts = h.split(/[–-]/);
     if (parts.length === 2) {
       const nowMin = nowHHMM();
       if (nowMin >= hhmm(parts[0].trim()) && nowMin < hhmm(parts[1].trim())) {
@@ -214,9 +220,9 @@ function computeIsOpen(uid) {
 }
 
 function closingTime(uid) {
-  const v = VENUE_MAP[uid];
-  if (!v?.hours) return null;
-  const parts = v.hours.split(/[–-]/);
+  const h = hoursForDay(uid, todayWd());
+  if (!h) return null;
+  const parts = h.split(/[–-]/);
   return parts.length === 2 ? parts[1].trim() : null;
 }
 
@@ -898,9 +904,10 @@ function renderDetail() {
   const hoursList = wdEntries.map(w => {
     const isToday = todayWd() === w.k;
     const accentBg = isToday ? typeColor : 'transparent';
+    const h = hoursForDay(v.uid, w.k) || '–';
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-radius:8px;background:${accentBg};">
       <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${isToday ? 600 : 400};color:${isToday ? '#fff' : INK};">${w.l}</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${isToday ? '#fff' : META};">${v.hours}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${isToday ? '#fff' : META};">${h}</span>
     </div>`;
   }).join('');
 
@@ -953,7 +960,7 @@ function renderDetail() {
 
           <div class="stat-card" onclick="toggleStat('hours')" id="sc-hours" style="flex:1;">
             <div>
-              <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.95;color:${BLACK};font-size:clamp(18px,4vw,26px);white-space:nowrap;">${v.hours}</div>
+              <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.95;color:${BLACK};font-size:clamp(18px,4vw,26px);white-space:nowrap;">${hoursForDay(v.uid, todayWd()) || v.hours}</div>
               <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">Öffnigszite</div>
             </div>
             ${S.hoursOpen ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">${hoursList}</div>` : ''}
