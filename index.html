@@ -727,12 +727,13 @@ function renderCard(v) {
       <button onclick="event.stopPropagation();toggleFav('${v.uid}')" aria-label="Favorit"
         style="font-size:19px;line-height:1;background:none;border:none;cursor:pointer;padding:2px;color:${fav ? '#fff' : 'rgba(255,255,255,.4)'};transition:color .15s;flex-shrink:0;margin-left:auto;">${fav ? '★' : '☆'}</button>
     </div>
+    ${inRevision || !noLive ? `
     <div style="display:flex;align-items:baseline;gap:10px;margin-top:18px;">
       ${inRevision
         ? `<div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;color:rgba(255,255,255,.55);line-height:1;font-size:22px;">Revision</div>`
         : `<div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;color:${fill != null ? '#fff' : 'rgba(255,255,255,.55)'};line-height:1;font-size:${fill != null ? '40px' : '18px'};">${guestStr}</div>
            ${fill != null ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.75);">Gäste jetzt</div>` : ''}`}
-    </div>
+    </div>` : ''}
     <div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;color:#fff;">
       <i class="${isOpen ? 'pulse' : ''}" style="width:7px;height:7px;border-radius:50%;background:#fff;display:inline-block;flex-shrink:0;"></i>
       ${statusLabel}<span style="color:rgba(255,255,255,.6);font-weight:500;"> · ${tempStr} Wasser</span>
