@@ -234,6 +234,12 @@ async function loadRevisionen() {
   } catch(e) {}
 }
 
+function fmtRevDate(dateStr) {
+  const M = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  const [, m, d] = dateStr.split('-').map(Number);
+  return d + '. ' + M[m - 1];
+}
+
 function slotsFor(uid, dayType) {
   if (dayType === 'Heute') return HEUTE_SLOTS[uid] || [];
   const b = AW[uid];
@@ -713,14 +719,16 @@ function renderCard(v) {
         style="font-size:19px;line-height:1;background:none;border:none;cursor:pointer;padding:2px;color:${fav ? '#fff' : 'rgba(255,255,255,.4)'};transition:color .15s;flex-shrink:0;margin-left:auto;">${fav ? '★' : '☆'}</button>
     </div>
     <div style="display:flex;align-items:baseline;gap:10px;margin-top:18px;">
-      <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;color:${fill != null ? '#fff' : 'rgba(255,255,255,.55)'};line-height:1;font-size:${fill != null ? '40px' : '18px'};">${guestStr}</div>
-      ${fill != null ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.75);">Gäste jetzt</div>` : ''}
+      ${inRevision
+        ? `<div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;color:rgba(255,255,255,.55);line-height:1;font-size:22px;">Revision</div>`
+        : `<div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;color:${fill != null ? '#fff' : 'rgba(255,255,255,.55)'};line-height:1;font-size:${fill != null ? '40px' : '18px'};">${guestStr}</div>
+           ${fill != null ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.75);">Gäste jetzt</div>` : ''}`}
     </div>
     <div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;color:#fff;">
       <i class="${isOpen ? 'pulse' : ''}" style="width:7px;height:7px;border-radius:50%;background:#fff;display:inline-block;flex-shrink:0;"></i>
       ${statusLabel}<span style="color:rgba(255,255,255,.6);font-weight:500;"> · ${tempStr} Wasser</span>
     </div>
-    ${hasGuests ? `
+    ${!inRevision && hasGuests ? `
     <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.22);">
       <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;">
         <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.75);font-weight:700;">Auslastung</span>
@@ -738,6 +746,8 @@ function renderDetail() {
   const v = VENUE_MAP[S.currentUid];
   if (!v) return '';
   const live = LIVE?.venues?.[v.uid];
+  const inRevision = isInRevision(v.uid);
+  const revision   = REVISIONEN[v.uid] || null;
   const isOpen = computeIsOpen(v.uid);
   const fill = live?.currentfill;
   const temp = live?.temperatureWater;
@@ -945,7 +955,11 @@ function renderDetail() {
         </div>
       </div>
 
-      ${hasGuests ? `<!-- Chart section -->
+      ${inRevision && revision ? `
+      <div style="margin-top:clamp(18px,4vw,28px);padding:clamp(20px,4vw,28px);background:#F4F4F4;border-radius:20px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:${META};font-weight:600;">Revision</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:clamp(17px,3vw,22px);font-weight:600;color:${INK};">Geschlossen vom ${fmtRevDate(revision.von)} bis ${fmtRevDate(revision.bis)}</div>
+      </div>` : hasGuests ? `<!-- Chart section -->
       <div style="margin-top:clamp(18px,4vw,28px);">
         <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;letter-spacing:-.005em;color:${INK};text-transform:uppercase;">Wie voll isch es</div>
         <div style="display:flex;gap:6px;margin-top:clamp(10px,3vw,16px);flex-wrap:wrap;align-items:center;justify-content:space-between;">
