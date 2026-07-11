@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-YVCH6TEG6Z"></script>
+<!-- Google tag (gtag.js) — lädt immer, Analytics nur mit Consent -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
+  gtag('consent', 'default', {
+    'analytics_storage': localStorage.getItem('cookie_consent') === 'accepted' ? 'granted' : 'denied'
+  });
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YVCH6TEG6Z"></script>
+<script>
   gtag('js', new Date());
   gtag('config', 'G-YVCH6TEG6Z');
 </script>
@@ -1451,6 +1456,30 @@ Promise.all([
   setInterval(() => loadHeuteSlots().then(() => render()), 15 * 60 * 1000);
   setInterval(() => render(), 60 * 1000);
 });
+</script>
+
+<div id="cookie-banner" style="position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#173D34;color:#fff;padding:16px 20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;line-height:1.5;">
+  <p style="margin:0;max-width:560px;">Diese Seite verwendet Google Analytics, um Besucherzahlen zu messen. Deine Daten werden nur mit deiner Einwilligung erhoben.</p>
+  <div style="display:flex;gap:8px;flex-shrink:0;">
+    <button id="cookie-decline" style="border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:8px 18px;font-size:13px;cursor:pointer;font-family:inherit;background:transparent;color:#fff;">Ablehnen</button>
+    <button id="cookie-accept" style="border:none;border-radius:20px;padding:8px 18px;font-size:13px;cursor:pointer;font-family:inherit;background:#fff;color:#173D34;font-weight:600;">Akzeptieren</button>
+  </div>
+</div>
+<script>
+  (function () {
+    var banner = document.getElementById('cookie-banner');
+    var consent = localStorage.getItem('cookie_consent');
+    if (consent === 'accepted' || consent === 'declined') banner.style.display = 'none';
+    document.getElementById('cookie-accept').addEventListener('click', function () {
+      localStorage.setItem('cookie_consent', 'accepted');
+      gtag('consent', 'update', { 'analytics_storage': 'granted' });
+      banner.style.display = 'none';
+    });
+    document.getElementById('cookie-decline').addEventListener('click', function () {
+      localStorage.setItem('cookie_consent', 'declined');
+      banner.style.display = 'none';
+    });
+  })();
 </script>
 </body>
 </html>
