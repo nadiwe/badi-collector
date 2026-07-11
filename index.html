@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{background:#E4E2E0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#173D34;}
@@ -24,6 +26,10 @@ a{text-decoration:none;color:inherit;}
 .modal-sheet{background:#fff;border-radius:clamp(16px,4vw,28px);padding:clamp(16px,4vw,24px);box-shadow:0 4px 22px rgba(23,61,52,.12);width:100%;max-width:740px;display:flex;flex-direction:column;gap:0;max-height:calc(100dvh - 32px);overflow-y:auto;}
 .stat-card{flex:1;min-width:150px;padding:clamp(14px,3.5vw,20px) clamp(14px,3.5vw,22px);background:#F4F4F4;border-radius:20px;cursor:pointer;display:flex;flex-direction:column;transition:background .18s;}
 .stat-card:hover{background:#ECECEC;}
+.dc-dark-soft{filter:brightness(1.35) contrast(0.92);}
+.leaflet-container{font-family:'IBM Plex Mono',monospace;background:#DEDEDE;}
+.leaflet-bar a{background:#F4F4F4;color:#173D34;border-color:#E0E0DC;}
+.leaflet-bar a:hover{background:#ECECEC;}
 </style>
 </head>
 <body>
@@ -42,30 +48,30 @@ const TYPE_LABEL = { fluss: 'Flussbad', see: 'Seebad', frei: 'Freibad', halle: '
 
 // ── Venue metadata ─────────────────────────────────────────────────────────
 const VENUES = [
-  { uid:'BADI-1',   name:'Seebad Enge',                       type:'see',   tempUid:'seb6943', address:'Mythenquai 9, 8002 Zürich',              hours:'07:00–21:00', season:'Mai–Sep'   },
-  { uid:'SSD-10',   name:'Seebad Utoquai',                    type:'see',   tempUid:'seb6945', address:'Utoquai 50, 8008 Zürich',                hours:'07:00–21:00', season:'Mai–Sep'   },
-  { uid:'seb6946',  name:'Strandbad Mythenquai',              type:'see',   tempUid:'seb6946', address:'Mythenquai 95, 8002 Zürich',             hours:'09:00–20:00', season:'Mai–Sep'   },
-  { uid:'seb6947',  name:'Strandbad Tiefenbrunnen',           type:'see',   tempUid:'seb6947', address:'Bellerivestrasse 201, 8008 Zürich',      hours:'09:00–20:00', season:'Mai–Sep'   },
-  { uid:'seb6948',  name:'Strandbad Wollishofen',             type:'see',   tempUid:'seb6948', address:'Mythenquai 559, 8038 Zürich',            hours:'09:00–20:00', season:'Mai–Sep'   },
-  { uid:'flb6938',  name:'Flussbad Au-Höngg',                  type:'fluss', tempUid:'flb6938', address:'Föhrenbühlweg 5, 8049 Zürich',           hours:'07:00–20:00', season:'Mai–Sep'   },
-  { uid:'flb6939',  name:'Flussbad Oberer Letten',            type:'fluss', tempUid:'flb6939', address:'Lettensteg 10, 8037 Zürich',             hours:'07:00–20:00', season:'Mai–Sep'   },
-  { uid:'flb6940',  name:'Flussbad Unterer Letten',           type:'fluss', tempUid:'flb6940', address:'Wasserwerkstrasse 141, 8037 Zürich',     hours:'07:00–20:00', season:'Mai–Sep'   },
-  { uid:'flb8803',  name:'Flussbad Unterer Letten (Flussteil)',type:'fluss',tempUid:'flb8803', address:'Wasserwerkstrasse 141, 8037 Zürich',     hours:'07:00–20:00', season:'Mai–Sep', note:'Flussteil' },
-  { uid:'flb6941',  name:'Frauenbad Stadthausquai',           type:'fluss', tempUid:'flb6941', address:'Stadthausquai 12, 8001 Zürich',          hours:'07:00–20:00', season:'Mai–Sep', note:'Nur Frauen' },
-  { uid:'flb6942',  name:'Männerbad Schanzengraben',          type:'fluss', tempUid:'flb6942', address:'Kanonengasse 20, 8004 Zürich',           hours:'07:00–20:00', season:'Mai–Sep', note:'Nur Männer' },
-  { uid:'LETZI-1',  name:'Freibad Letzigraben',               type:'frei',  tempUid:'fb002',   address:'Edelweissstrasse 5, 8048 Zürich',        hours:'09:00–21:30', season:'Mai–Sep', note:'Max-Frisch-Bad' },
-  { uid:'fb006',    name:'Freibad Allenmoos',                 type:'frei',  tempUid:'fb006',   address:'Ria-Schwarzwald-Weg 1, 8057 Zürich',     hours:'09:00–20:00', season:'Mai–Sep'   },
-  { uid:'fb008',    name:'Freibad Auhof',                     type:'frei',  tempUid:'fb008',   address:'Glaubtenstrasse 67, 8046 Zürich',        hours:'09:00–20:00', season:'Mai–Sep'   },
-  { uid:'fb012',    name:'Freibad Heuried',                   type:'frei',  tempUid:'fb012',   address:'Döltschiweg 130, 8055 Zürich',           hours:'09:00–20:00', season:'Mai–Sep'   },
-  { uid:'SSD-11',   name:'Freibad Seebach',                   type:'frei',  tempUid:'fb013',   address:'Hertensteinstrasse 119, 8052 Zürich',    hours:'09:00–20:00', season:'Mai–Sep'   },
-  { uid:'fb018',    name:'Freibad Zwischen den Hölzern',      type:'frei',  tempUid:'fb018',   address:'Goldbrunnenstrasse 119, 8055 Zürich',    hours:'09:00–20:00', season:'Mai–Sep'   },
-  { uid:'SSD-8',    name:'Josel-Areal',                       type:'frei',  tempUid:null,      address:'Zürich',                                 hours:'09:00–20:00', season:'Mai–Sep'   },
-  { uid:'SSD-2',    name:'Hallenbad Bläsi',                   type:'halle', tempUid:null,      address:'Hofwiesenstrasse 280, 8057 Zürich',      hours:'07:00–21:00', season:'Ganzjährig', defaultTemp:29 },
-  { uid:'SSD-3',    name:'Hallenbad Bungertwies',             type:'halle', tempUid:null,      address:'Kronenstrasse 18, 8006 Zürich',          hours:'07:00–21:00', season:'Ganzjährig', defaultTemp:29 },
-  { uid:'SSD-4',    name:'Hallenbad City',                    type:'halle', tempUid:null,      address:'Sihlstrasse 71, 8001 Zürich',            hours:'06:30–21:00', season:'Ganzjährig', defaultTemp:28 },
-  { uid:'SSD-6',    name:'Hallenbad Leimbach',                type:'halle', tempUid:null,      address:'Leimbachstrasse 200, 8041 Zürich',       hours:'07:00–21:00', season:'Ganzjährig', defaultTemp:29 },
-  { uid:'SSD-7',    name:'Hallenbad Oerlikon',                type:'halle', tempUid:null,      address:'Wallisellenstrasse 100, 8050 Zürich',    hours:'07:00–22:00', season:'Ganzjährig', defaultTemp:28 },
-  { uid:'SSD-5',    name:'Wärmebad Käferberg',                type:'halle', tempUid:null,      address:'Emil-Klöti-Strasse 21, 8037 Zürich',     hours:'08:00–20:00', season:'Ganzjährig', defaultTemp:32 },
+  { uid:'BADI-1',   name:'Seebad Enge',                       type:'see',   lat:47.3601, lng:8.5314, tempUid:'seb6943', address:'Mythenquai 9, 8002 Zürich',              hours:'07:00–21:00', season:'Mai–Sep'   },
+  { uid:'SSD-10',   name:'Seebad Utoquai',                    type:'see',   lat:47.3580, lng:8.5507, tempUid:'seb6945', address:'Utoquai 50, 8008 Zürich',                hours:'07:00–21:00', season:'Mai–Sep'   },
+  { uid:'seb6946',  name:'Strandbad Mythenquai',              type:'see',   lat:47.3543, lng:8.5285, tempUid:'seb6946', address:'Mythenquai 95, 8002 Zürich',             hours:'09:00–20:00', season:'Mai–Sep'   },
+  { uid:'seb6947',  name:'Strandbad Tiefenbrunnen',           type:'see',   lat:47.3472, lng:8.5658, tempUid:'seb6947', address:'Bellerivestrasse 201, 8008 Zürich',      hours:'09:00–20:00', season:'Mai–Sep'   },
+  { uid:'seb6948',  name:'Strandbad Wollishofen',             type:'see',   lat:47.3369, lng:8.5241, tempUid:'seb6948', address:'Mythenquai 559, 8038 Zürich',            hours:'09:00–20:00', season:'Mai–Sep'   },
+  { uid:'flb6938',  name:'Flussbad Au-Höngg',                  type:'fluss', lat:47.3970, lng:8.4912, tempUid:'flb6938', address:'Föhrenbühlweg 5, 8049 Zürich',           hours:'07:00–20:00', season:'Mai–Sep'   },
+  { uid:'flb6939',  name:'Flussbad Oberer Letten',            type:'fluss', lat:47.3832, lng:8.5276, tempUid:'flb6939', address:'Lettensteg 10, 8037 Zürich',             hours:'07:00–20:00', season:'Mai–Sep'   },
+  { uid:'flb6940',  name:'Flussbad Unterer Letten',           type:'fluss', lat:47.3817, lng:8.5301, tempUid:'flb6940', address:'Wasserwerkstrasse 141, 8037 Zürich',     hours:'07:00–20:00', season:'Mai–Sep'   },
+  { uid:'flb8803',  name:'Flussbad Unterer Letten (Flussteil)',type:'fluss', lat:47.3815, lng:8.5308, tempUid:'flb8803', address:'Wasserwerkstrasse 141, 8037 Zürich',     hours:'07:00–20:00', season:'Mai–Sep', note:'Flussteil' },
+  { uid:'flb6941',  name:'Frauenbad Stadthausquai',           type:'fluss', lat:47.3693, lng:8.5413, tempUid:'flb6941', address:'Stadthausquai 12, 8001 Zürich',          hours:'07:00–20:00', season:'Mai–Sep', note:'Nur Frauen' },
+  { uid:'flb6942',  name:'Männerbad Schanzengraben',          type:'fluss', lat:47.3730, lng:8.5283, tempUid:'flb6942', address:'Kanonengasse 20, 8004 Zürich',           hours:'07:00–20:00', season:'Mai–Sep', note:'Nur Männer' },
+  { uid:'LETZI-1',  name:'Freibad Letzigraben',               type:'frei',  lat:47.3815, lng:8.4932, tempUid:'fb002',   address:'Edelweissstrasse 5, 8048 Zürich',        hours:'09:00–21:30', season:'Mai–Sep', note:'Max-Frisch-Bad' },
+  { uid:'fb006',    name:'Freibad Allenmoos',                 type:'frei',  lat:47.4068, lng:8.5431, tempUid:'fb006',   address:'Ria-Schwarzwald-Weg 1, 8057 Zürich',     hours:'09:00–20:00', season:'Mai–Sep'   },
+  { uid:'fb008',    name:'Freibad Auhof',                     type:'frei',  lat:47.4027, lng:8.4771, tempUid:'fb008',   address:'Glaubtenstrasse 67, 8046 Zürich',        hours:'09:00–20:00', season:'Mai–Sep'   },
+  { uid:'fb012',    name:'Freibad Heuried',                   type:'frei',  lat:47.3695, lng:8.5066, tempUid:'fb012',   address:'Döltschiweg 130, 8055 Zürich',           hours:'09:00–20:00', season:'Mai–Sep'   },
+  { uid:'SSD-11',   name:'Freibad Seebach',                   type:'frei',  lat:47.4241, lng:8.5402, tempUid:'fb013',   address:'Hertensteinstrasse 119, 8052 Zürich',    hours:'09:00–20:00', season:'Mai–Sep'   },
+  { uid:'fb018',    name:'Freibad Zwischen den Hölzern',      type:'frei',  lat:47.3651, lng:8.5005, tempUid:'fb018',   address:'Goldbrunnenstrasse 119, 8055 Zürich',    hours:'09:00–20:00', season:'Mai–Sep'   },
+  { uid:'SSD-8',    name:'Josel-Areal',                       type:'frei',  lat:47.3813, lng:8.5201, tempUid:null,      address:'Zürich',                                 hours:'09:00–20:00', season:'Mai–Sep'   },
+  { uid:'SSD-2',    name:'Hallenbad Bläsi',                   type:'halle', lat:47.4082, lng:8.5372, tempUid:null,      address:'Hofwiesenstrasse 280, 8057 Zürich',      hours:'07:00–21:00', season:'Ganzjährig', defaultTemp:29 },
+  { uid:'SSD-3',    name:'Hallenbad Bungertwies',             type:'halle', lat:47.3864, lng:8.5347, tempUid:null,      address:'Kronenstrasse 18, 8006 Zürich',          hours:'07:00–21:00', season:'Ganzjährig', defaultTemp:29 },
+  { uid:'SSD-4',    name:'Hallenbad City',                    type:'halle', lat:47.3763, lng:8.5372, tempUid:null,      address:'Sihlstrasse 71, 8001 Zürich',            hours:'06:30–21:00', season:'Ganzjährig', defaultTemp:28 },
+  { uid:'SSD-6',    name:'Hallenbad Leimbach',                type:'halle', lat:47.3367, lng:8.5193, tempUid:null,      address:'Leimbachstrasse 200, 8041 Zürich',       hours:'07:00–21:00', season:'Ganzjährig', defaultTemp:29 },
+  { uid:'SSD-7',    name:'Hallenbad Oerlikon',                type:'halle', lat:47.4118, lng:8.5540, tempUid:null,      address:'Wallisellenstrasse 100, 8050 Zürich',    hours:'07:00–22:00', season:'Ganzjährig', defaultTemp:28 },
+  { uid:'SSD-5',    name:'Wärmebad Käferberg',                type:'halle', lat:47.3934, lng:8.5240, tempUid:null,      address:'Emil-Klöti-Strasse 21, 8037 Zürich',     hours:'08:00–20:00', season:'Ganzjährig', defaultTemp:32 },
 ];
 
 const VENUE_MAP = Object.fromEntries(VENUES.map(v => [v.uid, v]));
@@ -103,11 +109,17 @@ let S = {
   hoursOpen: false,
   chartZoomed: false,
   chartRes: '15min',
+  viewMode: 'cards',
 };
 
 // Render während Touch unterdrücken damit iOS-Scroll-Geste nicht unterbrochen wird
 let _touchActive  = false;
 let _renderQueued = false;
+
+let _mapEl      = null; // persistent Leaflet container div (survives innerHTML re-renders)
+let _map        = null;
+let _markers    = {};
+let _mapBasemap = 'gray';
 
 // ── Data ───────────────────────────────────────────────────────────────────
 let AW = {};     // uid → {slots:{Werktag:[],Wochenende:[],Feiertag:[]}, messtage_echt, ...}
@@ -908,6 +920,23 @@ function render() {
             Stand ${dateLabel}${liveTs ? ', ' + timeLabel + ' Uhr' + ageLabel : ''}
           </div>
         </div>
+        <div style="display:inline-flex;align-items:center;gap:3px;background:#173D34;border-radius:999px;padding:4px;flex-shrink:0;">
+          <button onclick="setViewMode('cards')" title="Kacheln"
+            style="width:34px;height:34px;border-radius:999px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;
+                   background:${S.viewMode==='cards'?'#fff':'transparent'};color:${S.viewMode==='cards'?'#173D34':'rgba(255,255,255,.75)'};">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <rect x="1" y="1" width="6" height="6" rx="1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2"/>
+              <rect x="1" y="9" width="6" height="6" rx="1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2"/>
+            </svg>
+          </button>
+          <button onclick="setViewMode('map')" title="Karte"
+            style="width:34px;height:34px;border-radius:999px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;
+                   background:${S.viewMode==='map'?'#fff':'transparent'};color:${S.viewMode==='map'?'#173D34':'rgba(255,255,255,.75)'};">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 1.5a4 4 0 0 1 4 4c0 2.8-4 9-4 9S4 8.3 4 5.5a4 4 0 0 1 4-4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
       <section style="background:#FFFFFF;border-radius:28px;padding:22px;box-shadow:0 4px 22px rgba(23,61,52,.08);display:flex;flex-direction:column;gap:16px;">
@@ -919,7 +948,18 @@ function render() {
           ${list.length} Badis · ${list.filter(v => computeIsOpen(v.uid)).length} offen
         </div>
 
-        ${isEmpty ? `
+        ${S.viewMode === 'map' ? `
+          <div style="position:relative;">
+            <div id="map-slot" style="width:100%;height:clamp(400px,58vh,580px);border-radius:20px;background:#DEDEDE;"></div>
+            <div style="position:absolute;top:12px;right:12px;z-index:1000;display:inline-flex;align-items:center;gap:3px;background:#000;border-radius:999px;padding:4px;">
+              <button data-basemap="gray" onclick="setMapBasemap('gray')"
+                style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.03em;padding:5px 13px;border-radius:999px;border:none;cursor:pointer;
+                       background:${_mapBasemap==='gray'?'#fff':'transparent'};color:${_mapBasemap==='gray'?'#000':'#fff'};">Hell</button>
+              <button data-basemap="dark" onclick="setMapBasemap('dark')"
+                style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.03em;padding:5px 13px;border-radius:999px;border:none;cursor:pointer;
+                       background:${_mapBasemap==='dark'?'#fff':'transparent'};color:${_mapBasemap==='dark'?'#000':'#fff'};">Dunkel</button>
+            </div>
+          </div>` : isEmpty ? `
           <div style="padding:44px 10px 54px;text-align:center;">
             <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:600;color:${INK};">Keni Badis gfunde</div>
             <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:${META};margin-top:10px;line-height:1.6;">Probier en andere Filter ode füeg Favoriten hinzue.</div>
@@ -954,6 +994,13 @@ function render() {
   }
 
   document.getElementById('app').innerHTML = html;
+
+  if (S.viewMode === 'map') {
+    setTimeout(() => initOrUpdateMap(), 0);
+  } else if (_map) {
+    // Detach map container when switching back to cards (reuse later)
+    getMapEl().remove();
+  }
 
   // Scroll-Position wiederherstellen oder zum "jetzt"-Balken scrollen
   if (S.chartZoomed && S.currentUid) {
@@ -1091,6 +1138,96 @@ function parseLive(raw) {
     };
   }
   return { timestamp: raw.timestamp, venues };
+}
+
+const MAP_BASEMAPS = {
+  gray: { url:'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', attr:'Esri, HERE, Garmin' },
+  dark: { url:'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',                                                attr:'© OpenStreetMap, © CARTO', sub:'abcd', cls:'dc-dark-soft' },
+};
+
+function getMapEl() {
+  if (!_mapEl) {
+    _mapEl = document.createElement('div');
+    _mapEl.style.cssText = 'width:100%;height:clamp(400px,58vh,580px);border-radius:20px;overflow:hidden;background:#DEDEDE;';
+  }
+  return _mapEl;
+}
+
+function setViewMode(mode) {
+  S.viewMode = mode;
+  render();
+}
+
+function setMapBasemap(key) {
+  _mapBasemap = key;
+  if (_map && _baseLayer) {
+    _map.removeLayer(_baseLayer);
+    const b = MAP_BASEMAPS[key];
+    const opts = { maxZoom:19, attribution:b.attr };
+    if (b.sub) opts.subdomains = b.sub;
+    if (b.cls) opts.className  = b.cls;
+    _baseLayer = L.tileLayer(b.url, opts).addTo(_map);
+  }
+  // re-render only for the chip highlight update
+  const btns = document.querySelectorAll('[data-basemap]');
+  btns.forEach(btn => {
+    const active = btn.dataset.basemap === key;
+    btn.style.background = active ? '#fff' : 'transparent';
+    btn.style.color       = active ? '#000' : '#fff';
+  });
+}
+
+let _baseLayer = null;
+
+function initOrUpdateMap() {
+  const el = getMapEl();
+  const slot = document.getElementById('map-slot');
+  if (slot) slot.replaceWith(el);
+
+  if (!_map) {
+    _map = L.map(el, { zoomControl:true, scrollWheelZoom:false, attributionControl:true })
+             .setView([47.378, 8.540], 13);
+    const b = MAP_BASEMAPS[_mapBasemap];
+    const opts = { maxZoom:19, attribution:b.attr };
+    if (b.sub) opts.subdomains = b.sub;
+    if (b.cls) opts.className  = b.cls;
+    _baseLayer = L.tileLayer(b.url, opts).addTo(_map);
+  } else {
+    setTimeout(() => _map.invalidateSize(), 50);
+  }
+
+  updateMapMarkers();
+}
+
+function updateMapMarkers() {
+  if (!_map) return;
+  const visible = new Set(filteredVenues().map(v => v.uid));
+
+  VENUES.forEach(v => {
+    if (!v.lat) return;
+    const show = visible.has(v.uid);
+    const col  = TYPE_COLOR[v.type] || INK;
+    const open = computeIsOpen(v.uid);
+    const fill  = open ? col : '#CFCFCC';
+    const stroke = open ? col : '#ADADA9';
+
+    if (_markers[v.uid]) {
+      if (show) {
+        _markers[v.uid].setStyle({ fillColor:fill, color:stroke });
+        if (!_map.hasLayer(_markers[v.uid])) _markers[v.uid].addTo(_map);
+      } else {
+        _map.removeLayer(_markers[v.uid]);
+      }
+    } else if (show) {
+      const mk = L.circleMarker([v.lat, v.lng], {
+        radius:10, color:stroke, weight:2, fillColor:fill, fillOpacity:0.82,
+      }).addTo(_map);
+      mk.bindTooltip(v.name, { permanent:false, direction:'top', offset:[0,-8],
+        className:'', opacity:1 });
+      mk.on('click', () => openDetail(v.uid));
+      _markers[v.uid] = mk;
+    }
+  });
 }
 
 function fetchLive() {
