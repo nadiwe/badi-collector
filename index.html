@@ -193,15 +193,27 @@ function hhmm(s) { // "08:30" → minutes
 
 function computeIsOpen(uid) {
   const live = LIVE?.venues?.[uid];
-  if (live?.openClosed === 'offen') return true;
-  if (live?.openClosed === 'geschlossen') return false;
-  // Fallback for venues without API open/closed data (Hallenbäder etc.)
   const v = VENUE_MAP[uid];
-  if (!v?.hours) return false;
+  // Öffnungszeiten sind zuverlässiger als API-Status (der bei voller Kapazität
+  // oder Daten-Lag fälschlicherweise "geschlossen" meldet)
+  if (v?.hours) {
+    const parts = v.hours.split(/[–-]/);
+    if (parts.length === 2) {
+      const nowMin = nowHHMM();
+      if (nowMin >= hhmm(parts[0].trim()) && nowMin < hhmm(parts[1].trim())) {
+        return true;
+      }
+    }
+  }
+  // Ausserhalb der Öffnungszeiten: nur "offen" wenn API es explizit sagt
+  return live?.openClosed === 'offen';
+}
+
+function closingTime(uid) {
+  const v = VENUE_MAP[uid];
+  if (!v?.hours) return null;
   const parts = v.hours.split(/[–-]/);
-  if (parts.length !== 2) return false;
-  const nowMin = nowHHMM();
-  return nowMin >= hhmm(parts[0].trim()) && nowMin < hhmm(parts[1].trim());
+  return parts.length === 2 ? parts[1].trim() : null;
 }
 
 function slotsFor(uid, dayType) {
@@ -657,7 +669,10 @@ function renderCard(v) {
   const hasTemp    = temp != null && temp !== '';
   const hasGuests  = live?.maxspace != null;
   const guestStr   = fill != null ? numFmt(fill) : 'Keine Daten';
-  const statusLabel = isOpen ? 'offen' : (noLive ? '–' : 'geschlossen');
+  const closing = closingTime(v.uid);
+  const statusLabel = isOpen
+    ? (closing ? 'offen bis ' + closing : 'offen')
+    : (noLive ? '–' : 'geschlossen');
   const tempStr = hasTemp ? parseFloat(temp) + '°' : '–';
   const dev = devInfo(v.uid);
   const fav = !!S.favs[v.uid];
@@ -858,7 +873,7 @@ function renderDetail() {
         <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;">
           <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:${META};font-weight:600;">${TYPE_LABEL[v.type]}</div>
           <span style="display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;color:${statusColor};">
-            <i style="width:6px;height:6px;border-radius:50%;background:${statusDot};display:inline-block;"></i>${isOpen ? 'offen' : 'geschlossen'}
+            <i style="width:6px;height:6px;border-radius:50%;background:${statusDot};display:inline-block;"></i>${isOpen ? (closingTime(v.uid) ? 'offen bis ' + closingTime(v.uid) : 'offen') : 'geschlossen'}
             <span style="color:${META};">· ${v.season}</span>
           </span>
         </div>
