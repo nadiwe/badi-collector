@@ -120,6 +120,8 @@ const VENUES = [
 ];
 
 const VENUE_MAP = Object.fromEntries(VENUES.map(v => [v.uid, v]));
+// Umkehr-Mapping: Stadt-ZH-poiid (tempUid) → Crowdmonitor-uid
+const _TEMP_UID_REV = Object.fromEntries(VENUES.filter(v => v.tempUid).map(v => [v.tempUid, v.uid]));
 
 // Beckentemperaturen für Hallenbäder (geladen aus badi-stammdaten.json)
 let HALLE_TEMPS = {
@@ -171,6 +173,7 @@ let _mapBasemap = 'gray';
 let AW = {};     // uid → {slots:{Werktag:[],Wochenende:[],Feiertag:[]}, messtage_echt, ...}
 let LIVE = null; // {timestamp, venues:{uid:{currentfill,freespace,maxspace,temperatureWater,openClosed}}}
 let HEUTE_SLOTS = {}; // uid → [{zeit:"HH:MM", auslastung:pct}] — heutige Istdaten aus CSV
+let TEMP_WEEK   = {}; // uid → {mo:22, di:22, ...} — letzte Temp pro Wochentag aus CSV
 let REVISIONEN  = {}; // uid → {von:"YYYY-MM-DD", bis:"YYYY-MM-DD", name}
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -851,10 +854,12 @@ function renderDetail() {
     </div>`;
   }).join('');
 
-  // Temp weekly comparison (just show same temp for all days since we only have live)
   const tempList = wdEntries.map(w => {
     const isToday = todayWd() === w.k;
-    const tVal = isToday && hasTemp ? parseFloat(temp) + '°' : '–';
+    const weekTemp = TEMP_WEEK[v.uid]?.[w.k];
+    const tVal = isToday && hasTemp ? parseFloat(temp) + '°'
+               : weekTemp != null   ? weekTemp + '°'
+               : '–';
     const accentBg = isToday ? typeColor : 'transparent';
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-radius:8px;background:${accentBg};">
       <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${isToday ? 600 : 400};color:${isToday ? '#fff' : INK};">${w.l}</span>
@@ -1324,6 +1329,27 @@ async function loadHeuteSlots() {
   } catch(e) {}
 }
 
+async function loadTempSlots() {
+  try {
+    const r = await fetch(BASE + 'data/temperaturen/' + currentWeekFile() + '.csv?t=' + Date.now());
+    if (!r.ok) return;
+    const WD = ['so','mo','di','mi','do','fr','sa'];
+    const next = {};
+    for (const line of (await r.text()).trim().split('\n').slice(1)) {
+      const [timestamp, tempUid, , temperatureWater] = line.split(',');
+      if (!timestamp || !tempUid || !temperatureWater) continue;
+      const uid = _TEMP_UID_REV[tempUid];
+      if (!uid) continue;
+      const temp = parseFloat(temperatureWater);
+      if (isNaN(temp)) continue;
+      const wd = WD[new Date(timestamp.slice(0, 10)).getDay()];
+      if (!next[uid]) next[uid] = {};
+      next[uid][wd] = temp; // letzte Messung des Tages gewinnt
+    }
+    TEMP_WEEK = next;
+  } catch(e) {}
+}
+
 async function fetchBesucherWS() {
   return new Promise((resolve, reject) => {
     try {
@@ -1460,6 +1486,7 @@ Promise.all([
   fetch(BASE + 'auswertung/auswertung.json').then(r => r.ok ? r.json() : null).catch(() => null),
   Promise.allSettled([fetchBesucherWS(), loadTemps()]),
   loadHeuteSlots(),
+  loadTempSlots(),
   loadRevisionen(),
   loadStammdaten(),
 ]).then(([aw, [wsRes]]) => {
@@ -1480,7 +1507,7 @@ Promise.all([
   setInterval(refreshTemps, 2 * 60 * 1000);
 
   // Heutige CSV-Messdaten alle 15 Minuten aktualisieren
-  setInterval(() => loadHeuteSlots().then(() => render()), 15 * 60 * 1000);
+  setInterval(() => Promise.all([loadHeuteSlots(), loadTempSlots()]).then(() => render()), 15 * 60 * 1000);
 
   // "vor X Min" Label jede Minute aktualisieren
   setInterval(() => render(), 60 * 1000);
@@ -1489,10 +1516,11 @@ Promise.all([
   fetchLive().then(live => { LIVE = parseLive(live); render(); });
   connectWS();
   loadHeuteSlots();
+  loadTempSlots();
   loadRevisionen();
   loadStammdaten();
   setInterval(refreshTemps, 2 * 60 * 1000);
-  setInterval(() => loadHeuteSlots().then(() => render()), 15 * 60 * 1000);
+  setInterval(() => Promise.all([loadHeuteSlots(), loadTempSlots()]).then(() => render()), 15 * 60 * 1000);
   setInterval(() => render(), 60 * 1000);
 });
 </script>
