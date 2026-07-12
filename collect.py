@@ -19,13 +19,23 @@ def _csv_safe(value):
     return ("'" + s) if s.startswith(("=", "+", "-", "@", "\t", "\r")) else s
 
 
-# Besucherzahlen — interne UIDs aus dem Crowdmonitor WebSocket (ohne SSD-1)
-BESUCHER_IDS = {
-    "SSD-2", "SSD-3", "SSD-4", "SSD-6", "SSD-7", "SSD-10",
-    "BADI-1", "flb6939", "flb6940", "flb8803", "flb6941",
-    "fb006", "fb008", "fb012", "LETZI-1", "SSD-11", "fb018",
-    "seb6946", "seb6947", "seb6948", "SSD-5",
-}
+def _load_stammdaten() -> set:
+    """Liest data/badi-stammdaten.json und gibt die UIDs aller Bäder mit CrowdMonitor-API zurück."""
+    try:
+        with open("data/badi-stammdaten.json", encoding="utf-8") as f:
+            data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return set()
+    ids: set = set()
+    for section in ("hallenbäder", "freibäder", "flussbäder", "seebäder"):
+        for entry in data.get(section, []):
+            if entry.get("besucher", {}).get("typ") == "api":
+                ids.add(entry["uid"])
+    return ids
+
+
+# Besucherzahlen — UIDs aus badi-stammdaten.json (besucher.typ == "api")
+BESUCHER_IDS = _load_stammdaten()
 
 # Temperaturen — poiids aus der Stadt-Zürich-API (ohne Hallenbad Altstetten)
 TEMPERATUREN_IDS = {

@@ -1,0 +1,649 @@
+{
+  "_info": {
+    "beschreibung": "Stammdaten aller Zürcher Badis — Quellen, manuelle Daten und Review-Plan",
+    "letzte_aktualisierung": "2026-07-12",
+    "naechste_pruefung": "2026-10-12",
+    "pruefungsintervall": "alle 3 Monate",
+    "pruefung_felder": [
+      "oeffnungszeiten",
+      "saison",
+      "temperatur",
+      "besucher_api"
+    ]
+  },
+  "hallenbäder": [
+    {
+      "uid": "SSD-1",
+      "name": "Hallenbad Altstetten",
+      "standort": "Dachslernstrasse 35, 8048 Zürich",
+      "oeffnungszeiten": {
+        "wert": "Mo/Mi/Fr 06:00–21:00, Di/Do 08:00–21:00, Sa/So 08:00–18:00",
+        "quelle": "bad-altstetten.ch",
+        "typ": "manuell",
+        "pruefung": "alle 3 Monate"
+      },
+      "revision_2026": {
+        "wert": "30. Juli – 16. August 2026",
+        "quelle": "bad-altstetten.ch",
+        "typ": "manuell",
+        "hinweis": "Grosse Sanierung geplant Frühling 2027 – Ende 2029 (stadt-zuerich.ch)"
+      },
+      "temperatur": {
+        "wert": {
+          "Schwimmbecken": "28°C",
+          "Nichtschwimmerbecken": "29°C",
+          "Sprungbecken": "29°C",
+          "Wärmebecken": "34°C"
+        },
+        "quelle": "bad-altstetten.ch",
+        "typ": "manuell",
+        "pruefung": "alle 3 Monate"
+      },
+      "besucher": {
+        "wert": "keine Daten",
+        "quelle": null,
+        "typ": "keine"
+      }
+    },
+    {
+      "uid": "SSD-2",
+      "name": "Hallenbad Bläsi",
+      "standort": "Limmattalstrasse 154, 8049 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "revision_2026": {
+        "wert": "27. Juli – 16. August 2026",
+        "quelle": "stadt-zuerich.ch/hallenbaeder",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "wert": {
+          "Schwimmbecken": "29°C"
+        },
+        "quelle": "stadt-zuerich.ch/blaesi",
+        "typ": "manuell",
+        "pruefung": "alle 3 Monate"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    },
+    {
+      "uid": "SSD-3",
+      "name": "Hallenbad Bungertwies",
+      "standort": "Hofstrasse 56, 8044 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "revision_2026": {
+        "wert": "11. – 31. Juli 2026",
+        "quelle": "stadt-zuerich.ch/hallenbaeder",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "wert": {
+          "Schwimmbecken": "29°C"
+        },
+        "quelle": "stadt-zuerich.ch/bungertwies",
+        "typ": "manuell",
+        "pruefung": "alle 3 Monate"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    },
+    {
+      "uid": "SSD-4",
+      "name": "Hallenbad City",
+      "standort": "Sihlstrasse 71, 8001 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "revision_2026": {
+        "wert": "4. Juli – 7. August 2026",
+        "quelle": "stadt-zuerich.ch/hallenbaeder",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "wert": {
+          "Schwimmbecken": "28°C",
+          "Nichtschwimmerbecken": "31°C",
+          "Variobecken": "29°C"
+        },
+        "quelle": "stadt-zuerich.ch/city",
+        "typ": "manuell",
+        "pruefung": "alle 3 Monate"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    },
+    {
+      "uid": "SSD-5",
+      "name": "Wärmebad Käferberg",
+      "standort": "Emil-Klöti-Strasse 17, 8037 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "revision_2026": {
+        "wert": "11. Juli – 2. August 2026",
+        "quelle": "stadt-zuerich.ch/hallenbaeder",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "wert": {
+          "Wärmebad": "32°C"
+        },
+        "quelle": "stadt-zuerich.ch/kaeferberg",
+        "typ": "manuell",
+        "pruefung": "alle 3 Monate"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    },
+    {
+      "uid": "SSD-6",
+      "name": "Hallenbad Leimbach",
+      "standort": "Klebestrasse 3, 8041 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "revision_2026": {
+        "wert": "18. Juli – 16. August 2026",
+        "quelle": "stadt-zuerich.ch/hallenbaeder",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "wert": {
+          "Schwimmbecken": "29°C",
+          "Planschbecken": "31°C"
+        },
+        "quelle": "stadt-zuerich.ch/leimbach",
+        "typ": "manuell",
+        "pruefung": "alle 3 Monate"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    },
+    {
+      "uid": "SSD-7",
+      "name": "Hallenbad Oerlikon",
+      "standort": "Wallisellenstrasse 100, 8050 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "revision_2026": {
+        "wert": "2. – 23. August 2026",
+        "quelle": "stadt-zuerich.ch/hallenbaeder",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "wert": {
+          "50m-Schwimmbecken": "28°C",
+          "Sprungbecken": "29°C",
+          "Nichtschwimmerbecken": "30°C",
+          "Planschbecken": "30°C"
+        },
+        "quelle": "stadt-zuerich.ch/oerlikon",
+        "typ": "manuell",
+        "pruefung": "alle 3 Monate"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    }
+  ],
+  "freibäder": [
+    {
+      "uid": "fb006",
+      "name": "Freibad Allenmoos",
+      "standort": "Ringstrasse 79, 8057 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "saison_2026": {
+        "wert": "9. Mai – ca. 15. September",
+        "quelle": "stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    },
+    {
+      "uid": "fb008",
+      "name": "Freibad Auhof",
+      "standort": "Luegislandstrasse 160, 8051 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "saison_2026": {
+        "wert": "9. Mai – 29. September",
+        "quelle": "stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    },
+    {
+      "uid": "DOLDER-1",
+      "name": "Freibad Dolder",
+      "standort": "Adlisbergstrasse 36, 8044 Zürich",
+      "oeffnungszeiten": {
+        "wert": "manuell prüfen",
+        "quelle": "doldereisundbad.ch",
+        "typ": "manuell",
+        "pruefung": "alle 3 Monate"
+      },
+      "saison_2026": {
+        "wert": "Anfang Juni – Herbst 2026",
+        "quelle": "doldereisundbad.ch",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "wert": "beheizt",
+        "quelle": "doldereisundbad.ch",
+        "typ": "manuell",
+        "pruefung": "alle 3 Monate"
+      },
+      "besucher": {
+        "wert": "keine Daten",
+        "quelle": null,
+        "typ": "keine"
+      }
+    },
+    {
+      "uid": "fb012",
+      "name": "Freibad Heuried",
+      "standort": "Wasserschöpfi 71, 8055 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "saison_2026": {
+        "wert": "9. Mai – ca. 15. September",
+        "quelle": "stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    },
+    {
+      "uid": "LETZI-1",
+      "name": "Freibad Letzigraben",
+      "standort": "Edelweissstrasse 5, 8048 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "saison_2026": {
+        "wert": "1. Mai – 29. September",
+        "quelle": "stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    },
+    {
+      "uid": "SSD-11",
+      "name": "Freibad Seebach",
+      "standort": "Seebacherstrasse, 8052 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "saison_2026": {
+        "wert": "11. April – 25. Oktober",
+        "quelle": "stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    },
+    {
+      "uid": "fb018",
+      "name": "Freibad Zwischen den Hölzern",
+      "standort": "Zwischenhölzerweg 1, Oberengstringen",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "saison_2026": {
+        "wert": "9. Mai – 15. September",
+        "quelle": "stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    }
+  ],
+  "flussbäder": [
+    {
+      "uid": "flb6938",
+      "name": "Flussbad Au-Höngg",
+      "standort": "Werdinsel, 8049 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "saison_2026": {
+        "wert": "9. Mai – ca. 15. September",
+        "quelle": "stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "besucher": {
+        "wert": "keine Daten",
+        "quelle": null,
+        "typ": "keine",
+        "hinweis": "Gratisbad, nicht im CrowdMonitor"
+      }
+    },
+    {
+      "uid": "flb6939",
+      "name": "Flussbad Oberer Letten",
+      "standort": "Lettensteg 10, 8037 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "saison_2026": {
+        "wert": "9. Mai – 15. September",
+        "quelle": "stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    },
+    {
+      "uid": "flb6940",
+      "name": "Flussbad Unterer Letten",
+      "standort": "Werdinsel, 8037 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "saison_2026": {
+        "wert": "9. Mai – 15. September",
+        "quelle": "stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    },
+    {
+      "uid": "flb8803",
+      "name": "Flussbad Unterer Letten (Flussteil)",
+      "standort": "Werdinsel, 8037 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "saison_2026": {
+        "wert": "9. Mai – 15. September",
+        "quelle": "stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    },
+    {
+      "uid": "flb6941",
+      "name": "Frauenbad Stadthausquai",
+      "standort": "Stadthausquai 12, 8001 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "saison_2026": {
+        "wert": "9. Mai – 15. September",
+        "quelle": "stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    },
+    {
+      "uid": "flb6942",
+      "name": "Männerbad Schanzengraben",
+      "standort": "Badweg 10, 8004 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "saison_2026": {
+        "wert": "12. Mai – 15. September",
+        "quelle": "stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "wert": "Flusswasser (Zürichsee)",
+        "quelle": null,
+        "typ": "keine"
+      },
+      "besucher": {
+        "wert": "keine Daten",
+        "quelle": null,
+        "typ": "keine",
+        "hinweis": "Gratisbad, nicht im CrowdMonitor"
+      }
+    }
+  ],
+  "seebäder": [
+    {
+      "uid": "BADI-1",
+      "name": "Seebad Enge",
+      "standort": "Mythenquai 9, 8002 Zürich",
+      "oeffnungszeiten": {
+        "wert": "9. Mai–31. Mai: 09:00–19:00, 1. Juni–30. Aug: 08:00–20:00, 31. Aug–20. Sep: 08:00–19:00",
+        "quelle": "seebadenge.ch",
+        "typ": "manuell",
+        "pruefung": "alle 3 Monate"
+      },
+      "saison_2026": {
+        "wert": "9. Mai – 20. September",
+        "quelle": "seebadenge.ch",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    },
+    {
+      "uid": "SSD-10",
+      "name": "Seebad Utoquai",
+      "standort": "Utoquai 50, 8008 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "saison_2026": {
+        "wert": "11. April – 25. Oktober",
+        "quelle": "stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    },
+    {
+      "uid": "seb6946",
+      "name": "Strandbad Mythenquai",
+      "standort": "Mythenquai 95, 8002 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "saison_2026": {
+        "wert": "9. Mai – 29. September",
+        "quelle": "stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    },
+    {
+      "uid": "seb6947",
+      "name": "Strandbad Tiefenbrunnen",
+      "standort": "Bellerivestrasse 170, 8008 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "saison_2026": {
+        "wert": "9. Mai – 29. September",
+        "quelle": "stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    },
+    {
+      "uid": "seb6948",
+      "name": "Strandbad Wollishofen",
+      "standort": "Mythenquai 559, 8038 Zürich",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "saison_2026": {
+        "wert": "9. Mai – 15. September",
+        "quelle": "stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "temperatur": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "besucher": {
+        "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
+        "typ": "api"
+      }
+    }
+  ]
+}
