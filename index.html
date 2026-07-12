@@ -1321,11 +1321,22 @@ async function loadHeuteSlots() {
       if (!timestamp.startsWith(today)) continue;
       const ms = parseFloat(maxspace);
       if (!ms) continue;
-      const zeit = timestamp.slice(11, 16);
-      if (!nextSlots[uid]) nextSlots[uid] = [];
-      nextSlots[uid].push({ zeit, auslastung: cf / ms * 100 });
+      // Auf nächste 15-min-Grenze runden (14:59 → 15:00, 08:29 + 08:30 → selber Slot)
+      const raw = timestamp.slice(11, 16);
+      const [rh, rm] = raw.split(':').map(Number);
+      const snapped = Math.round((rh * 60 + rm) / 15) * 15;
+      const zeit = String(Math.floor(snapped / 60) % 24).padStart(2, '0') + ':' + String(snapped % 60).padStart(2, '0');
+      if (!nextSlots[uid]) nextSlots[uid] = {};
+      if (!nextSlots[uid][zeit]) nextSlots[uid][zeit] = { sum: 0, count: 0 };
+      nextSlots[uid][zeit].sum += cf / ms * 100;
+      nextSlots[uid][zeit].count++;
     }
-    HEUTE_SLOTS     = nextSlots;
+    HEUTE_SLOTS = {};
+    for (const [uid, slotMap] of Object.entries(nextSlots)) {
+      HEUTE_SLOTS[uid] = Object.entries(slotMap)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([zeit, { sum, count }]) => ({ zeit, auslastung: sum / count }));
+    }
     GUEST_WEEK_TOTAL = nextTotals;
   } catch(e) {}
 }

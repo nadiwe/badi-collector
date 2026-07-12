@@ -73,7 +73,8 @@ def _day_type(d: date) -> str:
 # ── Daten laden ───────────────────────────────────────────────────────────
 
 def _slot(ts: datetime) -> str:
-    return f"{ts.hour:02d}:{(ts.minute // 15) * 15:02d}"
+    snapped = round((ts.hour * 60 + ts.minute) / 15) * 15
+    return f"{(snapped // 60) % 24:02d}:{snapped % 60:02d}"
 
 
 def _strip_csv_safe(value: str) -> str:
