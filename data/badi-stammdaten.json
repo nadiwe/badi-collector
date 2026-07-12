@@ -2,8 +2,8 @@
   "_info": {
     "beschreibung": "Stammdaten aller Zürcher Badis — Quellen, manuelle Daten und Review-Plan",
     "letzte_aktualisierung": "2026-07-12",
-    "naechste_pruefung": "2026-10-12",
-    "pruefungsintervall": "alle 3 Monate",
+    "naechste_pruefung": "2027-07-12",
+    "pruefungsintervall": "jährlich",
     "pruefung_felder": [
       "oeffnungszeiten",
       "saison",
@@ -20,7 +20,7 @@
         "wert": "Mo/Mi/Fr 06:00–21:00, Di/Do 08:00–21:00, Sa/So 08:00–18:00",
         "quelle": "https://www.bad-altstetten.ch",
         "typ": "manuell",
-        "pruefung": "alle 3 Monate"
+        "pruefung": "jährlich"
       },
       "revision_2026": {
         "wert": "30. Juli – 16. August 2026",
@@ -37,7 +37,7 @@
         },
         "quelle": "https://www.bad-altstetten.ch",
         "typ": "manuell",
-        "pruefung": "alle 3 Monate"
+        "pruefung": "jährlich"
       },
       "besucher": {
         "wert": "keine Daten",
@@ -65,7 +65,7 @@
         },
         "quelle": "https://www.stadt-zuerich.ch/blaesi",
         "typ": "manuell",
-        "pruefung": "alle 3 Monate"
+        "pruefung": "jährlich"
       },
       "besucher": {
         "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
@@ -92,7 +92,7 @@
         },
         "quelle": "https://www.stadt-zuerich.ch/bungertwies",
         "typ": "manuell",
-        "pruefung": "alle 3 Monate"
+        "pruefung": "jährlich"
       },
       "besucher": {
         "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
@@ -121,7 +121,7 @@
         },
         "quelle": "https://www.stadt-zuerich.ch/city",
         "typ": "manuell",
-        "pruefung": "alle 3 Monate"
+        "pruefung": "jährlich"
       },
       "besucher": {
         "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
@@ -148,7 +148,7 @@
         },
         "quelle": "https://www.stadt-zuerich.ch/kaeferberg",
         "typ": "manuell",
-        "pruefung": "alle 3 Monate"
+        "pruefung": "jährlich"
       },
       "besucher": {
         "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
@@ -176,7 +176,7 @@
         },
         "quelle": "https://www.stadt-zuerich.ch/leimbach",
         "typ": "manuell",
-        "pruefung": "alle 3 Monate"
+        "pruefung": "jährlich"
       },
       "besucher": {
         "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
@@ -206,7 +206,7 @@
         },
         "quelle": "https://www.stadt-zuerich.ch/oerlikon",
         "typ": "manuell",
-        "pruefung": "alle 3 Monate"
+        "pruefung": "jährlich"
       },
       "besucher": {
         "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
@@ -269,7 +269,7 @@
         "wert": "manuell prüfen",
         "quelle": "https://www.doldereisundbad.ch",
         "typ": "manuell",
-        "pruefung": "alle 3 Monate"
+        "pruefung": "jährlich"
       },
       "saison_2026": {
         "wert": "Anfang Juni – Herbst 2026",
@@ -281,7 +281,7 @@
         "wert": "beheizt",
         "quelle": "https://www.doldereisundbad.ch",
         "typ": "manuell",
-        "pruefung": "alle 3 Monate"
+        "pruefung": "jährlich"
       },
       "besucher": {
         "wert": "keine Daten",

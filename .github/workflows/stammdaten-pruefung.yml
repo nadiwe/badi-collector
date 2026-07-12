@@ -2,8 +2,8 @@ name: Stammdaten-Prüfung
 
 on:
   schedule:
-    - cron: "0 7 12 1,4,7,10 *"  # 12. Jan / Apr / Jul / Okt um 07:00 UTC
-  workflow_dispatch:               # auch manuell startbar
+    - cron: "0 7 12 7 *"  # 12. Juli um 07:00 UTC — jährlich
+  workflow_dispatch:        # auch manuell startbar
 
 jobs:
   pruefung:
@@ -16,40 +16,82 @@ jobs:
       - name: Repository laden
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
 
-      - name: Prüfliste aus badi-stammdaten.json generieren
+      - name: Prüfliste generieren
         run: |
           python3 - <<'PYEOF'
           import json
+          from datetime import date
 
           with open("data/badi-stammdaten.json", encoding="utf-8") as f:
               data = json.load(f)
 
-          lines = []
-          sections = ["hallenbäder", "freibäder", "flussbäder", "seebäder"]
-          for section in sections:
+          year = date.today().year
+          rev_key = f"revision_{year}"
+          saison_key = f"saison_{year}"
+
+          oeffnungszeiten_items = []
+          temperatur_items = []
+          revision_items = []
+          saison_items = []
+
+          for section in ["hallenbäder", "freibäder", "flussbäder", "seebäder"]:
+              is_halle = section == "hallenbäder"
+              is_outdoor = section in ["freibäder", "flussbäder", "seebäder"]
               for venue in data.get(section, []):
                   name = venue.get("name", venue.get("uid", "?"))
-                  for field, content in venue.items():
-                      if not isinstance(content, dict):
-                          continue
-                      if content.get("pruefung") != "alle 3 Monate":
-                          continue
-                      wert = content.get("wert")
-                      if isinstance(wert, dict):
-                          wert_str = ", ".join(f"{k}: {v}" for k, v in wert.items())
-                      else:
-                          wert_str = str(wert) if wert is not None else "—"
-                      quelle = content.get("quelle") or "?"
-                      lines.append(f"- [ ] **{name}** — `{field}`: {wert_str}  \n  Quelle: [{quelle}]({quelle if quelle.startswith('http') else '#'})")
 
-          body = "## 📋 Stammdaten-Prüfung — alle 3 Monate\n\n"
-          body += "Folgende Felder in `data/badi-stammdaten.json` prüfen und bei Änderungen aktualisieren:\n\n"
-          body += "\n".join(lines)
-          body += "\n\n---\n_Automatisch generiert vom [stammdaten-pruefung Workflow](../../actions/workflows/stammdaten-pruefung.yml)_"
+                  oz = venue.get("oeffnungszeiten", {})
+                  if oz.get("typ") == "manuell":
+                      wert = oz.get("wert", "—")
+                      quelle = oz.get("quelle", "?")
+                      oeffnungszeiten_items.append(
+                          f"- [ ] **{name}**: {wert}  \n  Quelle: {quelle}"
+                      )
+
+                  temp = venue.get("temperatur", {})
+                  if temp.get("typ") == "manuell" and isinstance(temp.get("wert"), dict):
+                      wert_str = ", ".join(f"{k}: {v}" for k, v in temp["wert"].items())
+                      quelle = temp.get("quelle", "?")
+                      temperatur_items.append(
+                          f"- [ ] **{name}**: {wert_str}  \n  Quelle: {quelle}"
+                      )
+
+                  if is_halle and rev_key in venue:
+                      rev = venue[rev_key]
+                      wert = rev.get("wert", "—")
+                      quelle = rev.get("quelle", "?")
+                      revision_items.append(
+                          f"- [ ] **{name}**: {wert}  \n  Quelle: {quelle}"
+                      )
+
+                  if is_outdoor and saison_key in venue:
+                      saison = venue[saison_key]
+                      wert = saison.get("wert", "—")
+                      quelle = saison.get("quelle", "?")
+                      saison_items.append(
+                          f"- [ ] **{name}**: {wert}  \n  Quelle: {quelle}"
+                      )
+
+          body = f"## 📋 Stammdaten-Prüfung {year}\n\n"
+
+          body += "### 🕐 Öffnungszeiten (manuell gepflegt)\n\n"
+          body += ("\n".join(oeffnungszeiten_items) if oeffnungszeiten_items else "_Keine manuellen Einträge_") + "\n\n"
+
+          body += "### 🌡️ Temperaturen (manuell gepflegt)\n\n"
+          body += ("\n".join(temperatur_items) if temperatur_items else "_Keine manuellen Einträge_") + "\n\n"
+
+          body += "### 🔧 Revisionsdaten Hallenbäder\n\n"
+          body += ("\n".join(revision_items) if revision_items else "_Keine Einträge_") + "\n\n"
+
+          body += "### 🌊 Saisonstart und Saisonende\n\n"
+          body += ("\n".join(saison_items) if saison_items else "_Keine Einträge_") + "\n\n"
+
+          body += "---\n_Automatisch generiert vom [stammdaten-pruefung Workflow](../../actions/workflows/stammdaten-pruefung.yml)_"
 
           with open("/tmp/issue_body.txt", "w") as f:
               f.write(body)
-          print(f"✓ {len(lines)} Felder zur Prüfung")
+          total = len(oeffnungszeiten_items) + len(temperatur_items) + len(revision_items) + len(saison_items)
+          print(f"✓ {total} Prüfpunkte generiert")
           PYEOF
 
       - name: GitHub Issue erstellen
@@ -57,13 +99,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           BODY=$(cat /tmp/issue_body.txt)
-          QUARTER=$(python3 -c "
-          from datetime import date
-          d = date.today()
-          q = (d.month - 1) // 3 + 1
-          print(f'Q{q} {d.year}')
-          ")
-          TITLE="📋 Stammdaten-Prüfung ${QUARTER}"
+          YEAR=$(date +%Y)
+          TITLE="📋 Stammdaten-Prüfung ${YEAR}"
 
           EXISTING=$(gh issue list --label "stammdaten" --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
 
