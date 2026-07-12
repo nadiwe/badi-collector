@@ -506,7 +506,7 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus, wd) {
   const labelStep = zoomed ? 1 : 2;
   function makeLabels(arr) {
     return arr.map((s, i) => {
-      if (i % labelStep !== 0) return '';
+      if (i % labelStep !== 0 && i !== arr.length - 1) return '';
       const pct = (i / arr.length * 100).toFixed(1);
       return `<span style="position:absolute;left:${pct}%;font-family:'IBM Plex Mono',monospace;font-size:${labelFz};color:#ADADA9;white-space:nowrap;">${s.zeit}</span>`;
     }).join('');
