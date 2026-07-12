@@ -253,6 +253,7 @@ def _impute(rows: list, open_d: set, in_season_gaps: set) -> list:
 # ── Konsolen-Ausgabe ──────────────────────────────────────────────────────
 
 DAY_TYPES = ["Werktag", "Wochenende", "Feiertag"]
+WD_KEYS   = ["mo", "di", "mi", "do", "fr", "sa", "so"]  # Montag=0 … Sonntag=6
 COL = 15
 
 
@@ -308,7 +309,7 @@ def _save_json(
     badis_out = []
     for badi in badis:
         slots_obj: dict = {}
-        for dt in DAY_TYPES:
+        for dt in [*DAY_TYPES, *WD_KEYS]:
             entries = []
             for s in sorted({k[2] for k in slot_avg if k[0] == badi and k[1] == dt}):
                 v = slot_avg.get((badi, dt, s))
@@ -318,7 +319,8 @@ def _save_json(
                         "auslastung": round(v, 1),
                         "geschaetzt": slot_est.get((badi, dt, s), False),
                     })
-            slots_obj[dt] = entries
+            if entries:
+                slots_obj[dt] = entries
 
         saison: dict = {}
         if "seasonal" in levels:
@@ -387,14 +389,19 @@ def main():
     badis   = sorted({r["name"] for r in active})
     p_types = [t for t in DAY_TYPES if any(r["day_type"] == t for r in active)]
 
-    # Slot-Durchschnitte mit geschätzt-Flag
+    # Slot-Durchschnitte mit geschätzt-Flag (Werktag/Wochenende/Feiertag + pro Wochentag)
     bucket:     dict = defaultdict(list)
     bucket_est: dict = defaultdict(bool)
     for r in active:
-        key = (r["name"], r["day_type"], r["slot"])
-        bucket[key].append(r["util"])
+        dt_key = (r["name"], r["day_type"], r["slot"])
+        bucket[dt_key].append(r["util"])
         if r["estimated"]:
-            bucket_est[key] = True
+            bucket_est[dt_key] = True
+        wd = WD_KEYS[r["date"].weekday()]
+        wd_key = (r["name"], wd, r["slot"])
+        bucket[wd_key].append(r["util"])
+        if r["estimated"]:
+            bucket_est[wd_key] = True
     slot_avg = {k: sum(v) / len(v) for k, v in bucket.items()}
     slot_est = dict(bucket_est)
 

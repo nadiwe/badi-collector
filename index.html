@@ -403,14 +403,22 @@ function sparklineSVG(uid, open) {
 
 function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus, wd) {
   let slots = slotsFor(uid, dayType);
-  // Hüt-Tab ohne Daten → historischen Durchschnitt für diesen Wochentag zeigen
+  // Hüt-Tab ohne Live-Daten → Wochentag-Durchschnitt als Fallback
   if (!slots.length && dayType === 'Heute') {
-    slots = slotsFor(uid, dayTypeFor(todayWd()));
+    slots = slotsFor(uid, todayWd());
+    if (!slots.length) slots = slotsFor(uid, dayTypeFor(todayWd()));
     showFocus = false;
   }
   if (!slots.length) return '<div style="height:116px;display:flex;align-items:center;justify-content:center;color:#8C8C8C;font-family:\'IBM Plex Mono\',monospace;font-size:11px;">Noch keine Daten</div>';
+
+  // Hüt-Tab: Wochentag-Durchschnitt für Ghost-Balken (unabhängig von Live-Daten)
+  let histSlots = dayType === 'Heute'
+    ? (slotsFor(uid, todayWd()).length ? slotsFor(uid, todayWd()) : slotsFor(uid, dayTypeFor(todayWd())))
+    : [];
+
   // 1h und Übersicht: Stunden-Durchschnitt; 15min: Rohdaten
   if (!zoomed || res === '1h') slots = groupByHour(slots);
+  if (histSlots.length && (!zoomed || res === '1h')) histSlots = groupByHour(histSlots);
 
   // Auf Öffnungszeiten einschränken
   const meta = VENUE_MAP[uid];
@@ -428,6 +436,7 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus, wd) {
     return f.length >= 3 ? f : arr;
   }
   slots = filterToHours(slots);
+  if (histSlots.length) histSlots = filterToHours(histSlots);
 
   // Für 1h-aggregierte Modi: fehlende Stunden bis Schliesszeit auffüllen
   if (!zoomed || res === '1h') {
@@ -458,6 +467,15 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus, wd) {
     }
   }
 
+  // Ghost-Balken: Hist-Zeitachse in Haupt-Slots einmergen, hist-Wert annotieren
+  if (histSlots.length) {
+    const histMap = new Map(histSlots.filter(s => s.auslastung != null).map(s => [s.zeit, s.auslastung]));
+    const existing = new Set(slots.map(s => s.zeit));
+    const extra = [...histMap.keys()].filter(zt => !existing.has(zt)).map(zt => ({ zeit: zt, auslastung: null }));
+    if (extra.length) slots = [...slots, ...extra].sort((a, b) => hhmm(a.zeit) - hhmm(b.zeit));
+    slots = slots.map(s => ({ ...s, hist: histMap.get(s.zeit) ?? null }));
+  }
+
   const isToday = showFocus === true;
   const nowMin  = nowHHMM();
 
@@ -481,7 +499,8 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus, wd) {
   }
   const n       = slots.length;
   const vals    = slots.map(s => s.auslastung);
-  const maxV    = Math.max(...vals.filter(v => v != null), 0.001);
+  const histVals = slots.map(s => s.hist).filter(h => h != null);
+  const maxV    = Math.max(...vals.filter(v => v != null), ...histVals, 0.001);
   const norm    = vals.map(v => v != null ? v / maxV : null);
 
   // Letzter Slot mit echten Daten → wird hervorgehoben (nur für «heute»)
@@ -519,12 +538,19 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus, wd) {
     return `<line x1="0" x2="${W}" y1="${gy.toFixed(1)}" y2="${gy.toFixed(1)}" stroke="#ECECE9" stroke-width="0.5" vector-effect="non-scaling-stroke"/>`;
   }).join('');
 
+  const ghostBars = slots.map((s, i) => {
+    if (!s.hist) return '';
+    const v = s.hist / maxV;
+    const y = ys(v);
+    return `<rect x="${xs(i).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.6, (H - 2) - y).toFixed(1)}" rx="${Math.min(1.4, bw * 0.25).toFixed(1)}" fill="${periodColor}26"/>`;
+  }).join('');
+
   const bars = norm.map((v, i) => {
     if (v === null) return '';
     const isLatest = i === lastDataIdx;
     const isNow    = i === nowIdx;
     const y    = ys(v);
-    const fill = isLatest ? periodColor : periodColor + '26';
+    const fill = isLatest ? periodColor : (isToday ? periodColor + '80' : periodColor + '26');
     return `<rect${isNow ? ' data-now="true"' : ''} x="${xs(i).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.6, (H - 2) - y).toFixed(1)}" rx="${Math.min(1.4, bw * 0.25).toFixed(1)}" fill="${fill}"/>`;
   }).join('');
 
@@ -540,7 +566,7 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus, wd) {
   }
 
   const yAxisEl = `<div style="position:absolute;left:-${yAxisW}px;top:0;width:${yAxisW - 4}px;height:${chartH}px;">${yAxis}</div>`;
-  const svgEl   = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="100%" height="${chartH}" style="display:block;overflow:visible;">${gridLines}${bars}</svg>`;
+  const svgEl   = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="100%" height="${chartH}" style="display:block;overflow:visible;">${gridLines}${ghostBars}${bars}</svg>`;
 
   if (zoomed) {
     // Mindestbreite: immer > Container (mind. 900px total oder 80px pro Bar)
