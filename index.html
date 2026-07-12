@@ -639,8 +639,16 @@ function seasonChart(uid, half, color) {
       <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#ADADA9;">${m}</span>
     </div>`;
   }).join('');
+  const verfuegbarAb = (() => {
+    const ersteM = AW[uid]?.erste_messung;
+    if (!ersteM) return null;
+    const [y, mo] = ersteM.split('-').map(Number);
+    const MONATE = ['','Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+    return (mo >= 5 && mo <= 9) ? `${MONATE[10]} ${y}` : `${MONATE[5]} ${y + 1}`;
+  })();
   return `
     <div style="display:flex;align-items:flex-end;gap:4px;height:90px;">${bars}</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#ADADA9;margin-top:10px;">Noch keine Daten${verfuegbarAb ? ` – verfügbar ab ca. ${verfuegbarAb}` : ''}</div>
     `;
 }
 
@@ -796,6 +804,15 @@ function renderDetail() {
     : (hasTemp ? parseFloat(temp) + '°' : '–');
   const hasGuests = live?.maxspace != null;
   const fav = !!S.favs[v.uid];
+
+  // "Daten seit..." — erste echte Messung aus auswertung.json
+  const ersteMessung = AW[v.uid]?.erste_messung;
+  const dataSeit = (() => {
+    if (!ersteMessung) return null;
+    const [y, mo, d] = ersteMessung.split('-').map(Number);
+    const MONATE = ['','Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+    return `${d}. ${MONATE[mo]} ${y}`;
+  })();
   const typeColor = TYPE_COLOR[v.type];
   const statusColor = isOpen ? '#2A9D63' : META;
   const statusDot = isOpen ? '#2A9D63' : '#CFCFCC';
@@ -975,6 +992,7 @@ function renderDetail() {
         </div>
         ${S.period === 'woche' ? `<div style="display:flex;gap:4px;margin-top:12px;">${weekdayTabs}</div>` : ''}
         <div style="margin-top:clamp(12px,3vw,20px);">${chart}</div>
+        ${dataSeit ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#ADADA9;margin-top:8px;padding-left:2px;">Daten seit ${dataSeit}</div>` : ''}
       </div>` : ''}
     </div>
   </div>`;
