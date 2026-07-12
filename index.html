@@ -835,14 +835,34 @@ function renderDetail() {
   const statBg = '#F4F4F4';
 
   // Guest weekly list — Summe aller currentfill-Messungen pro Wochentag
+  // Erwartete Tages-Summe aus AW bis zu einem gegebenen Zeitpunkt (in Minuten seit Mitternacht)
+  function awExpected(uid, dayType, maxspace, upToMin = Infinity) {
+    const slots = AW[uid]?.slots?.[dayType] || [];
+    return slots
+      .filter(sl => { const [h, m] = sl.zeit.split(':').map(Number); return h * 60 + m <= upToMin; })
+      .reduce((s, sl) => s + sl.auslastung / 100 * maxspace, 0);
+  }
+
   const guestList = wdEntries.map(w => {
     const isToday = todayWd() === w.k;
     const total = GUEST_WEEK_TOTAL[v.uid]?.[w.k];
     const val = total != null ? numFmt(Math.round(total)) : '–';
+    // Trend-Pfeil: Vergleich mit historischem AW-Durchschnitt
+    let arrowHtml = '';
+    if (total != null && live?.maxspace && AW[v.uid]) {
+      const upTo = isToday ? nowHHMM() : Infinity;
+      const exp = awExpected(v.uid, dayTypeFor(w.k), live.maxspace, upTo);
+      if (exp > 0) {
+        const ratio = total / exp;
+        const col = isToday ? 'rgba(255,255,255,.85)' : (ratio > 1.15 ? '#2A9D63' : '#E07B54');
+        if (ratio > 1.15)      arrowHtml = ` <span style="font-size:10px;color:${col};">↑</span>`;
+        else if (ratio < 0.85) arrowHtml = ` <span style="font-size:10px;color:${col};">↓</span>`;
+      }
+    }
     const accentBg = isToday ? typeColor : 'transparent';
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-radius:8px;background:${accentBg};">
       <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${isToday ? 600 : 400};color:${isToday ? '#fff' : INK};">${w.l}</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${isToday ? '#fff' : META};">${val}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${isToday ? '#fff' : META};">${val}${arrowHtml}</span>
     </div>`;
   }).join('');
 
