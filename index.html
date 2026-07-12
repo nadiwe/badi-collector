@@ -376,6 +376,11 @@ function sparklineSVG(uid, open) {
 
 function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus, wd) {
   let slots = slotsFor(uid, dayType);
+  // Hüt-Tab ohne Daten → historischen Durchschnitt für diesen Wochentag zeigen
+  if (!slots.length && dayType === 'Heute') {
+    slots = slotsFor(uid, dayTypeFor(todayWd()));
+    showFocus = false;
+  }
   if (!slots.length) return '<div style="height:116px;display:flex;align-items:center;justify-content:center;color:#8C8C8C;font-family:\'IBM Plex Mono\',monospace;font-size:11px;">Noch keine Daten</div>';
   // 1h und Übersicht: Stunden-Durchschnitt; 15min: Rohdaten
   if (!zoomed || res === '1h') slots = groupByHour(slots);
