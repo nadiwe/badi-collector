@@ -167,9 +167,6 @@ let AW = {};     // uid → {slots:{Werktag:[],Wochenende:[],Feiertag:[]}, messt
 let LIVE = null; // {timestamp, venues:{uid:{currentfill,freespace,maxspace,temperatureWater,openClosed}}}
 let HEUTE_SLOTS = {}; // uid → [{zeit:"HH:MM", auslastung:pct}] — heutige Istdaten aus CSV
 let REVISIONEN  = {}; // uid → {von:"YYYY-MM-DD", bis:"YYYY-MM-DD", name}
-let TEMP_CACHE = {};         // tempUid → [{zeit, temp}]
-let TEMP_CSV_LOADING = false;
-let TEMP_CSV_DONE    = false;
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 function todayWd() {
@@ -328,29 +325,6 @@ function parseCSVRows(text) {
   });
 }
 
-async function loadTempCSV() {
-  if (TEMP_CSV_LOADING || TEMP_CSV_DONE) return;
-  TEMP_CSV_LOADING = true;
-  try {
-    const r = await fetch(BASE + 'data/temperaturen/' + currentWeekFile() + '.csv');
-    if (r.ok) {
-      const rows = parseCSVRows(await r.text());
-      const today = new Date().toISOString().slice(0, 10);
-      const byUid = {};
-      for (const row of rows) {
-        if (!row.uid || !row.timestamp?.startsWith(today)) continue;
-        const temp = parseFloat(row.temperatureWater);
-        if (isNaN(temp)) continue;
-        if (!byUid[row.uid]) byUid[row.uid] = [];
-        byUid[row.uid].push({ zeit: row.timestamp.slice(11, 16), temp });
-      }
-      Object.assign(TEMP_CACHE, byUid);
-    }
-  } catch(e) {}
-  TEMP_CSV_DONE = true;
-  TEMP_CSV_LOADING = false;
-  if (S.currentUid) render();
-}
 
 // ── Chart helpers ──────────────────────────────────────────────────────────
 function groupByHour(slots) {
@@ -366,22 +340,6 @@ function groupByHour(slots) {
     .map(g => ({ zeit: g.zeit, auslastung: g.auslastung / g.count }));
 }
 
-function tempSparkSVG(data, color) {
-  if (!data || data.length < 2) return '';
-  const temps = data.map(d => d.temp);
-  const lo = Math.min(...temps) - 0.5, hi = Math.max(...temps) + 0.5;
-  const range = hi - lo || 1;
-  const W = 100, H = 28;
-  const xs = i => (data.length > 1 ? (i / (data.length - 1)) * W : W / 2);
-  const ys = v => H - 2 - ((v - lo) / range) * (H - 4);
-  const path = data.map((d, i) => `${i ? 'L' : 'M'}${xs(i).toFixed(1)} ${ys(d.temp).toFixed(1)}`).join(' ');
-  const area = path + ` L${xs(data.length-1).toFixed(1)} ${H} L${xs(0).toFixed(1)} ${H} Z`;
-  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="100%" height="${H}" style="display:block;overflow:visible;">
-    <path d="${area}" fill="${color}" opacity="0.12"/>
-    <path d="${path}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
-    <circle cx="${xs(data.length-1).toFixed(1)}" cy="${ys(temps[temps.length-1]).toFixed(1)}" r="2.5" fill="${color}" stroke="#fff" stroke-width="1.2" vector-effect="non-scaling-stroke"/>
-  </svg>`;
-}
 
 // ── SVG chart helpers ──────────────────────────────────────────────────────
 function sparklineSVG(uid, open) {
@@ -812,12 +770,7 @@ function renderDetail() {
     </button>`;
   }).join('');
 
-  // Trigger temp CSV load when needed
-  if (v.tempUid && S.period === 'heute' && !TEMP_CSV_LOADING && !TEMP_CSV_DONE) {
-    loadTempCSV();
-  }
-
-  // Chart controls (only for heute/woche) — drei Modi
+// Chart controls (only for heute/woche) — drei Modi
   const showChartControls = S.period === 'heute' || S.period === 'woche';
   const chartModes = [
     { mode: 'overview', label: 'Übersicht', active: !S.chartZoomed },
@@ -841,26 +794,6 @@ function renderDetail() {
     chart = detailBarChart(v.uid, chartDayType, chartColor, S.chartZoomed, S.chartRes);
   }
 
-  // Temperature history section (heute only, for venues with tempUid)
-  let tempHistSection = '';
-  if (v.tempUid && S.period === 'heute' && TEMP_CSV_DONE) {
-    const tData = TEMP_CACHE[v.tempUid];
-    if (tData && tData.length >= 2) {
-      const first = tData[0], last = tData[tData.length - 1];
-      tempHistSection = `
-        <div style="margin-top:22px;">
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.10em;text-transform:uppercase;color:${META};font-weight:600;margin-bottom:10px;">
-            Wassertemperatur heute · ${first.zeit}–${last.zeit} Uhr
-          </div>
-          <div style="height:50px;">${tempSparkSVG(tData, typeColor)}</div>
-          <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#ADADA9;margin-top:5px;">
-            <span>${first.zeit}</span>
-            <span style="font-size:10px;color:${INK};font-weight:600;">${last.temp}° aktuell</span>
-            <span>${last.zeit}</span>
-          </div>
-        </div>`;
-    }
-  }
 
   // Stat cards
   const statBg = '#F4F4F4';
@@ -987,7 +920,6 @@ function renderDetail() {
         </div>
         ${S.period === 'woche' ? `<div style="display:flex;gap:4px;margin-top:12px;">${weekdayTabs}</div>` : ''}
         <div style="margin-top:clamp(12px,3vw,20px);">${chart}</div>
-        ${tempHistSection}
       </div>` : ''}
     </div>
   </div>`;
