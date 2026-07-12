@@ -21,7 +21,7 @@ def _csv_safe(value):
 
 # Besucherzahlen — interne UIDs aus dem Crowdmonitor WebSocket (ohne SSD-1)
 BESUCHER_IDS = {
-    "SSD-2", "SSD-3", "SSD-4", "SSD-6", "SSD-7", "SSD-8", "SSD-10",
+    "SSD-2", "SSD-3", "SSD-4", "SSD-6", "SSD-7", "SSD-10",
     "BADI-1", "flb6939", "flb6940", "flb8803", "flb6941",
     "fb006", "fb008", "fb012", "LETZI-1", "SSD-11", "fb018",
     "seb6946", "seb6947", "seb6948", "SSD-5",
