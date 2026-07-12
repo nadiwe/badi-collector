@@ -533,10 +533,8 @@
       "name": "Seebad Enge",
       "standort": "Mythenquai 9, 8002 Zürich",
       "oeffnungszeiten": {
-        "wert": "9. Mai–31. Mai: 09:00–19:00, 1. Juni–30. Aug: 08:00–20:00, 31. Aug–20. Sep: 08:00–19:00",
-        "quelle": "https://www.seebadenge.ch",
-        "typ": "manuell",
-        "pruefung": "alle 3 Monate"
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
       },
       "saison_2026": {
         "wert": "9. Mai – 20. September",
