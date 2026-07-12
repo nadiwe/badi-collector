@@ -172,8 +172,9 @@ let _mapBasemap = 'gray';
 // ── Data ───────────────────────────────────────────────────────────────────
 let AW = {};     // uid → {slots:{Werktag:[],Wochenende:[],Feiertag:[]}, messtage_echt, ...}
 let LIVE = null; // {timestamp, venues:{uid:{currentfill,freespace,maxspace,temperatureWater,openClosed}}}
-let HEUTE_SLOTS = {}; // uid → [{zeit:"HH:MM", auslastung:pct}] — heutige Istdaten aus CSV
-let TEMP_WEEK   = {}; // uid → {mo:22, di:22, ...} — letzte Temp pro Wochentag aus CSV
+let HEUTE_SLOTS     = {}; // uid → [{zeit:"HH:MM", auslastung:pct}] — heutige Istdaten aus CSV
+let GUEST_WEEK_TOTAL = {}; // uid → {mo:sum, di:sum, ...} — Summe currentfill pro Wochentag aus CSV
+let TEMP_WEEK       = {}; // uid → {mo:22, di:22, ...} — letzte Temp pro Wochentag aus CSV
 let REVISIONEN  = {}; // uid → {von:"YYYY-MM-DD", bis:"YYYY-MM-DD", name}
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -833,20 +834,11 @@ function renderDetail() {
   // Stat cards
   const statBg = '#F4F4F4';
 
-  // Guest weekly list — today: live count; other days: typical daily peak
+  // Guest weekly list — Summe aller currentfill-Messungen pro Wochentag
   const guestList = wdEntries.map(w => {
-    const dt = dayTypeFor(w.k);
-    const slots = slotsFor(v.uid, dt);
     const isToday = todayWd() === w.k;
-    let val;
-    if (isToday && fill != null) {
-      val = numFmt(fill);
-    } else if (slots.length && live?.maxspace) {
-      const peakAusl = Math.max(...slots.map(s => s.auslastung));
-      val = 'bis ' + numFmt(Math.round(peakAusl / 100 * live.maxspace));
-    } else {
-      val = '–';
-    }
+    const total = GUEST_WEEK_TOTAL[v.uid]?.[w.k];
+    const val = total != null ? numFmt(Math.round(total)) : '–';
     const accentBg = isToday ? typeColor : 'transparent';
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-radius:8px;background:${accentBg};">
       <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${isToday ? 600 : 400};color:${isToday ? '#fff' : INK};">${w.l}</span>
@@ -1310,22 +1302,31 @@ function fetchLive() {
 
 async function loadHeuteSlots() {
   const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Zurich' }); // "2026-07-05"
+  const WD_MAP = ['so','mo','di','mi','do','fr','sa'];
   try {
     const r = await fetch(BASE + 'data/besucher/' + currentWeekFile() + '.csv?t=' + Date.now());
     if (!r.ok) return;
-    const lines = (await r.text()).trim().split('\n').slice(1); // header überspringen
-    const next = {};
+    const lines = (await r.text()).trim().split('\n').slice(1);
+    const nextSlots = {}, nextTotals = {};
     for (const line of lines) {
       const [timestamp, uid, , currentfill, , maxspace] = line.split(',');
-      if (!timestamp?.startsWith(today)) continue;
-      if (!VENUE_MAP[uid]) continue;
-      const ms = parseFloat(maxspace), cf = parseFloat(currentfill);
-      if (!ms || isNaN(cf)) continue;
-      const zeit = timestamp.slice(11, 16); // "HH:MM"
-      if (!next[uid]) next[uid] = [];
-      next[uid].push({ zeit, auslastung: cf / ms * 100 });
+      if (!timestamp || !uid || !VENUE_MAP[uid]) continue;
+      const cf = parseFloat(currentfill);
+      if (isNaN(cf) || cf < 0) continue;
+      // Tages-Summe für alle Wochentage
+      const wd = WD_MAP[new Date(timestamp.slice(0, 10)).getDay()];
+      if (!nextTotals[uid]) nextTotals[uid] = {};
+      nextTotals[uid][wd] = (nextTotals[uid][wd] || 0) + cf;
+      // Auslastungs-Slots nur für heute
+      if (!timestamp.startsWith(today)) continue;
+      const ms = parseFloat(maxspace);
+      if (!ms) continue;
+      const zeit = timestamp.slice(11, 16);
+      if (!nextSlots[uid]) nextSlots[uid] = [];
+      nextSlots[uid].push({ zeit, auslastung: cf / ms * 100 });
     }
-    HEUTE_SLOTS = next;
+    HEUTE_SLOTS     = nextSlots;
+    GUEST_WEEK_TOTAL = nextTotals;
   } catch(e) {}
 }
 
