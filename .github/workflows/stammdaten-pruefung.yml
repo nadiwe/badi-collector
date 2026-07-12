@@ -1,0 +1,82 @@
+name: Stammdaten-Prüfung
+
+on:
+  schedule:
+    - cron: "0 7 12 1,4,7,10 *"  # 12. Jan / Apr / Jul / Okt um 07:00 UTC
+  workflow_dispatch:               # auch manuell startbar
+
+jobs:
+  pruefung:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: Repository laden
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+
+      - name: Prüfliste aus badi-stammdaten.json generieren
+        run: |
+          python3 - <<'PYEOF'
+          import json
+
+          with open("data/badi-stammdaten.json", encoding="utf-8") as f:
+              data = json.load(f)
+
+          lines = []
+          sections = ["hallenbäder", "freibäder", "flussbäder", "seebäder"]
+          for section in sections:
+              for venue in data.get(section, []):
+                  name = venue.get("name", venue.get("uid", "?"))
+                  for field, content in venue.items():
+                      if not isinstance(content, dict):
+                          continue
+                      if content.get("pruefung") != "alle 3 Monate":
+                          continue
+                      wert = content.get("wert")
+                      if isinstance(wert, dict):
+                          wert_str = ", ".join(f"{k}: {v}" for k, v in wert.items())
+                      else:
+                          wert_str = str(wert) if wert is not None else "—"
+                      quelle = content.get("quelle") or "?"
+                      lines.append(f"- [ ] **{name}** — `{field}`: {wert_str}  \n  Quelle: [{quelle}]({quelle if quelle.startswith('http') else '#'})")
+
+          body = "## 📋 Stammdaten-Prüfung — alle 3 Monate\n\n"
+          body += "Folgende Felder in `data/badi-stammdaten.json` prüfen und bei Änderungen aktualisieren:\n\n"
+          body += "\n".join(lines)
+          body += "\n\n---\n_Automatisch generiert vom [stammdaten-pruefung Workflow](../../actions/workflows/stammdaten-pruefung.yml)_"
+
+          with open("/tmp/issue_body.txt", "w") as f:
+              f.write(body)
+          print(f"✓ {len(lines)} Felder zur Prüfung")
+          PYEOF
+
+      - name: GitHub Issue erstellen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BODY=$(cat /tmp/issue_body.txt)
+          QUARTER=$(python3 -c "
+          from datetime import date
+          d = date.today()
+          q = (d.month - 1) // 3 + 1
+          print(f'Q{q} {d.year}')
+          ")
+          TITLE="📋 Stammdaten-Prüfung ${QUARTER}"
+
+          EXISTING=$(gh issue list --label "stammdaten" --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
+
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --body "$BODY"
+            echo "Kommentar zu bestehendem Issue #$EXISTING hinzugefügt."
+          else
+            gh issue create \
+              --title "$TITLE" \
+              --body "$BODY" \
+              --label "stammdaten" 2>/dev/null || \
+            gh issue create \
+              --title "$TITLE" \
+              --body "$BODY"
+            echo "Neues Issue erstellt."
+          fi
