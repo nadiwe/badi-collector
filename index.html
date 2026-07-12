@@ -369,7 +369,7 @@ function sparklineSVG(uid, open) {
   </svg>`;
 }
 
-function detailBarChart(uid, dayType, periodColor, zoomed, res) {
+function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus) {
   let slots = slotsFor(uid, dayType);
   if (!slots.length) return '<div style="height:116px;display:flex;align-items:center;justify-content:center;color:#8C8C8C;font-family:\'IBM Plex Mono\',monospace;font-size:11px;">Noch keine Daten</div>';
   // 1h und Übersicht: Stunden-Durchschnitt; 15min: Rohdaten
@@ -420,7 +420,7 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
     }
   }
 
-  const isToday = dayType === 'Heute' || dayType === dayTypeFor(todayWd());
+  const isToday = showFocus === true;
   const nowMin  = nowHHMM();
 
   // Aktuellen Live-Wert als Balken einfügen (nur heute, nur wenn Live-Daten vorhanden)
@@ -449,8 +449,8 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
   // Letzter Slot mit echten Daten → wird hervorgehoben (nur für «heute»)
   const lastDataIdx = isToday ? vals.reduce((li, v, i) => v != null ? i : li, -1) : -1;
 
-  // Für Auto-Scroll: zeitlich nächster Slot zum jetzigen Zeitpunkt
-  const nowIdx = isToday ? slots.reduce((bi, s, i) =>
+  // Für Auto-Scroll: zeitlich nächster Slot zum jetzigen Zeitpunkt (nur heute + offen)
+  const nowIdx = (isToday && computeIsOpen(uid)) ? slots.reduce((bi, s, i) =>
     Math.abs(hhmm(s.zeit) - nowMin) < Math.abs(hhmm(slots[bi].zeit) - nowMin) ? i : bi, 0) : -1;
 
   const H   = 34;
@@ -487,9 +487,7 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res) {
     const isNow    = i === nowIdx;
     const y    = ys(v);
     const fill = isLatest ? periodColor : periodColor + '26';
-    const cx   = (xs(i) + bw / 2).toFixed(1);
-    const dot  = isLatest ? `<circle cx="${cx}" cy="${(y - 1.8).toFixed(1)}" r="1.4" fill="${periodColor}"/>` : '';
-    return `<rect${isNow ? ' data-now="true"' : ''} x="${xs(i).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.6, (H - 2) - y).toFixed(1)}" rx="${Math.min(1.4, bw * 0.25).toFixed(1)}" fill="${fill}"/>${dot}`;
+    return `<rect${isNow ? ' data-now="true"' : ''} x="${xs(i).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.6, (H - 2) - y).toFixed(1)}" rx="${Math.min(1.4, bw * 0.25).toFixed(1)}" fill="${fill}"/>`;
   }).join('');
 
   // Label-Position: linker Rand des Balkens (i/n * 100%)
@@ -789,7 +787,8 @@ function renderDetail() {
   } else {
     const chartDayType = S.period === 'heute' ? 'Heute' : dayTypeFor(S.weekday);
     const chartColor = S.period === 'heute' ? PURPLE : INK;
-    chart = detailBarChart(v.uid, chartDayType, chartColor, S.chartZoomed, S.chartRes);
+    const showFocus = S.period === 'heute' || S.weekday === todayWd();
+    chart = detailBarChart(v.uid, chartDayType, chartColor, S.chartZoomed, S.chartRes, showFocus);
   }
 
 
