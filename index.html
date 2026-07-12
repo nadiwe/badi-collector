@@ -369,7 +369,7 @@ function sparklineSVG(uid, open) {
   </svg>`;
 }
 
-function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus) {
+function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus, wd) {
   let slots = slotsFor(uid, dayType);
   if (!slots.length) return '<div style="height:116px;display:flex;align-items:center;justify-content:center;color:#8C8C8C;font-family:\'IBM Plex Mono\',monospace;font-size:11px;">Noch keine Daten</div>';
   // 1h und Übersicht: Stunden-Durchschnitt; 15min: Rohdaten
@@ -378,8 +378,9 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus) {
   // Auf Öffnungszeiten einschränken
   const meta = VENUE_MAP[uid];
   function openingParts() {
-    if (!meta?.hours) return null;
-    const parts = meta.hours.split(/[–-]/);
+    const h = (wd ? hoursForDay(uid, wd) : null) || meta?.hours;
+    if (!h) return null;
+    const parts = h.split(/[–-]/);
     return parts.length === 2 ? parts.map(p => p.trim()) : null;
   }
   function filterToHours(arr) {
@@ -788,7 +789,8 @@ function renderDetail() {
     const chartDayType = S.period === 'heute' ? 'Heute' : dayTypeFor(S.weekday);
     const chartColor = S.period === 'heute' ? PURPLE : INK;
     const showFocus = S.period === 'heute' || S.weekday === todayWd();
-    chart = detailBarChart(v.uid, chartDayType, chartColor, S.chartZoomed, S.chartRes, showFocus);
+    const chartWd = S.period === 'heute' ? todayWd() : S.weekday;
+    chart = detailBarChart(v.uid, chartDayType, chartColor, S.chartZoomed, S.chartRes, showFocus, chartWd);
   }
 
 
