@@ -857,8 +857,8 @@ function renderDetail() {
 
   // Weekday tabs (only for "woche" period)
   const wdEntries = [
-    {k:'mo',l:'Mäntig'}, {k:'di',l:'Zistig'}, {k:'mi',l:'Mittwuch'},
-    {k:'do',l:'Dunstig'}, {k:'fr',l:'Friitg'}, {k:'sa',l:'Samstig'}, {k:'so',l:'Suntig'},
+    {k:'mo',l:'Mäntig',s:'Mo'}, {k:'di',l:'Zistig',s:'Di'}, {k:'mi',l:'Mittwuch',s:'Mi'},
+    {k:'do',l:'Dunstig',s:'Do'}, {k:'fr',l:'Friitg',s:'Fr'}, {k:'sa',l:'Samstig',s:'Sa'}, {k:'so',l:'Suntig',s:'So'},
   ];
   const weekdayTabs = wdEntries.map(w => {
     const active = S.weekday === w.k;
@@ -905,7 +905,7 @@ function renderDetail() {
     const val = total != null ? '~' + numFmt(Math.round(total)) : '–';
     const accentBg = isToday ? typeColor : 'transparent';
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-radius:8px;background:${accentBg};">
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${isToday ? 600 : 400};color:${isToday ? '#fff' : INK};">${w.l}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${isToday ? 600 : 400};color:${isToday ? '#fff' : INK};">${w.s}</span>
       <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${isToday ? '#fff' : META};">${val}</span>
     </div>`;
   }).join('');
@@ -918,7 +918,7 @@ function renderDetail() {
                : '–';
     const accentBg = isToday ? typeColor : 'transparent';
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-radius:8px;background:${accentBg};">
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${isToday ? 600 : 400};color:${isToday ? '#fff' : INK};">${w.l}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${isToday ? 600 : 400};color:${isToday ? '#fff' : INK};">${w.s}</span>
       <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${isToday ? '#fff' : META};">${tVal}</span>
     </div>`;
   }).join('');
@@ -937,7 +937,7 @@ function renderDetail() {
     const accentBg = isToday ? typeColor : 'transparent';
     const h = hoursForDay(v.uid, w.k) || '–';
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-radius:8px;background:${accentBg};">
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${isToday ? 600 : 400};color:${isToday ? '#fff' : INK};">${w.l}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${isToday ? 600 : 400};color:${isToday ? '#fff' : INK};">${w.s}</span>
       <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${isToday ? '#fff' : META};">${h}</span>
     </div>`;
   }).join('');
@@ -1040,6 +1040,23 @@ function render() {
   const isEmpty = list.length === 0;
 
   const html = `
+    <div style="position:fixed;top:16px;right:16px;z-index:1000;display:inline-flex;align-items:center;gap:2px;background:#173D34;border-radius:999px;padding:3px;box-shadow:0 2px 8px rgba(0,0,0,.18);">
+      <button onclick="setViewMode('cards')" title="Kacheln"
+        style="width:27px;height:27px;border-radius:999px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;
+               background:${S.viewMode==='cards'?'#fff':'transparent'};color:${S.viewMode==='cards'?'#173D34':'rgba(255,255,255,.75)'};">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <rect x="1" y="1" width="6" height="6" rx="1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2"/>
+          <rect x="1" y="9" width="6" height="6" rx="1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2"/>
+        </svg>
+      </button>
+      <button onclick="setViewMode('map')" title="Karte"
+        style="width:27px;height:27px;border-radius:999px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;
+               background:${S.viewMode==='map'?'#fff':'transparent'};color:${S.viewMode==='map'?'#173D34':'rgba(255,255,255,.75)'};">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 1.5a4 4 0 0 1 4 4c0 2.8-4 9-4 9S4 8.3 4 5.5a4 4 0 0 1 4-4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+        </svg>
+      </button>
+    </div>
     <div style="max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:22px;">
 
       <div>
@@ -1050,27 +1067,8 @@ function render() {
       </div>
 
       <section style="background:#FFFFFF;border-radius:28px;padding:22px;box-shadow:0 4px 22px rgba(23,61,52,.08);display:flex;flex-direction:column;gap:16px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            ${renderChips()}
-          </div>
-          <div style="display:inline-flex;align-items:center;gap:2px;background:#173D34;border-radius:999px;padding:3px;flex-shrink:0;">
-            <button onclick="setViewMode('cards')" title="Kacheln"
-              style="width:27px;height:27px;border-radius:999px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;
-                     background:${S.viewMode==='cards'?'#fff':'transparent'};color:${S.viewMode==='cards'?'#173D34':'rgba(255,255,255,.75)'};">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-                <rect x="1" y="1" width="6" height="6" rx="1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2"/>
-                <rect x="1" y="9" width="6" height="6" rx="1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2"/>
-              </svg>
-            </button>
-            <button onclick="setViewMode('map')" title="Karte"
-              style="width:27px;height:27px;border-radius:999px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;
-                     background:${S.viewMode==='map'?'#fff':'transparent'};color:${S.viewMode==='map'?'#173D34':'rgba(255,255,255,.75)'};">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M8 1.5a4 4 0 0 1 4 4c0 2.8-4 9-4 9S4 8.3 4 5.5a4 4 0 0 1 4-4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
-              </svg>
-            </button>
-          </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          ${renderChips()}
         </div>
 
         <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:${META};">
