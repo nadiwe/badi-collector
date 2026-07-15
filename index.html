@@ -233,6 +233,27 @@ function closingTime(uid) {
   return parts.length === 2 ? parts[1].trim() : null;
 }
 
+function nextOpenTime(uid) {
+  const WD = ['so','mo','di','mi','do','fr','sa'];
+  const LABEL = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+  const now = new Date();
+  const nowMin = nowHHMM();
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(now);
+    d.setDate(now.getDate() + i);
+    const wd = WD[d.getDay()];
+    const h = hoursForDay(uid, wd);
+    if (!h) continue;
+    const parts = h.split(/[–-]/);
+    if (parts.length !== 2) continue;
+    const openMin = hhmm(parts[0].trim());
+    if (i === 0 && nowMin >= openMin) continue;
+    const prefix = i === 0 ? '' : i === 1 ? 'morgen ' : LABEL[d.getDay()] + ' ';
+    return `öffnet ${prefix}${parts[0].trim()}`;
+  }
+  return null;
+}
+
 function isInRevision(uid) {
   const r = REVISIONEN[uid];
   if (!r) return false;
@@ -739,7 +760,7 @@ function renderCard(v) {
     ? 'Revision'
     : isOpen
       ? (closing ? 'offen bis ' + closing : 'offen')
-      : (noLive && !hasHoursData ? '–' : 'geschlossen');
+      : (noLive && !hasHoursData ? '–' : (nextOpenTime(v.uid) || 'geschlossen'));
   const tempStr = temp != null ? parseFloat(temp) + '°' : hallePoolTemp != null ? hallePoolTemp + '°' : '–';
   const dev = devInfo(v.uid);
   const fav = !!S.favs[v.uid];
@@ -928,7 +949,7 @@ function renderDetail() {
         <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;">
           <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:${META};font-weight:600;">${TYPE_LABEL[v.type]}</div>
           <span style="display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;color:${statusColor};">
-            <i style="width:6px;height:6px;border-radius:50%;background:${statusDot};display:inline-block;"></i>${isInRevision(v.uid) ? 'Revision' : isOpen ? (closingTime(v.uid) ? 'offen bis ' + closingTime(v.uid) : 'offen') : 'geschlossen'}
+            <i style="width:6px;height:6px;border-radius:50%;background:${statusDot};display:inline-block;"></i>${isInRevision(v.uid) ? 'Revision' : isOpen ? (closingTime(v.uid) ? 'offen bis ' + closingTime(v.uid) : 'offen') : (nextOpenTime(v.uid) || 'geschlossen')}
             <span style="color:${META};">· ${v.season}</span>
           </span>
         </div>
