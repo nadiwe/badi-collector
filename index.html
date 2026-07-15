@@ -1036,10 +1036,10 @@ function render() {
   const isEmpty = list.length === 0;
 
   const html = `
-    <div style="position:fixed;top:16px;right:16px;z-index:1000;display:inline-flex;align-items:center;gap:2px;background:#173D34;border-radius:999px;padding:3px;box-shadow:0 2px 8px rgba(0,0,0,.18);">
+    <div style="position:fixed;top:16px;right:16px;z-index:1000;display:inline-flex;align-items:center;gap:2px;background:#FFFFFF;border-radius:999px;padding:3px;box-shadow:0 4px 22px rgba(23,61,52,.12);">
       <button onclick="setViewMode('cards')" title="Kacheln"
         style="width:27px;height:27px;border-radius:999px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;
-               background:${S.viewMode==='cards'?'#fff':'transparent'};color:${S.viewMode==='cards'?'#173D34':'rgba(255,255,255,.75)'};">
+               background:${S.viewMode==='cards'?'#173D34':'transparent'};color:${S.viewMode==='cards'?'#fff':'rgba(23,61,52,.45)'};">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
           <rect x="1" y="1" width="6" height="6" rx="1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2"/>
           <rect x="1" y="9" width="6" height="6" rx="1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2"/>
@@ -1047,7 +1047,7 @@ function render() {
       </button>
       <button onclick="setViewMode('map')" title="Karte"
         style="width:27px;height:27px;border-radius:999px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;
-               background:${S.viewMode==='map'?'#fff':'transparent'};color:${S.viewMode==='map'?'#173D34':'rgba(255,255,255,.75)'};">
+               background:${S.viewMode==='map'?'#173D34':'transparent'};color:${S.viewMode==='map'?'#fff':'rgba(23,61,52,.45)'};">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
           <path d="M8 1.5a4 4 0 0 1 4 4c0 2.8-4 9-4 9S4 8.3 4 5.5a4 4 0 0 1 4-4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
         </svg>
