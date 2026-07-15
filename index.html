@@ -982,7 +982,9 @@ function renderDetail() {
           ${isHalle && !hasTemp ? '' : `
           <div class="stat-card" onclick="${hasTemp ? "toggleStat('temp')" : ''}" id="sc-temp" style="cursor:${hasTemp ? 'pointer' : 'default'};flex:1;">
             <div>
-              <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:${hasTemp ? BLACK : META};font-size:clamp(32px,8vw,48px);">${displayTemp}</div>
+              <div style="min-height:clamp(28px,7vw,42px);display:flex;align-items:flex-end;">
+                <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:${hasTemp ? BLACK : META};font-size:clamp(32px,8vw,48px);">${displayTemp}</div>
+              </div>
               <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">${isHalle ? 'Beckentemperatur' : 'Wassertemperatur'}</div>
             </div>
             ${S.tempOpen && hasTemp ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">${isHalle ? halleTempList : tempList}</div>` : ''}
@@ -990,7 +992,9 @@ function renderDetail() {
 
           <div class="stat-card" onclick="toggleStat('hours')" id="sc-hours" style="flex:1;">
             <div>
-              <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.95;color:${BLACK};font-size:clamp(18px,4vw,26px);white-space:nowrap;">${hoursForDay(v.uid, todayWd()) || v.hours}</div>
+              <div style="min-height:clamp(28px,7vw,42px);display:flex;align-items:flex-end;">
+                <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.95;color:${BLACK};font-size:clamp(18px,4vw,26px);white-space:nowrap;">${hoursForDay(v.uid, todayWd()) || v.hours}</div>
+              </div>
               <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">Öffnigszite</div>
             </div>
             ${S.hoursOpen ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">${hoursList}</div>` : ''}
