@@ -965,9 +965,9 @@ function renderDetail() {
 
       <!-- Stat cards -->
       <div style="margin-top:clamp(16px,4vw,24px);display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;">
-        <!-- Gäste (nur wenn Zählung vorhanden) -->
+        <!-- Gäste (nur wenn Zählung vorhanden) — immer eigene Zeile -->
         ${fill != null || hasGuests ? `
-        <div class="stat-card" id="sc-guest" style="cursor:default;">
+        <div class="stat-card" id="sc-guest" style="cursor:default;flex:1 1 100%;">
           <div>
             ${fill != null
               ? `<div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:${guestColor};font-size:clamp(32px,8vw,48px);">${numFmt(fill)}</div>`
@@ -977,8 +977,8 @@ function renderDetail() {
           </div>
         </div>` : ''}
 
-        <!-- Temperatur + Öffnungszeiten: gemeinsamer Sub-Container damit beide gleich hoch sind -->
-        <div style="display:flex;gap:10px;flex:2;min-width:300px;align-items:stretch;">
+        <!-- Temperatur + Öffnungszeiten: immer eigene Zeile, nebeneinander -->
+        <div style="display:flex;gap:10px;flex:1 1 100%;align-items:stretch;">
           ${isHalle && !hasTemp ? '' : `
           <div class="stat-card" onclick="${hasTemp ? "toggleStat('temp')" : ''}" id="sc-temp" style="cursor:${hasTemp ? 'pointer' : 'default'};flex:1;">
             <div>
