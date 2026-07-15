@@ -910,36 +910,32 @@ function renderDetail() {
     </div>`;
   }).join('');
 
+  const ROW = (accentBg, label, labelBold, value, fg, meta) =>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-radius:8px;background:${accentBg};min-width:0;">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${labelBold?600:400};color:${fg};white-space:nowrap;flex-shrink:0;">${label}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${meta};white-space:nowrap;padding-left:8px;">${value}</span>
+    </div>`;
+
   const tempList = wdEntries.map(w => {
     const isToday = todayWd() === w.k;
     const weekTemp = TEMP_WEEK[v.uid]?.[w.k];
     const tVal = isToday && hasTemp ? parseFloat(temp) + '°'
-               : weekTemp != null   ? weekTemp + '°'
-               : '–';
-    const accentBg = isToday ? typeColor : 'transparent';
-    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-radius:8px;background:${accentBg};">
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${isToday ? 600 : 400};color:${isToday ? '#fff' : INK};">${w.s}</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${isToday ? '#fff' : META};">${tVal}</span>
-    </div>`;
+               : weekTemp != null   ? weekTemp + '°' : '–';
+    return ROW(isToday ? typeColor : 'transparent', w.s, isToday, tVal,
+               isToday ? '#fff' : INK, isToday ? '#fff' : META);
   }).join('');
 
   // Halle: statische Becken-Liste statt Wochentags-Vergleich
   const halleTempList = (hallePools || []).map(p =>
-    `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-radius:8px;">
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:${INK};">${p.name}</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${META};">${p.temp}°</span>
-    </div>`
+    ROW('transparent', p.name, false, p.temp + '°', INK, META)
   ).join('');
 
   // Hours weekly
   const hoursList = wdEntries.map(w => {
     const isToday = todayWd() === w.k;
-    const accentBg = isToday ? typeColor : 'transparent';
     const h = hoursForDay(v.uid, w.k) || '–';
-    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-radius:8px;background:${accentBg};">
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${isToday ? 600 : 400};color:${isToday ? '#fff' : INK};">${w.s}</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${isToday ? '#fff' : META};">${h}</span>
-    </div>`;
+    return ROW(isToday ? typeColor : 'transparent', w.s, isToday, h,
+               isToday ? '#fff' : INK, isToday ? '#fff' : META);
   }).join('');
 
   return `
