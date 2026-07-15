@@ -925,9 +925,12 @@ function renderDetail() {
                isToday ? '#fff' : INK, isToday ? '#fff' : META);
   }).join('');
 
-  // Halle: statische Becken-Liste statt Wochentags-Vergleich
+  // Halle: statische Becken-Liste — Name darf kürzen, Temp immer sichtbar
   const halleTempList = (hallePools || []).map(p =>
-    ROW('transparent', p.name, false, p.temp + '°', INK, META)
+    `<div style="display:flex;align-items:center;gap:8px;padding:5px 10px;border-radius:8px;">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:${INK};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1;">${p.name}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${META};white-space:nowrap;flex-shrink:0;">${p.temp}°</span>
+    </div>`
   ).join('');
 
   // Hours weekly
@@ -1036,23 +1039,6 @@ function render() {
   const isEmpty = list.length === 0;
 
   const html = `
-    <div style="position:fixed;top:16px;right:16px;z-index:1000;display:inline-flex;align-items:center;gap:2px;background:#FFFFFF;border-radius:999px;padding:3px;box-shadow:0 4px 22px rgba(23,61,52,.12);">
-      <button onclick="setViewMode('cards')" title="Kacheln"
-        style="width:27px;height:27px;border-radius:999px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;
-               background:${S.viewMode==='cards'?'#173D34':'transparent'};color:${S.viewMode==='cards'?'#fff':'rgba(23,61,52,.45)'};">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-          <rect x="1" y="1" width="6" height="6" rx="1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2"/>
-          <rect x="1" y="9" width="6" height="6" rx="1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2"/>
-        </svg>
-      </button>
-      <button onclick="setViewMode('map')" title="Karte"
-        style="width:27px;height:27px;border-radius:999px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;
-               background:${S.viewMode==='map'?'#173D34':'transparent'};color:${S.viewMode==='map'?'#fff':'rgba(23,61,52,.45)'};">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M8 1.5a4 4 0 0 1 4 4c0 2.8-4 9-4 9S4 8.3 4 5.5a4 4 0 0 1 4-4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
-        </svg>
-      </button>
-    </div>
     <div style="max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:22px;">
 
       <div>
@@ -1063,8 +1049,25 @@ function render() {
       </div>
 
       <section style="background:#FFFFFF;border-radius:28px;padding:22px;box-shadow:0 4px 22px rgba(23,61,52,.08);display:flex;flex-direction:column;gap:16px;">
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
           ${renderChips()}
+          <div style="margin-left:auto;flex-shrink:0;display:inline-flex;align-items:center;gap:2px;background:#F4F4F4;border-radius:999px;padding:3px;">
+            <button onclick="setViewMode('cards')" title="Kacheln"
+              style="width:27px;height:27px;border-radius:999px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;
+                     background:${S.viewMode==='cards'?'#173D34':'transparent'};color:${S.viewMode==='cards'?'#fff':'rgba(23,61,52,.45)'};">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                <rect x="1" y="1" width="6" height="6" rx="1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2"/>
+                <rect x="1" y="9" width="6" height="6" rx="1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2"/>
+              </svg>
+            </button>
+            <button onclick="setViewMode('map')" title="Karte"
+              style="width:27px;height:27px;border-radius:999px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;
+                     background:${S.viewMode==='map'?'#173D34':'transparent'};color:${S.viewMode==='map'?'#fff':'rgba(23,61,52,.45)'};">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 1.5a4 4 0 0 1 4 4c0 2.8-4 9-4 9S4 8.3 4 5.5a4 4 0 0 1 4-4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+              </svg>
+            </button>
+          </div>
         </div>
 
         <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:${META};">
