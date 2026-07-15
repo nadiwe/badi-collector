@@ -968,7 +968,7 @@ function renderDetail() {
       <div style="margin-top:clamp(16px,4vw,24px);display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;">
         <!-- Gäste (nur wenn Zählung vorhanden) -->
         ${fill != null || hasGuests ? `
-        <div class="stat-card" onclick="${hasGuests ? "toggleStat('guest')" : ''}" id="sc-guest" style="${hasGuests ? '' : 'cursor:default;'}">
+        <div class="stat-card" id="sc-guest" style="cursor:default;">
           <div>
             ${fill != null
               ? `<div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:${guestColor};font-size:clamp(32px,8vw,48px);">${numFmt(fill)}</div>`
@@ -976,7 +976,6 @@ function renderDetail() {
             }
             <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">Gäste jetzt</div>
           </div>
-          ${S.guestOpen && hasGuests ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">${guestList}</div>` : ''}
         </div>` : ''}
 
         <!-- Temperatur + Öffnungszeiten: gemeinsamer Sub-Container damit beide gleich hoch sind -->
