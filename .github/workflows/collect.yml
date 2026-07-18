@@ -27,7 +27,7 @@ jobs:
         id: zeitcheck
         run: |
           STUNDE=$(TZ=Europe/Zurich date +%H | sed 's/^0//')
-          if [ "$STUNDE" -lt 6 ] || [ "$STUNDE" -ge 22 ]; then
+          if [ "$STUNDE" -lt 6 ] || [ "$STUNDE" -ge 23 ]; then
             echo "Ausserhalb Zeitfenster (${STUNDE}:xx Zürich), überspringe."
             echo "aktiv=false" >> $GITHUB_OUTPUT
           else
