@@ -1037,16 +1037,8 @@ function renderDetail() {
           style="font-size:20px;line-height:1;background:none;border:none;cursor:pointer;padding:2px;color:${fav ? PURPLE : '#CFCFCC'};transition:color .15s;flex-shrink:0;">${fav ? '★' : '☆'}</button>
       </div>
       ${v.note ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:${META};margin-top:6px;">${v.note}</div>` : ''}
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:6px;">
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:${META};">${v.address}</div>
-        ${v.officialUrl ? `<a href="${v.officialUrl}" target="_blank" rel="noopener"
-          style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${INK};display:inline-flex;align-items:center;gap:4px;padding:5px 13px;border-radius:999px;border:1.5px solid ${INK};background:transparent;text-decoration:none;white-space:nowrap;flex-shrink:0;">
-          Offizielle Webseite ↗
-        </a>` : ''}
-      </div>
-      <div style="margin-top:10px;padding:10px 14px;background:#FAFAF8;border-radius:12px;border:1px solid #E2E2E0;border-left:3px solid ${ORANGE};">
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:${META};line-height:1.55;">Diese Webseite ist nicht die offizielle Webseite des Bads. Die Angaben werden von uns zusammengetragen und können sich kurzfristig ändern. Bitte überprüfe die aktuellen Informationen auf der offiziellen Webseite.</div>
-      </div>
+      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.address)}" target="_blank" rel="noopener"
+        style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:${META};margin-top:6px;display:inline-block;text-decoration:underline;text-underline-offset:2px;text-decoration-color:${META}44;">${v.address}</a>
 
       <!-- Stat cards -->
       <div style="margin-top:clamp(16px,4vw,24px);display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;">
@@ -1117,6 +1109,14 @@ function renderDetail() {
         <div style="margin-top:clamp(12px,3vw,20px);">${chart}</div>
         ${dataSeit ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#ADADA9;margin-top:8px;padding-left:2px;">Daten seit ${dataSeit}</div>` : ''}
       </div>` : ''}
+
+      <div style="margin-top:clamp(20px,4vw,32px);padding-top:14px;border-top:1px solid #E8E8E6;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#ADADA9;line-height:1.5;max-width:480px;">Inoffizielle Seite — Angaben ohne Gewähr, können sich kurzfristig ändern.</div>
+        ${v.officialUrl ? `<a href="${v.officialUrl}" target="_blank" rel="noopener"
+          style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:${META};text-decoration:underline;text-underline-offset:2px;white-space:nowrap;flex-shrink:0;">
+          Offizielle Webseite ↗
+        </a>` : ''}
+      </div>
     </div>
   </div>`;
 }
