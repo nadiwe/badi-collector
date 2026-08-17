@@ -1,19 +1,24 @@
 {
   "meta": {
-    "generiert": "2026-08-16T20:30:07",
+    "generiert": "2026-08-17T04:00:08",
     "von": "2026-07-03",
-    "bis": "2026-08-16"
+    "bis": "2026-08-17"
   },
   "badis": [
     {
       "uid": "BADI-1",
       "name": "Enge",
-      "messtage_echt": 45,
+      "messtage_echt": 46,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-08-16",
+      "letzte_messung": "2026-08-17",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:00",
+            "auslastung": 1.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.6,
@@ -1000,6 +1005,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:00",
+            "auslastung": 1.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.4,
@@ -3334,12 +3344,17 @@
     {
       "uid": "flb6939",
       "name": "Flussbad Oberer Letten",
-      "messtage_echt": 45,
+      "messtage_echt": 46,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-08-16",
+      "letzte_messung": "2026-08-17",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -4326,6 +4341,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -6660,12 +6680,17 @@
     {
       "uid": "flb6940",
       "name": "Flussbad Unterer Letten",
-      "messtage_echt": 45,
+      "messtage_echt": 46,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-08-16",
+      "letzte_messung": "2026-08-17",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -7652,6 +7677,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -9986,12 +10016,17 @@
     {
       "uid": "flb8803",
       "name": "Flussbad Unterer Letten (Flussteil)",
-      "messtage_echt": 45,
+      "messtage_echt": 46,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-08-16",
+      "letzte_messung": "2026-08-17",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -10978,6 +11013,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -13312,12 +13352,17 @@
     {
       "uid": "flb6941",
       "name": "Frauenbad Stadthausquai",
-      "messtage_echt": 45,
+      "messtage_echt": 46,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-08-16",
+      "letzte_messung": "2026-08-17",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.1,
@@ -14304,6 +14349,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -16638,12 +16688,17 @@
     {
       "uid": "fb006",
       "name": "Freibad Allenmoos",
-      "messtage_echt": 45,
+      "messtage_echt": 46,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-08-16",
+      "letzte_messung": "2026-08-17",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -17630,6 +17685,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -19964,12 +20024,17 @@
     {
       "uid": "fb008",
       "name": "Freibad Auhof",
-      "messtage_echt": 45,
+      "messtage_echt": 46,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-08-16",
+      "letzte_messung": "2026-08-17",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -20956,6 +21021,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -23290,12 +23360,17 @@
     {
       "uid": "fb012",
       "name": "Freibad Heuried",
-      "messtage_echt": 45,
+      "messtage_echt": 46,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-08-16",
+      "letzte_messung": "2026-08-17",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -24282,6 +24357,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -26616,12 +26696,17 @@
     {
       "uid": "LETZI-1",
       "name": "Freibad Letzigraben",
-      "messtage_echt": 45,
+      "messtage_echt": 46,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-08-16",
+      "letzte_messung": "2026-08-17",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -27608,6 +27693,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -29942,12 +30032,17 @@
     {
       "uid": "SSD-11",
       "name": "Freibad Seebach",
-      "messtage_echt": 45,
+      "messtage_echt": 46,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-08-16",
+      "letzte_messung": "2026-08-17",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -30934,6 +31029,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -33268,12 +33368,17 @@
     {
       "uid": "fb018",
       "name": "Freibad Zwischen den Hölzern",
-      "messtage_echt": 45,
+      "messtage_echt": 46,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-08-16",
+      "letzte_messung": "2026-08-17",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -34260,6 +34365,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -36594,12 +36704,17 @@
     {
       "uid": "SSD-2",
       "name": "Hallenbad Blaesi",
-      "messtage_echt": 24,
+      "messtage_echt": 25,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-07-26",
+      "letzte_messung": "2026-08-17",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 7.1,
@@ -37254,6 +37369,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "07:15",
             "auslastung": 0.0,
@@ -39413,12 +39533,17 @@
     {
       "uid": "SSD-3",
       "name": "Hallenbad Bungertwies",
-      "messtage_echt": 24,
+      "messtage_echt": 25,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-08-16",
+      "letzte_messung": "2026-08-17",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 8.9,
@@ -40400,6 +40525,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -42694,12 +42824,17 @@
     {
       "uid": "SSD-4",
       "name": "Hallenbad City",
-      "messtage_echt": 10,
+      "messtage_echt": 11,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-08-16",
+      "letzte_messung": "2026-08-17",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 13.1,
@@ -43364,6 +43499,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 10.9,
@@ -45598,12 +45738,17 @@
     {
       "uid": "SSD-6",
       "name": "Hallenbad Leimbach",
-      "messtage_echt": 15,
+      "messtage_echt": 16,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-07-17",
+      "letzte_messung": "2026-08-17",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "07:15",
             "auslastung": 14.2,
@@ -46193,6 +46338,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "07:15",
             "auslastung": 15.0,
@@ -53732,12 +53882,17 @@
     {
       "uid": "SSD-10",
       "name": "Seebad Utoquai",
-      "messtage_echt": 45,
+      "messtage_echt": 46,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-08-16",
+      "letzte_messung": "2026-08-17",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.1,
@@ -54724,6 +54879,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.1,
@@ -57058,12 +57218,17 @@
     {
       "uid": "seb6946",
       "name": "Strandbad Mythenquai",
-      "messtage_echt": 45,
+      "messtage_echt": 46,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-08-16",
+      "letzte_messung": "2026-08-17",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -58050,6 +58215,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -60384,12 +60554,17 @@
     {
       "uid": "seb6947",
       "name": "Strandbad Tiefenbrunnen",
-      "messtage_echt": 45,
+      "messtage_echt": 46,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-08-16",
+      "letzte_messung": "2026-08-17",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -61376,6 +61551,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -63710,12 +63890,17 @@
     {
       "uid": "seb6948",
       "name": "Strandbad Wollishofen",
-      "messtage_echt": 45,
+      "messtage_echt": 46,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-08-16",
+      "letzte_messung": "2026-08-17",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -64702,6 +64887,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.0,
@@ -67036,12 +67226,17 @@
     {
       "uid": "SSD-5",
       "name": "Waermebad Kaeferberg",
-      "messtage_echt": 22,
+      "messtage_echt": 23,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-08-16",
+      "letzte_messung": "2026-08-17",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 0.5,
@@ -67711,6 +67906,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:00",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:15",
             "auslastung": 1.4,
