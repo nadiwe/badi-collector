@@ -74,7 +74,7 @@
 <meta name="twitter:title" content="Wasserziit — Zürich Badi Finder">
 <meta name="twitter:description" content="Aktuelle Badi-Auslastung in Zürich: Besucherzahlen, Wassertemperatur und Öffnungszeiten — live.">
 
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://server.arcgisonline.com https://*.cartocdn.com https://www.google-analytics.com https://www.googletagmanager.com; connect-src 'self' wss://badi-public.crowdmonitor.ch:9591 https://badi-public.crowdmonitor.ch https://www.stadt-zuerich.ch https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://region1.google-analytics.com; object-src 'none'; base-uri 'self'; form-action 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://server.arcgisonline.com https://www.google-analytics.com https://www.googletagmanager.com; connect-src 'self' wss://badi-public.crowdmonitor.ch:9591 https://badi-public.crowdmonitor.ch https://www.stadt-zuerich.ch https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://region1.google-analytics.com; object-src 'none'; base-uri 'self'; form-action 'none';">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -82,25 +82,47 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{background:#E4E2E0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#173D34;}
+html,body{background:#E4E2E0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#000;}
 button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 a{text-decoration:none;color:inherit;}
-::selection{background:#6E3BF2;color:#fff;}
+::selection{background:#000;color:#fff;}
 @keyframes livepulse{0%,100%{opacity:1;}50%{opacity:.25;}}
 .pulse{animation:livepulse 2s ease-in-out infinite;}
 .card{transition:box-shadow .15s;}
-.card:hover{box-shadow:0 4px 22px rgba(23,61,52,.14)!important;}
+.card:hover{box-shadow:0 4px 22px rgba(0,0,0,.14)!important;}
 .tile-card{transition:box-shadow .15s;}
-.tile-card:hover{box-shadow:0 4px 22px rgba(23,61,52,.22)!important;}
+.tile-card:hover{box-shadow:0 4px 22px rgba(0,0,0,.22)!important;}
 .chip{transition:all .12s;}
 .modal-scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);z-index:2000;display:flex;align-items:center;justify-content:center;padding:clamp(0px,2vw,16px);overflow-y:auto;}
-.modal-sheet{background:#fff;border-radius:clamp(16px,4vw,28px);padding:clamp(16px,4vw,24px);box-shadow:0 4px 22px rgba(23,61,52,.12);width:100%;max-width:740px;display:flex;flex-direction:column;gap:0;max-height:calc(100dvh - 32px);overflow-y:auto;}
-.stat-card{flex:1;min-width:150px;padding:clamp(14px,3.5vw,20px) clamp(14px,3.5vw,22px);background:#F4F4F4;border-radius:20px;cursor:pointer;display:flex;flex-direction:column;transition:background .18s;}
+.modal-sheet{background:#fff;border-radius:clamp(16px,4vw,28px);padding:clamp(16px,4vw,24px);box-shadow:0 4px 22px rgba(0,0,0,.12);width:100%;max-width:740px;display:flex;flex-direction:column;gap:0;max-height:calc(100dvh - 32px);overflow-y:auto;}
+.stat-card{flex:1;min-width:150px;padding:clamp(14px,3.5vw,20px) clamp(14px,3.5vw,22px);background:#F4F4F4;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;transition:background .18s;}
 .stat-card:hover{background:#ECECEC;}
-.dc-dark-soft{filter:brightness(1.35) contrast(0.92);}
+.stat-card{position:relative;}
+.chev{position:absolute;bottom:10px;right:10px;width:16px;height:16px;color:#000;display:flex;align-items:center;justify-content:center;}
+.chev svg{transition:transform .15s;}
+.chev.open svg{transform:rotate(180deg);}
 .leaflet-container{font-family:'IBM Plex Mono',monospace;background:#DEDEDE;}
-.leaflet-bar a{background:#F4F4F4;color:#173D34;border-color:#E0E0DC;}
+.leaflet-bar a{background:#F4F4F4;color:#000;border-color:#E0E0DC;}
 .leaflet-bar a:hover{background:#ECECEC;}
+.sw{flex-shrink:0;display:inline-flex;align-items:center;gap:2px;background:#EDEDEB;border-radius:10px;padding:3px;}
+.sw-btn{height:26px;min-width:32px;padding:0 10px;display:inline-flex;align-items:center;justify-content:center;border:none;border-radius:7px;background:transparent;color:#8C8C8C;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.04em;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s;}
+.sw-btn.on{background:#000;color:#fff;}
+.stat-row{display:flex;gap:10px;align-items:stretch;}
+.stat-row>.stat-card{flex:1;min-width:0;justify-content:space-between;}
+.stat-val{font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.9;font-size:clamp(24px,6.5vw,44px);}
+.stat-val.hours{font-size:clamp(15px,3.8vw,24px);line-height:1.1;}
+.stat-lbl{font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:#8C8C8C;font-weight:700;margin-top:10px;}
+.lbl-short{display:none;}
+.wd-btn{height:32px;}
+.legal-body a{color:inherit;text-decoration:underline;text-underline-offset:2px;}
+@media (max-width:600px){
+  .lbl-long{display:none;}.lbl-short{display:inline;}
+  .sw-btn{padding:0 8px;letter-spacing:0;}
+  .stat-row{gap:6px;}
+  .wd-btn{height:28px;font-size:10.5px!important;}
+  .stat-row>.stat-card{padding:12px 10px;}
+  .stat-lbl{font-size:9px;letter-spacing:.06em;margin-top:8px;}
+}
 </style>
 </head>
 <body>
@@ -108,14 +130,188 @@ a{text-decoration:none;color:inherit;}
 
 <script>
 // ── Design tokens ──────────────────────────────────────────────────────────
-const INK    = '#173D34';
-const PURPLE = '#6E3BF2';
-const ORANGE = '#F47B43';
+const INK    = '#000000';
 const BLACK  = '#000000';
 const META   = '#8C8C8C';
+const FAV    = '#FF6163'; // Favoriten (Filter + Stern)
 
-const TYPE_COLOR = { fluss: PURPLE, see: INK, frei: ORANGE, halle: BLACK };
-const TYPE_LABEL = { fluss: 'Flussbad', see: 'Seebad', frei: 'Freibad', halle: 'Hallenbad' };
+// Typfarben — alles, was keinem Typ zugeordnet ist, ist schwarz (INK)
+const TYPE_COLOR = { see: '#3649FE', fluss: '#1C8C83', frei: '#F365FF', halle: '#6F36F2' };
+
+// Textfarbe auf farbigem Grund: schwarz auf hellen Farben (Rosa, Rot), sonst weiss — als "r,g,b"
+function onRGB(hex) {
+  const lin = c => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+  const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+  const L = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+  return L > 0.3 ? '0,0,0' : '255,255,255';
+}
+const onColor = hex => `rgb(${onRGB(hex)})`;
+// ── Sprache (DE/EN) ────────────────────────────────────────────────────────
+let LANG = 'de';
+try { if (localStorage.getItem('wasserziit_lang') === 'en') LANG = 'en'; } catch(e) {}
+
+const I18N = {
+  de: {
+    type: { fluss: 'Flussbad', see: 'Seebad', frei: 'Freibad', halle: 'Hallenbad' },
+    chip: { fav: '★ Favorit', alle: 'Alli', fluss: 'Fluss', see: 'See', frei: 'Frei', halle: 'Halle' },
+    months:      ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
+    monthsShort: ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'],
+    wdLong:  { mo:'Mäntig', di:'Zistig', mi:'Mittwuch', do:'Dunstig', fr:'Friitg', sa:'Samstig', so:'Suntig' },
+    wdShort: { mo:'Mo', di:'Di', mi:'Mi', do:'Do', fr:'Fr', sa:'Sa', so:'So' },
+    wdBtn:   { mo:'Mo', di:'Di', mi:'Mi', do:'Do', fr:'Fr', sa:'Sa', so:'So' },
+    dateLocale: 'de-CH',
+    fmtDate: (d, m) => `${d}. ${m}`,
+    stand: (date, time, age) => `${date}${time ? ', ' + time + ' Uhr' + age : ''}`,
+    ageMin: n => ` · vor ${n} Min`,
+    countLine: (n, open) => `${n} Badis · ${open} offen`,
+    tiles: 'Kacheln', map: 'Karte', light: 'Hell', dark: 'Dunkel',
+    emptyTitle: 'Keni Badis gfunde', emptyHint: 'Probier en andere Filter ode füeg Favoriten hinzue.',
+    open: 'offen', openUntil: t => `offen bis ${t}`, closed: 'geschlossen',
+    opens: (prefix, t) => `öffnet ${prefix}${t}`, tomorrow: 'morgen',
+    revision: 'Revision',
+    devMore: p => `${p}% voller als sonst`, devLess: p => `${p}% ruhiger als sonst`, devSame: 'etwa wie sonst',
+    guestsNow: 'Gäste jetzt', noData: 'Keine Daten', water: 'Wasser', occupancy: 'Auslastung',
+    noGuestData: 'Für dieses Bad sind keine Besucherdaten verfügbar.',
+    chartOverview: 'Tag', chart1h: '1 Std', chart15: '15 Min', chart1hShort: '1h', chart15Short: '15m', resolution: 'Auflösung',
+    howBusy: 'Wie voll isch es', dataSince: d => `Daten seit ${d}`,
+    noDataYet: 'Noch keine Daten',
+    closedFromTo: (a, b) => `Geschlossen vom ${a} bis ${b}`,
+    poolTemp: 'Beckentemperatur', waterTemp: 'Wassertemperatur', hours: 'Öffnigszite',
+    poolShort: 'Becken', waterShort: 'Wasser', guestsShort: 'Gäste',
+    specialHours: 'Besondere Öffnungszeiten &amp; Hinweise',
+    hinweis: { revision: 'Revision', zusatz: 'Zusätzliche Öffnungszeiten', schliessung: 'Abweichende Schliessung' },
+    from: d => `ab ${d}`,
+    officialSite: 'Offizielle Webseite ↗', season: 'Saison',
+    seasonEnded: d => `Saison beendet (${d})`, seasonStarts: d => `Saisonstart ${d}`, seasonUntil: d => `Saison bis ${d}`,
+    seasonClosedNote: m => `Das Bad ist bis zur nächsten Saison geschlossen (meistens ab ${m}). Sobald die neuen Daten bekannt sind, steht hier, wann es wieder öffnet.`,
+    seasonReview: y => `Rückblick Saison ${y}`, peakAvg: 'Ø Tagesspitze Gäste',
+    histMonths: 'Monate', histWeeks: 'Wochen', kw: w => `KW${w}`,
+    recordedSince: (d, n) => `Aufgezeichnet seit ${d} · ${n} Messtage`,
+    legendMonths: 'Zahl = Ø Tagesspitze Gäste · % = Ø Auslastung', legendWeeks: 'Ø Auslastung pro Woche (in % der Kapazität)',
+    fairWeather: t => `Ab ${t} Uhr nur bei schönem Wetter.`,
+    favorite: 'Favorit', close: 'Schliessen',
+    cookieText: 'Diese Seite verwendet Google Analytics, um Besucherzahlen zu messen. Deine Daten werden nur mit deiner Einwilligung erhoben.',
+    cookieDecline: 'Ablehnen', cookieAccept: 'Akzeptieren',
+    cityIndoor: 'Hallenbäder', citySummer: 'Sommerbäder',
+    legalLinks: { impressum: 'Impressum', datenschutz: 'Datenschutz', cookies: 'Cookie-Einstellungen' }, feedback: 'Feedback', feedbackSubject: 'Wasserziit – Feedback',
+    feedbackText: 'Danke, dass du Wasserziit nutzt! Ich bin immer dankbar für Feedback – ob Ideen, Fehler oder Wünsche. Jede Rückmeldung hilft, die Seite besser zu machen.',
+    feedbackBtn: 'E-Mail schreiben',
+    legal: {
+      impressum: {
+        title: 'Impressum',
+        sections: [
+          ['Verantwortlich', 'Nadia Westermann · <a href="mailto:nadia.west@hispeed.ch">nadia.west@hispeed.ch</a><br>Ideen, Fehler oder Wünsche? Schreib mir gerne.'],
+          ['Hinweis', 'Privates, nicht-kommerzielles Projekt – keine offizielle Seite der Stadt Zürich.<br>Alle Angaben ohne Gewähr. Öffnungszeiten, Temperaturen und Auslastung können von der tatsächlichen Situation abweichen.'],
+          ['Daten', 'Wassertemperatur &amp; Status: Sportamt Stadt Zürich · Besucherzahlen: Crowdmonitor · Durchschnittliche Auslastung: selbst berechnet aus gesammelten Live-Daten'],
+          ['Karte', 'Esri, HERE, Garmin'],
+        ],
+      },
+      datenschutz: {
+        title: 'Datenschutz',
+        sections: [
+          ['Google Analytics', 'Nur mit deiner Einwilligung. Misst Besucherzahlen; Daten können in die USA übermittelt werden. Widerruf jederzeit über «Cookie-Einstellungen».'],
+          ['Externe Dienste', 'GitHub Pages (Hosting), Google Fonts, unpkg.com, Esri (Karte) sowie Crowdmonitor und Stadt Zürich (Live-Daten) erhalten technisch bedingt deine IP-Adresse.'],
+          ['Im Browser gespeichert', 'Favoriten, Sprache und Cookie-Wahl – nur lokal auf deinem Gerät.'],
+          ['Kontakt', 'Auskunft oder Löschung: <a href="mailto:nadia.west@hispeed.ch">nadia.west@hispeed.ch</a>'],
+        ],
+      },
+    },
+  },
+  en: {
+    type: { fluss: 'River pool', see: 'Lake pool', frei: 'Outdoor pool', halle: 'Indoor pool' },
+    chip: { fav: '★ Favourites', alle: 'All', fluss: 'River', see: 'Lake', frei: 'Outdoor', halle: 'Indoor' },
+    months:      ['January','February','March','April','May','June','July','August','September','October','November','December'],
+    monthsShort: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    wdLong:  { mo:'Monday', di:'Tuesday', mi:'Wednesday', do:'Thursday', fr:'Friday', sa:'Saturday', so:'Sunday' },
+    wdShort: { mo:'Mon', di:'Tue', mi:'Wed', do:'Thu', fr:'Fri', sa:'Sat', so:'Sun' },
+    wdBtn:   { mo:'Mo', di:'Tu', mi:'We', do:'Th', fr:'Fr', sa:'Sa', so:'Su' },
+    dateLocale: 'en-GB',
+    fmtDate: (d, m) => `${d} ${m}`,
+    stand: (date, time, age) => `${date}${time ? ', ' + time + age : ''}`,
+    ageMin: n => ` · ${n} min ago`,
+    countLine: (n, open) => `${n} pools · ${open} open`,
+    tiles: 'Tiles', map: 'Map', light: 'Light', dark: 'Dark',
+    emptyTitle: 'No pools found', emptyHint: 'Try a different filter or add some favourites.',
+    open: 'open', openUntil: t => `open until ${t}`, closed: 'closed',
+    opens: (prefix, t) => `opens ${prefix}${t}`, tomorrow: 'tomorrow',
+    revision: 'Maintenance',
+    devMore: p => `${p}% busier than usual`, devLess: p => `${p}% quieter than usual`, devSame: 'about as usual',
+    guestsNow: 'Guests now', noData: 'No data', water: 'water', occupancy: 'Occupancy',
+    noGuestData: 'No visitor data is available for this pool.',
+    chartOverview: 'Day', chart1h: '1 h', chart15: '15 min', chart1hShort: '1h', chart15Short: '15m', resolution: 'Resolution',
+    howBusy: 'How busy is it', dataSince: d => `Data since ${d}`,
+    noDataYet: 'No data yet',
+    closedFromTo: (a, b) => `Closed from ${a} to ${b}`,
+    poolTemp: 'Pool temperature', waterTemp: 'Water temperature', hours: 'Opening hours',
+    poolShort: 'Pool', waterShort: 'Water', guestsShort: 'Guests',
+    specialHours: 'Special opening hours &amp; notices',
+    hinweis: { revision: 'Maintenance', zusatz: 'Additional opening hours', schliessung: 'Special closure' },
+    from: d => `from ${d}`,
+    officialSite: 'Official website ↗', season: 'Season',
+    seasonEnded: d => `Season ended (${d})`, seasonStarts: d => `Season starts ${d}`, seasonUntil: d => `Season until ${d}`,
+    seasonClosedNote: m => `This pool is closed until next season (usually from ${m}). As soon as the new dates are known, you will see here when it reopens.`,
+    seasonReview: y => `Season ${y} in review`, peakAvg: 'Avg. daily peak guests',
+    histMonths: 'Months', histWeeks: 'Weeks', kw: w => `W${w}`,
+    recordedSince: (d, n) => `Recorded since ${d} · ${n} days of data`,
+    legendMonths: 'Number = avg. daily peak guests · % = avg. occupancy', legendWeeks: 'Avg. occupancy per week (% of capacity)',
+    fairWeather: t => `After ${t} only in fine weather.`,
+    favorite: 'Favourite', close: 'Close',
+    cookieText: 'This site uses Google Analytics to measure visitor numbers. Your data is only collected with your consent.',
+    cookieDecline: 'Decline', cookieAccept: 'Accept',
+    cityIndoor: 'Indoor pools', citySummer: 'Summer pools',
+    legalLinks: { impressum: 'Legal notice', datenschutz: 'Privacy', cookies: 'Cookie settings' }, feedback: 'Feedback', feedbackSubject: 'Wasserziit – Feedback',
+    feedbackText: 'Thanks for using Wasserziit! I am always grateful for feedback – ideas, bugs or wishes. Every message helps to make the site better.',
+    feedbackBtn: 'Write an email',
+    legal: {
+      impressum: {
+        title: 'Legal notice',
+        sections: [
+          ['Responsible', 'Nadia Westermann · <a href="mailto:nadia.west@hispeed.ch">nadia.west@hispeed.ch</a><br>Ideas, bugs or wishes? Feel free to write to me.'],
+          ['Note', 'Private, non-commercial project – not an official site of the City of Zurich.<br>All information without guarantee. Opening hours, temperatures and occupancy may differ from the actual situation.'],
+          ['Data', 'Water temperature &amp; status: Sports Department, City of Zurich · Visitor numbers: Crowdmonitor · Average occupancy: calculated independently from collected live data'],
+          ['Map', 'Esri, HERE, Garmin'],
+        ],
+      },
+      datenschutz: {
+        title: 'Privacy',
+        sections: [
+          ['Google Analytics', 'Only with your consent. Measures visitor numbers; data may be transferred to the USA. Withdraw any time via “Cookie settings”.'],
+          ['External services', 'GitHub Pages (hosting), Google Fonts, unpkg.com, Esri (map) as well as Crowdmonitor and the City of Zurich (live data) receive your IP address for technical reasons.'],
+          ['Stored in your browser', 'Favourites, language and cookie choice – only locally on your device.'],
+          ['Contact', 'Information or deletion: <a href="mailto:nadia.west@hispeed.ch">nadia.west@hispeed.ch</a>'],
+        ],
+      },
+    },
+  },
+};
+const T = () => I18N[LANG];
+
+// Inhalte aus den Daten (Hinweise, Saison, Becken) — nur Englisch braucht eine Übersetzung
+const EN_TERMS = {
+  'Ganzjährig': 'Year-round', 'Mai–Sep': 'May–Sep',
+  'Flussteil': 'River section', 'Nur Frauen': 'Women only', 'Nur Männer': 'Men only',
+  'Schwimmbecken': 'Swimming pool', 'Schwimmerbecken': 'Swimming pool', '50m-Schwimmbecken': '50 m pool', '50m-Schwimmerbecken': '50 m pool',
+  'Nichtschwimmerbecken': 'Non-swimmer pool', 'Lehrschwimmbecken': 'Teaching pool', 'Mehrzweckbecken': 'Multi-purpose pool',
+  'Planschbecken': 'Paddling pool', 'Sprungbecken': 'Diving pool', 'Variobecken': 'Variable-depth pool',
+  'Wärmebad': 'Thermal pool', 'Wärmebecken': 'Warm-water pool',
+};
+function tr(s) { return LANG === 'en' && s ? (EN_TERMS[s] ?? s) : s; }
+
+function setLang(l) {
+  LANG = l;
+  try { localStorage.setItem('wasserziit_lang', l); } catch(e) {}
+  applyStaticLang();
+  render();
+}
+
+// Teile ausserhalb von render() (html-lang, Cookie-Banner)
+function applyStaticLang() {
+  document.documentElement.lang = LANG;
+  const set = (id, key) => { const el = document.getElementById(id); if (el) el.textContent = T()[key]; };
+  set('cookie-text', 'cookieText');
+  set('cookie-decline', 'cookieDecline');
+  set('cookie-accept', 'cookieAccept');
+}
 
 // ── Venue metadata ─────────────────────────────────────────────────────────
 const VENUES = [
@@ -189,7 +385,6 @@ let S = {
   filter: 'alle',
   currentUid: null,
   favs: {},
-  period: 'heute',
   weekday: todayWd(),
   guestOpen: false,
   tempOpen: false,
@@ -198,6 +393,8 @@ let S = {
   chartZoomed: false,
   chartRes: '15min',
   viewMode: 'cards',
+  legal: null, // 'impressum' | 'datenschutz'
+  histRes: 'monat', // Rückblick geschlossener Bäder: 'monat' | 'woche'
 };
 
 // Render während Touch unterdrücken damit iOS-Scroll-Geste nicht unterbrochen wird
@@ -217,6 +414,7 @@ let GUEST_WEEK_TOTAL = {}; // uid → {mo:sum, di:sum, ...} — Summe currentfil
 let TEMP_WEEK       = {}; // uid → {mo:22, di:22, ...} — letzte Temp pro Wochentag aus CSV
 let REVISIONEN  = {}; // uid → {von:"YYYY-MM-DD", bis:"YYYY-MM-DD", name}
 let HINWEISE    = {}; // uid → [{typ, von, bis, beschreibung, zeiten}]
+let _temps      = { byUid: {}, byName: {} }; // Status/Temperatur der Stadt (poiid → …)
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 function todayWd() {
@@ -227,6 +425,9 @@ function todayWd() {
 function isWeekend(wd) { return wd === 'sa' || wd === 'so'; }
 
 function dayTypeFor(wd) { return isWeekend(wd) ? 'Wochenende' : 'Werktag'; }
+
+// Durchschnitt für genau diesen Wochentag; nur wenn der fehlt: Werktag/Wochenende
+function typicalKey(uid, wd) { return slotsFor(uid, wd).length ? wd : dayTypeFor(wd); }
 
 function numFmt(n) {
   if (n == null || n < 0) return '–';
@@ -243,17 +444,87 @@ function hhmm(s) { // "08:30" → minutes
   return h * 60 + m;
 }
 
+// Datum (YYYY-MM-DD) des nächsten Tages mit diesem Wochentag, heute eingeschlossen
+function dateForWd(wd) {
+  const idx = ['mo','di','mi','do','fr','sa','so'].indexOf(wd);
+  const d = new Date(todayISO() + 'T12:00:00');
+  const cur = (d.getDay() + 6) % 7;
+  d.setDate(d.getDate() + (idx - cur + 7) % 7);
+  return d.toLocaleDateString('sv-SE');
+}
+
+// Öffnungszeiten-Zeitraum der Stadt (Stammdaten oeffnungszeiten_<jahr>), der für dieses Datum gilt
+function hoursPeriod(v, iso) {
+  return v?.hoursPeriods?.find(p => p.von <= iso && iso <= p.bis) || null;
+}
+
 function hoursForDay(uid, wd) {
   const v = VENUE_MAP[uid];
   if (!v) return null;
+  if (v.hoursPeriods) {
+    const p = hoursPeriod(v, dateForWd(wd));
+    if (!p) return null;                          // ausserhalb der Saison
+    if (p.tage === 'so-fr' && wd === 'sa') return null;
+    return p.zeit;
+  }
   // Wenn hoursPerDay vorhanden: nur diese verwenden — fehlender Tag = kein Betrieb
   if (v.hoursPerDay) return v.hoursPerDay[wd] ?? null;
   return v.hours ?? null;
 }
 
+// Mehrere Becken: das Schwimmbecken ist die aussagekräftigste Temperatur
+function mainPool(pools) {
+  if (!pools?.length) return null;
+  return pools.find(p => /schwimm/i.test(p.name) && !/nicht|lehr/i.test(p.name)) || pools[0];
+}
+
+function todayISO() { return new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Zurich' }); }
+
+function fmtIsoShort(iso) {
+  const [, m, d] = iso.split('-').map(Number);
+  return T().fmtDate(d, T().monthsShort[m - 1]);
+}
+
+// 'before' | 'in' | 'after' | null (keine Saisondaten, z.B. Hallenbad)
+function seasonState(v) {
+  if (!v?.seasonFrom) return null;
+  const t = todayISO();
+  return t < v.seasonFrom ? 'before' : t > v.seasonTo ? 'after' : 'in';
+}
+
+// Üblicher Saisonstart (Monat der letzten Saison), Standard: Mai
+function usualStartMonth(v) {
+  const m = v?.seasonFrom ? parseInt(v.seasonFrom.slice(5, 7)) : 5;
+  return T().months[m - 1];
+}
+
+function seasonLabel(v) {
+  return v.seasonFrom ? `${fmtIsoShort(v.seasonFrom)} – ${fmtIsoShort(v.seasonTo)}` : tr(v.season);
+}
+
+// Ein Statustext für Kachel und Detail
+function statusText(uid) {
+  const v = VENUE_MAP[uid];
+  if (isInRevision(uid)) return T().revision;
+  const st = seasonState(v);
+  if (st === 'after')  return T().seasonEnded(fmtIsoShort(v.seasonTo));
+  if (st === 'before') return T().seasonStarts(fmtIsoShort(v.seasonFrom));
+  if (computeIsOpen(uid)) { const c = closingTime(uid); return c ? T().openUntil(c) : T().open; }
+  // Sommerbad ohne Saisondaten, das die Stadt als geschlossen meldet: keine Prognose
+  const cityStatus = LIVE?.venues?.[uid]?.openClosed ?? _temps?.byUid?.[v?.tempUid]?.openClosed;
+  if (v && v.type !== 'halle' && !v.seasonFrom && cityStatus === 'geschlossen') return T().closed;
+  return nextOpenTime(uid) || T().closed;
+}
+
 function computeIsOpen(uid) {
   if (isInRevision(uid)) return false;
   const live = LIVE?.venues?.[uid];
+  const v = VENUE_MAP[uid];
+  const st = seasonState(v);
+  if (st === 'before' || st === 'after') return false;
+  // Sommerbad ohne bekannte Saisondaten (z.B. Dolder): Status der Stadt gilt
+  const cityStatus = live?.openClosed ?? _temps?.byUid?.[v?.tempUid]?.openClosed;
+  if (v && v.type !== 'halle' && !v.seasonFrom && cityStatus === 'geschlossen') return false;
   const h = hoursForDay(uid, todayWd());
   // Öffnungszeiten sind zuverlässiger als API-Status (der bei voller Kapazität
   // oder Daten-Lag fälschlicherweise "geschlossen" meldet)
@@ -279,7 +550,6 @@ function closingTime(uid) {
 
 function nextOpenTime(uid) {
   const WD = ['so','mo','di','mi','do','fr','sa'];
-  const LABEL = ['So','Mo','Di','Mi','Do','Fr','Sa'];
   const now = new Date();
   const nowMin = nowHHMM();
   for (let i = 0; i < 7; i++) {
@@ -292,8 +562,8 @@ function nextOpenTime(uid) {
     if (parts.length !== 2) continue;
     const openMin = hhmm(parts[0].trim());
     if (i === 0 && nowMin >= openMin) continue;
-    const prefix = i === 0 ? '' : i === 1 ? 'morgen ' : LABEL[d.getDay()] + ' ';
-    return `öffnet ${prefix}${parts[0].trim()}`;
+    const prefix = i === 0 ? '' : i === 1 ? T().tomorrow + ' ' : T().wdShort[wd] + ' ';
+    return T().opens(prefix, parts[0].trim());
   }
   return null;
 }
@@ -315,20 +585,19 @@ async function loadHinweise() {
 }
 
 function renderHinweis(h) {
-  const M = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
   function fmtD(s) {
     if (!s) return '';
     const [, m, d] = s.split('-').map(Number);
-    return d + '. ' + M[m - 1];
+    return T().fmtDate(d, T().monthsShort[m - 1]);
   }
   const TYPE_META = {
-    revision:    { label: 'Revision',                   bg: '#F4F4F4', border: '#8C8C8C', fg: '#555' },
-    zusatz:      { label: 'Zusätzliche Öffnungszeiten', bg: '#F0FBF4', border: '#2A9D63', fg: '#1B7045' },
-    schliessung: { label: 'Abweichende Schliessung',    bg: '#FEF3EB', border: '#F47B43', fg: '#8C4A1C' },
+    revision:    { label: T().hinweis.revision,    bg: '#F4F4F4', border: '#8C8C8C', fg: '#555' },
+    zusatz:      { label: T().hinweis.zusatz,      bg: '#F0FBF4', border: '#2A9D63', fg: '#1B7045' },
+    schliessung: { label: T().hinweis.schliessung, bg: '#FEF3EB', border: '#F47B43', fg: '#8C4A1C' },
   };
   const m = TYPE_META[h.typ] || { label: h.typ, bg: '#F4F4F4', border: '#8C8C8C', fg: '#555' };
   const dateRange = h.von
-    ? (h.bis ? fmtD(h.von) + ' – ' + fmtD(h.bis) : 'ab ' + fmtD(h.von))
+    ? (h.bis ? fmtD(h.von) + ' – ' + fmtD(h.bis) : T().from(fmtD(h.von)))
     : '';
   return `
   <div style="padding:12px 14px;border-radius:14px;background:${m.bg};border-left:3px solid ${m.border};">
@@ -360,12 +629,17 @@ async function loadStammdaten() {
         if (!v) continue;
         if (entry.standort) v.address = entry.standort;
         if (entry.officialUrl) v.officialUrl = entry.officialUrl;
+        // Saisondaten (z.B. saison_2026: {von, bis}) → Status «Saison beendet» / «Saisonstart»
+        const sz = entry['saison_' + new Date().getFullYear()];
+        if (sz?.von && sz?.bis) { v.seasonFrom = sz.von; v.seasonTo = sz.bis; }
+        const oz = entry['oeffnungszeiten_' + new Date().getFullYear()];
+        if (Array.isArray(oz?.perioden) && oz.perioden.length) v.hoursPeriods = oz.perioden;
         if (entry.besucher?.typ === 'keine') v.noOccupancy = true;
         const tw = entry.temperatur?.wert;
         if (entry.temperatur?.typ === 'manuell' && tw && typeof tw === 'object') {
           const pools = Object.entries(tw).map(([name, val]) => ({ name, temp: parseInt(val) }));
           HALLE_TEMPS[entry.uid] = pools;
-          if (pools.length > 0) v.defaultTemp = pools[0].temp;
+          if (pools.length > 0) v.defaultTemp = mainPool(pools).temp;
         }
       }
     }
@@ -373,9 +647,8 @@ async function loadStammdaten() {
 }
 
 function fmtRevDate(dateStr) {
-  const M = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
   const [, m, d] = dateStr.split('-').map(Number);
-  return d + '. ' + M[m - 1];
+  return T().fmtDate(d, T().months[m - 1]);
 }
 
 function slotsFor(uid, dayType) {
@@ -397,8 +670,7 @@ function nearestSlot(slots, nowMin) {
 function computeDev(uid) {
   const live = LIVE?.venues?.[uid];
   if (!live || live.currentfill == null || !live.maxspace) return null;
-  const dayType = dayTypeFor(S.weekday);
-  const slots = slotsFor(uid, dayType);
+  const slots = slotsFor(uid, typicalKey(uid, todayWd()));
   if (!slots.length) return null;
   const slot = nearestSlot(slots, nowHHMM());
   if (!slot || !slot.auslastung) return null;
@@ -409,15 +681,15 @@ function computeDev(uid) {
 
 function devInfo(uid) {
   const live = LIVE?.venues?.[uid];
-  if (isInRevision(uid)) return { arrow:'', short:'Revision', color: META, barColor:'#DEDEDE' };
+  if (isInRevision(uid)) return { arrow:'', short:T().revision, color: META, barColor:'#DEDEDE' };
   const isOpen = computeIsOpen(uid);
-  if (!isOpen) return { arrow:'', short:'geschlossen', color: META, barColor:'#DEDEDE' };
+  if (!isOpen) return { arrow:'', short:T().closed, color: META, barColor:'#DEDEDE' };
   const dev = computeDev(uid);
-  if (dev == null) return { arrow:'≈', short:'etwa wie sonst', color: META, barColor: META };
+  if (dev == null) return { arrow:'≈', short:T().devSame, color: META, barColor: META };
   const pct = Math.round(Math.abs(dev - 1) * 100);
-  if (dev >= 1.10) return { arrow:'▲', short: pct + '% voller als sonst', color: ORANGE, barColor: ORANGE };
-  if (dev <= 0.90) return { arrow:'▼', short: pct + '% ruhiger als sonst', color: INK,    barColor: INK    };
-  return { arrow:'≈', short:'etwa wie sonst', color: META, barColor: META };
+  if (dev >= 1.10) return { arrow:'▲', short: T().devMore(pct), color: BLACK, barColor: BLACK };
+  if (dev <= 0.90) return { arrow:'▼', short: T().devLess(pct), color: INK,    barColor: INK    };
+  return { arrow:'≈', short:T().devSame, color: META, barColor: META };
 }
 
 
@@ -475,7 +747,7 @@ function groupByHour(slots) {
 
 // ── SVG chart helpers ──────────────────────────────────────────────────────
 function sparklineSVG(uid, open) {
-  const dayType = dayTypeFor(todayWd());
+  const dayType = typicalKey(uid, todayWd());
   const slots = slotsFor(uid, dayType);
   if (!slots.length) return '';
   const vals = slots.map(s => s.auslastung);
@@ -501,6 +773,9 @@ function sparklineSVG(uid, open) {
   </svg>`;
 }
 
+const CHART_H = 160;
+const AVG_ALPHA = c => c + '40'; // heller Ton für Durchschnittswerte
+
 function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus, wd) {
   let slots = slotsFor(uid, dayType);
   // Hüt-Tab ohne Live-Daten → Wochentag-Durchschnitt als Fallback
@@ -509,7 +784,7 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus, wd) {
     if (!slots.length) slots = slotsFor(uid, dayTypeFor(todayWd()));
     showFocus = false;
   }
-  if (!slots.length) return '<div style="height:116px;display:flex;align-items:center;justify-content:center;color:#8C8C8C;font-family:\'IBM Plex Mono\',monospace;font-size:11px;">Noch keine Daten</div>';
+  if (!slots.length) return '<div style="height:' + (CHART_H + 23) + 'px;display:flex;align-items:center;justify-content:center;color:#8C8C8C;font-family:\'IBM Plex Mono\',monospace;font-size:11px;">' + T().noDataYet + '</div>';
 
   // Hüt-Tab: Wochentag-Durchschnitt für Ghost-Balken (unabhängig von Live-Daten)
   let histSlots = dayType === 'Heute'
@@ -590,7 +865,7 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus, wd) {
         : String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
       const existIdx = slots.findIndex(s => s.zeit === liveZeit);
       if (existIdx >= 0) {
-        slots[existIdx] = { zeit: liveZeit, auslastung: nowPct };
+        slots[existIdx] = { ...slots[existIdx], auslastung: nowPct }; // Durchschnitt (hist) behalten
       } else {
         slots = [...slots, { zeit: liveZeit, auslastung: nowPct }]
           .sort((a, b) => hhmm(a.zeit) - hhmm(b.zeit));
@@ -617,7 +892,7 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus, wd) {
   const xs  = i => i * (W / n) + gap / 2;
   const ys  = v => H - 2 - Math.max(0.04, v) * (H - 4);
 
-  const chartH  = zoomed ? 200 : 116;
+  const chartH  = CHART_H; // feste Höhe, egal welche Auflösung
   const labelFz = zoomed ? '10px' : '9px';
 
   // Y-Achse: absolute Gästezahl wenn maxspace bekannt, sonst Prozent als Fallback
@@ -638,11 +913,18 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus, wd) {
     return `<line x1="0" x2="${W}" y1="${gy.toFixed(1)}" y2="${gy.toFixed(1)}" stroke="#ECECE9" stroke-width="0.5" vector-effect="non-scaling-stroke"/>`;
   }).join('');
 
+  // Ein Balken als absolut positioniertes div (Prozent der Fläche); Rundung in px bleibt immer gleich
+  function barDiv(i, y, fill, isNow) {
+    const top = (y / H * 100).toFixed(2);
+    const hgt = (Math.max(0.6, (H - 2) - y) / H * 100).toFixed(2);
+    return `<div${isNow ? ' data-now="true"' : ''} style="position:absolute;left:${xs(i).toFixed(2)}%;width:${bw.toFixed(2)}%;top:${top}%;height:${hgt}%;background:${fill};border-radius:7px 7px 0 0;"></div>`;
+  }
+
   const ghostBars = slots.map((s, i) => {
     if (!s.hist) return '';
     const v = s.hist / maxV;
     const y = ys(v);
-    return `<rect x="${xs(i).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.6, (H - 2) - y).toFixed(1)}" rx="${Math.min(1.4, bw * 0.25).toFixed(1)}" fill="${periodColor}26"/>`;
+    return barDiv(i, y, AVG_ALPHA(periodColor), false);
   }).join('');
 
   const bars = norm.map((v, i) => {
@@ -650,8 +932,9 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus, wd) {
     const isLatest = i === lastDataIdx;
     const isNow    = i === nowIdx;
     const y    = ys(v);
-    const fill = isLatest ? periodColor : (isToday ? periodColor + '80' : periodColor + '26');
-    return `<rect${isNow ? ' data-now="true"' : ''} x="${xs(i).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.6, (H - 2) - y).toFixed(1)}" rx="${Math.min(1.4, bw * 0.25).toFixed(1)}" fill="${fill}"/>`;
+    // Durchschnitt immer im gleichen hellen Ton wie der Hintergrund-Balken beim heutigen Tag
+    const fill = isLatest ? periodColor : (isToday ? periodColor + '80' : AVG_ALPHA(periodColor));
+    return barDiv(i, y, fill, isNow);
   }).join('');
 
   // Label-Position: linker Rand des Balkens (i/n * 100%)
@@ -666,7 +949,10 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus, wd) {
   }
 
   const yAxisEl = `<div style="position:absolute;left:-${yAxisW}px;top:0;width:${yAxisW - 4}px;height:${chartH}px;">${yAxis}</div>`;
-  const svgEl   = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="100%" height="${chartH}" style="display:block;overflow:visible;">${gridLines}${ghostBars}${bars}</svg>`;
+  const svgEl   = `<div style="position:relative;height:${chartH}px;">
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="100%" height="${chartH}" style="display:block;position:absolute;inset:0;overflow:visible;">${gridLines}</svg>
+      ${ghostBars}${bars}
+    </div>`;
 
   if (zoomed) {
     // Mindestbreite: immer > Container (mind. 900px total oder 80px pro Bar)
@@ -692,73 +978,16 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus, wd) {
     </div>`;
 }
 
-function seasonChart(uid, half, color) {
-  const SOMMER = ['Mai','Jun','Jul','Aug','Sep'];
-  const WINTER = ['Okt','Nov','Dez','Jan','Feb','Mär'];
-  const months = half === 'sommer' ? SOMMER : WINTER;
-  const saison = AW[uid]?.saison;
-
-  // Wenn saisonale Durchschnittswerte vorhanden: zwei Balken (Sommer vs. Winter)
-  if (saison) {
-    const sVal = saison['Sommer_Mai_Sep'];
-    const wVal = saison['Winter_Okt_Apr'];
-    const vals = half === 'sommer'
-      ? [sVal ?? 0, wVal ?? 0]
-      : [wVal ?? 0, sVal ?? 0];
-    const labels = half === 'sommer' ? ['Sommer', 'Winter'] : ['Winter', 'Sommer'];
-    const colors = half === 'sommer' ? [ORANGE, INK + '60'] : [BLACK, ORANGE + '60'];
-    const max = Math.max(...vals, 0.001);
-    const norm = vals.map(v => v / max);
-    const n = 2;
-    const W = 100, H = 34, gap = 8;
-    const bw = (W - gap) / n;
-    const xs = i => i * (bw + gap);
-    const ys = v => H - 2 - Math.max(0.04, v) * (H - 4);
-    const bars = norm.map((v, i) => {
-      const y = ys(v);
-      return `<rect x="${xs(i).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.6, (H - 2) - y).toFixed(1)}" rx="2" fill="${colors[i]}"/>`;
-    }).join('');
-    const labelDivs = labels.map((l, i) =>
-      `<div style="flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#ADADA9;">${l}<br><span style="font-size:11px;font-weight:600;color:${INK};">${vals[i] != null ? vals[i].toFixed(1) + '%' : '–'}</span></div>`
-    ).join('');
-    return `
-      <div style="height:116px;position:relative;">
-        <div style="height:100%;">
-          <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" width="100%" height="100%" style="display:block;">${bars}</svg>
-        </div>
-      </div>
-      <div style="display:flex;gap:2px;margin-top:10px;">${labelDivs}</div>`;
-  }
-
-  // Noch keine Saisondaten: Monats-Platzhalter mit Hinweis
-  const isSummer = half === 'sommer';
-  const bars = months.map((m, i) => {
-    const h = isSummer ? [20, 45, 70, 60, 30][i] ?? 20 : [35, 40, 45, 42, 38, 30][i] ?? 30;
-    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
-      <div style="width:100%;height:${h}px;background:${color}22;border-radius:3px 3px 0 0;border-top:2px dashed ${color}44;"></div>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#ADADA9;">${m}</span>
-    </div>`;
-  }).join('');
-  const verfuegbarAb = (() => {
-    const ersteM = AW[uid]?.erste_messung;
-    if (!ersteM) return null;
-    const [y, mo] = ersteM.split('-').map(Number);
-    const MONATE = ['','Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
-    return (mo >= 5 && mo <= 9) ? `${MONATE[10]} ${y}` : `${MONATE[5]} ${y + 1}`;
-  })();
-  return `
-    <div style="display:flex;align-items:flex-end;gap:4px;height:90px;">${bars}</div>
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#ADADA9;margin-top:10px;">Noch keine Daten${verfuegbarAb ? ` – verfügbar ab ca. ${verfuegbarAb}` : ''}</div>
-    `;
-}
-
 // ── Filter / sort helpers ─────────────────────────────────────────────────
 function filteredVenues() {
   let list = VENUES.slice();
   if (S.filter === 'fav') list = list.filter(v => S.favs[v.uid]);
   else if (S.filter !== 'alle') list = list.filter(v => v.type === S.filter);
 
-  return list;
+  // Offene zuerst; danach gleiche Reihenfolge wie die Filter: Halle, Frei, See, Fluss
+  const ORDER = { halle: 0, frei: 1, see: 2, fluss: 3 };
+  const openRank = v => computeIsOpen(v.uid) ? 0 : 1;
+  return list.sort((a, b) => openRank(a) - openRank(b) || ORDER[a.type] - ORDER[b.type]);
 }
 
 function chipCounts() {
@@ -774,19 +1003,19 @@ function chipCounts() {
 function renderChips() {
   const counts = chipCounts();
   const chips = [
-    { key:'fav',   label:'★ Favorit', color: PURPLE },
-    { key:'alle',  label:'Alli',      color: INK    },
-    { key:'fluss', label:'Fluss',     color: PURPLE },
-    { key:'see',   label:'See',       color: INK    },
-    { key:'frei',  label:'Frei',      color: ORANGE },
-    { key:'halle', label:'Halle',     color: BLACK  },
+    // Kein «Alli»-Filter mehr: aktiven Filter nochmals antippen → alle anzeigen
+    { key:'halle', label:T().chip.halle, color: TYPE_COLOR.halle },
+    { key:'frei',  label:T().chip.frei,  color: TYPE_COLOR.frei  },
+    { key:'see',   label:T().chip.see,   color: TYPE_COLOR.see   },
+    { key:'fluss', label:T().chip.fluss, color: TYPE_COLOR.fluss },
+    { key:'fav',   label:T().chip.fav,   color: FAV },
   ];
   return chips.map(c => {
     const active = S.filter === c.key;
     const bg = active ? c.color : 'transparent';
-    const col = active ? '#fff' : c.color;
+    const col = active ? onColor(c.color) : c.color;
     return `<button class="chip" onclick="setFilter('${c.key}')"
-      style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;letter-spacing:.03em;padding:7px 15px;border-radius:999px;border:1.5px solid ${c.color};background:${bg};color:${col};display:inline-flex;align-items:center;gap:6px;white-space:nowrap;">
+      style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;letter-spacing:.03em;padding:7px 15px;border-radius:10px;border:1.5px solid ${c.color};background:${bg};color:${col};display:inline-flex;align-items:center;gap:6px;white-space:nowrap;">
       ${c.label}<span style="opacity:.6;">${counts[c.key]}</span>
     </button>`;
   }).join('');
@@ -795,25 +1024,24 @@ function renderChips() {
 
 // ── Tile gauge SVG (weiße Balken auf farbigem Hintergrund) ───────────────
 function tileGaugeSVG(uid, open) {
-  const dayType = dayTypeFor(todayWd());
-  const slots = slotsFor(uid, dayType);
+  const FG = open ? onRGB(TYPE_COLOR[VENUE_MAP[uid]?.type] || INK) : '255,255,255';
+  const dayType = typicalKey(uid, todayWd());
+  // Stundenwerte statt 15-Min-Slots → weniger, dafür breitere Balken
+  const slots = groupByHour(slotsFor(uid, dayType));
   if (!slots.length) return '<div style="height:34px;"></div>';
   const vals = slots.map(s => s.auslastung);
   const max = Math.max(...vals, 0.001);
   const norm = vals.map(v => v / max);
   const nowMin = nowHHMM();
-  const nowIdx = open ? slots.reduce((bi, s, i) =>
-    Math.abs(hhmm(s.zeit) - nowMin) < Math.abs(hhmm(slots[bi].zeit) - nowMin) ? i : bi, 0) : -1;
-  const n = norm.length;
-  const gap = n > 12 ? 0.3 : 0.7;
-  const bw = (100 / n) - gap;
-  const xs = i => i * (100 / n) + gap / 2;
+  const nowH   = Math.floor(nowMin / 60);
+  const nowIdx = open ? slots.findIndex(s => parseInt(s.zeit) === nowH) : -1;
+  const gap = 3;
   const bars = norm.map((v, i) => {
     const isNow = open && i === nowIdx;
     const h = Math.max(4, v * 100);
-    const fill = isNow ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.28)';
+    const fill = isNow ? 'rgba(' + FG + ',1)' : 'rgba(' + FG + ',0.28)';
     return `<div style="flex:1;height:${h.toFixed(1)}%;background:${fill};border-radius:2px 2px 0 0;position:relative;">
-      ${isNow ? `<div style="position:absolute;left:0;right:0;bottom:${(v*100).toFixed(1)}%;height:0;border-top:2px dotted rgba(255,255,255,.5);"></div>` : ''}
+      ${isNow ? `<div style="position:absolute;left:0;right:0;bottom:${(v*100).toFixed(1)}%;height:0;border-top:2px dotted rgba(${FG},.5);"></div>` : ''}
     </div>`;
   }).join('');
   return `<div style="display:flex;align-items:flex-end;gap:${gap}px;height:34px;">${bars}</div>`;
@@ -826,60 +1054,64 @@ function renderCard(v) {
   const noLive = !live;
   const fill = live?.currentfill;
   const liveTemp = live?.temperatureWater;
-  const hallePoolTemp = v.type === 'halle' ? HALLE_TEMPS[v.uid]?.[0]?.temp : null;
+  const hallePoolTemp = v.type === 'halle' ? mainPool(HALLE_TEMPS[v.uid])?.temp ?? null : null;
   const temp = (liveTemp != null && liveTemp !== '') ? liveTemp : null;
   const hasTemp = temp != null || hallePoolTemp != null;
-  const hasGuests  = live?.maxspace != null;
-  const guestStr   = fill != null ? numFmt(fill) : 'Keine Daten';
+  const sState = seasonState(v);
+  const offSeason = sState === 'before' || sState === 'after';
+  const hasGuests  = live?.maxspace != null && !offSeason;
+  const guestStr   = fill != null ? numFmt(fill) : T().noData;
   const inRevision = isInRevision(v.uid);
   const revision   = REVISIONEN[v.uid] || null;
   const closing = closingTime(v.uid);
   const hasHoursData = hoursForDay(v.uid, todayWd()) != null;
-  const statusLabel = inRevision
-    ? 'Revision'
-    : isOpen
-      ? (closing ? 'offen bis ' + closing : 'offen')
-      : (noLive && !hasHoursData ? '–' : (nextOpenTime(v.uid) || 'geschlossen'));
+  const statusLabel = (noLive && !hasHoursData && !sState && !inRevision) ? '–' : statusText(v.uid);
   const tempStr = temp != null ? parseFloat(temp) + '°' : hallePoolTemp != null ? hallePoolTemp + '°' : '–';
   const dev = devInfo(v.uid);
   const fav = !!S.favs[v.uid];
   const bg = isOpen ? (TYPE_COLOR[v.type] || INK) : '#4A4A4A';
   const opacity = isOpen ? 1 : 0.68;
   const gauge = tileGaugeSVG(v.uid, isOpen);
+  const FG = isOpen ? onRGB(TYPE_COLOR[v.type]) : '255,255,255';
 
   return `<div class="tile-card" onclick="openDetail('${v.uid}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')openDetail('${v.uid}')"
-    style="text-align:left;background:${bg};border:none;border-radius:22px;padding:16px 17px;cursor:pointer;width:100%;font:inherit;color:#fff;display:block;opacity:${opacity};box-shadow:0 2px 12px rgba(23,61,52,.10);">
+    style="text-align:left;background:${bg};border:none;border-radius:22px;padding:16px 17px;cursor:pointer;width:100%;font:inherit;color:rgb(${FG});display:flex;flex-direction:column;opacity:${opacity};box-shadow:0 2px 12px rgba(0,0,0,.10);">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;">
       <div style="min-width:0;">
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.8);font-weight:600;">${TYPE_LABEL[v.type]}</span>
-        <div style="font-family:'Outfit',sans-serif;font-size:19px;font-weight:600;letter-spacing:-.01em;margin-top:6px;line-height:1.15;color:#fff;">${v.name}</div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(${FG},.8);font-weight:600;">${T().type[v.type]}</span>
+        <div style="font-family:'Outfit',sans-serif;font-size:19px;font-weight:600;letter-spacing:-.01em;margin-top:6px;line-height:1.15;color:rgb(${FG});">${v.name}</div>
       </div>
-      <button onclick="event.stopPropagation();toggleFav('${v.uid}')" aria-label="Favorit"
-        style="font-size:19px;line-height:1;background:none;border:none;cursor:pointer;padding:2px;color:${fav ? '#fff' : 'rgba(255,255,255,.4)'};transition:color .15s;flex-shrink:0;margin-left:auto;">${fav ? '★' : '☆'}</button>
+      <button onclick="event.stopPropagation();toggleFav('${v.uid}')" aria-label="${T().favorite}"
+        style="font-size:19px;line-height:1;background:none;border:none;cursor:pointer;padding:2px;color:${fav ? 'rgb(' + FG + ')' : 'rgba(' + FG + ',.4)'};transition:color .15s;flex-shrink:0;margin-left:auto;">${fav ? '★' : '☆'}</button>
     </div>
-    ${inRevision || fill != null || hasGuests ? `
+    ${inRevision || (!offSeason && (fill != null || hasGuests)) ? `
     <div style="display:flex;align-items:baseline;gap:10px;margin-top:18px;">
       ${inRevision
-        ? `<div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;color:rgba(255,255,255,.55);line-height:1;font-size:22px;">Revision</div>`
-        : `<div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;color:${fill != null ? '#fff' : 'rgba(255,255,255,.55)'};line-height:1;font-size:${fill != null ? '40px' : '18px'};">${guestStr}</div>
-           ${fill != null ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.75);">Gäste jetzt</div>` : ''}`}
+        ? `<div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;color:rgba(${FG},.55);line-height:1;font-size:22px;">${T().revision}</div>`
+        : `<div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;color:${fill != null ? 'rgb(' + FG + ')' : 'rgba(' + FG + ',.55)'};line-height:1;font-size:${fill != null ? '40px' : '18px'};">${guestStr}</div>
+           ${fill != null ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(${FG},.75);">${T().guestsNow}</div>` : ''}`}
     </div>` : ''}
-    <div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;color:#fff;">
-      <i class="${isOpen ? 'pulse' : ''}" style="width:7px;height:7px;border-radius:50%;background:#fff;display:inline-block;flex-shrink:0;"></i>
-      ${statusLabel}<span style="color:rgba(255,255,255,.6);font-weight:500;"> · ${tempStr} Wasser</span>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;color:rgb(${FG});">
+      <i class="${isOpen ? 'pulse' : ''}" style="width:7px;height:7px;border-radius:50%;background:rgb(${FG});display:inline-block;flex-shrink:0;"></i>
+      ${statusLabel}<span style="color:rgba(${FG},.6);font-weight:500;"> · ${tempStr} ${T().water}</span>
     </div>
+    ${sState === 'in' ? `<div style="margin-top:4px;padding-left:15px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:rgba(${FG},.7);">${T().seasonUntil(fmtIsoShort(v.seasonTo))}</div>` : ''}
     ${inRevision && revision ? `
-    <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.22);">
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:rgba(255,255,255,.6);">${fmtRevDate(revision.von)} – ${fmtRevDate(revision.bis)}</div>
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(${FG},.22);">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:rgba(${FG},.6);">${fmtRevDate(revision.von)} – ${fmtRevDate(revision.bis)}</div>
     </div>` : !inRevision && hasGuests ? `
-    <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.22);">
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(${FG},.22);">
       <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;">
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.75);font-weight:700;">Auslastung</span>
-        <span style="display:inline-flex;align-items:center;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#fff;">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:rgba(${FG},.75);font-weight:700;">${T().occupancy}</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:rgb(${FG});">
           <span style="font-size:9px;line-height:1;">${dev.arrow}</span>${dev.short}
         </span>
       </div>
       <div style="margin-top:11px;">${gauge}</div>
+    </div>` : !inRevision ? `
+    <div style="flex:1;min-height:16px;"></div>
+    <div style="padding-top:14px;border-top:1px solid rgba(${FG},.22);">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:rgba(${FG},.6);line-height:1.5;">${offSeason ? T().seasonClosedNote(usualStartMonth(v)) : T().noGuestData}</div>
     </div>` : ''}
   </div>`;
 }
@@ -900,9 +1132,11 @@ function renderDetail() {
     ? (hallePools != null && hallePools.length > 0)
     : (temp != null && temp !== '');
   const displayTemp = isHalle
-    ? (hallePools ? hallePools[0].temp + '°' : '–')
+    ? (hallePools ? mainPool(hallePools).temp + '°' : '–')
     : (hasTemp ? parseFloat(temp) + '°' : '–');
-  const hasGuests = live?.maxspace != null;
+  const sState    = seasonState(v);
+  const offSeason = sState === 'before' || sState === 'after';
+  const hasGuests = live?.maxspace != null && !offSeason;
   const fav = !!S.favs[v.uid];
   const todayStr = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Zurich' });
   const relevantHinweise = (HINWEISE[v.uid] || []).filter(h => !h.bis || h.bis >= todayStr);
@@ -914,67 +1148,45 @@ function renderDetail() {
   const dataSeit = (() => {
     if (!ersteMessung) return null;
     const [y, mo, d] = ersteMessung.split('-').map(Number);
-    const MONATE = ['','Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
-    return `${d}. ${MONATE[mo]} ${y}`;
+    return T().fmtDate(d, T().months[mo - 1]) + ' ' + y;
   })();
   const typeColor = TYPE_COLOR[v.type];
   const statusColor = isOpen ? '#2A9D63' : META;
   const statusDot = isOpen ? '#2A9D63' : '#CFCFCC';
   const guestColor = isOpen ? BLACK : META;
 
-  // Period tabs — Winter nur für Ganzjahres-Badis
-  const isYearRound = v.season === 'Ganzjährig';
-  const periods = [
-    { key:'heute',  label:'Hüt',       color: PURPLE },
-    { key:'woche',  label:'Die Wuche', color: INK    },
-    { key:'sommer', label:'☀ Sommer',  color: ORANGE },
-    ...(isYearRound ? [{ key:'winter', label:'❄ Winter', color: BLACK }] : []),
-  ];
-  const periodTabs = periods.map(p => {
-    const active = S.period === p.key;
-    return `<button onclick="setPeriod('${p.key}')"
-      style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.02em;padding:9px 16px;border-radius:999px;border:${active ? 'none' : '1.5px solid ' + p.color};background:${active ? p.color : 'transparent'};color:${active ? '#fff' : p.color};cursor:pointer;flex-shrink:0;white-space:nowrap;transition:all .12s;">
-      ${p.label}
-    </button>`;
-  }).join('');
-
-  // Weekday tabs (only for "woche" period)
-  const wdEntries = [
-    {k:'mo',l:'Mäntig',s:'Mo'}, {k:'di',l:'Zistig',s:'Di'}, {k:'mi',l:'Mittwuch',s:'Mi'},
-    {k:'do',l:'Dunstig',s:'Do'}, {k:'fr',l:'Friitg',s:'Fr'}, {k:'sa',l:'Samstig',s:'Sa'}, {k:'so',l:'Suntig',s:'So'},
-  ];
+  // Wochentage immer sichtbar, heute vorausgewählt; Farbe nach Bad-Typ
+  const wdEntries = ['mo','di','mi','do','fr','sa','so'].map(k => ({ k, l: T().wdLong[k], s: T().wdShort[k], b: T().wdBtn[k] }));
   const weekdayTabs = wdEntries.map(w => {
-    const active = S.weekday === w.k;
-    return `<button onclick="setWeekday('${w.k}')"
-      style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.01em;padding:0 8px;height:34px;border-radius:999px;border:${active ? 'none' : '1.5px solid ' + INK};background:${active ? INK : 'transparent'};color:${active ? '#fff' : INK};cursor:pointer;flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:all .12s;min-width:0;">
-      ${w.l}
+    const active  = S.weekday === w.k;
+    const isToday = todayWd() === w.k;
+    // Mit Rahmen in der Typfarbe; heute mit vollem Rahmen, gewählter Tag gefüllt
+    return `<button class="wd-btn" onclick="setWeekday('${w.k}')" aria-pressed="${active}" title="${w.l}"
+      style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;padding:0;border-radius:7px;border:${active ? 'none' : '1.5px solid ' + (isToday ? typeColor : typeColor + '40')};background:${active ? typeColor : 'transparent'};color:${active ? onColor(typeColor) : typeColor};cursor:pointer;flex:1;min-width:0;text-align:center;transition:all .12s;">
+      ${w.b}
     </button>`;
   }).join('');
 
-// Chart controls (only for heute/woche) — drei Modi
-  const showChartControls = S.period === 'heute' || S.period === 'woche';
+  // Chart controls — drei Modi
   const chartModes = [
-    { mode: 'overview', label: 'Übersicht', active: !S.chartZoomed },
-    { mode: '1h',       label: '1 Std',     active: S.chartZoomed && S.chartRes === '1h' },
-    { mode: '15min',    label: '15 Min',    active: S.chartZoomed && S.chartRes === '15min' },
+    { mode: '15min',    label: `<span class="lbl-long">${T().chart15}</span><span class="lbl-short">${T().chart15Short}</span>`, active: S.chartZoomed && S.chartRes === '15min' },
+    { mode: '1h',       label: `<span class="lbl-long">${T().chart1h}</span><span class="lbl-short">${T().chart1hShort}</span>`, active: S.chartZoomed && S.chartRes === '1h' },
+    { mode: 'overview', label: T().chartOverview, active: !S.chartZoomed },
   ];
-  const chartControls = chartModes.map(({ mode, label, active }) =>
-    `<button onclick="setChartMode('${mode}')"
-      style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;padding:6px 14px;border-radius:999px;border:1.5px solid ${INK};background:${active ? INK : 'transparent'};color:${active ? '#fff' : INK};cursor:pointer;transition:all .12s;">
-      ${label}
-    </button>`
-  ).join('');
+  // Alle Switches (Sprache, Ansicht, Karte, Auflösung) teilen den Stil .sw / .sw-btn
+  const chartControls = `<div class="sw" role="radiogroup" aria-label="${T().resolution}">
+    ${chartModes.map(({ mode, label, active }) =>
+      `<button class="sw-btn${active ? ' on' : ''}" role="radio" aria-checked="${active}" onclick="setChartMode('${mode}')">${label}</button>`
+    ).join('')}
+  </div>`;
 
   // Chart
   let chart;
-  if (S.period === 'sommer' || S.period === 'winter') {
-    chart = seasonChart(v.uid, S.period, S.period === 'sommer' ? ORANGE : BLACK);
-  } else {
-    const chartDayType = S.period === 'heute' ? 'Heute' : dayTypeFor(S.weekday);
-    const chartColor = S.period === 'heute' ? PURPLE : INK;
-    const showFocus = S.period === 'heute' || S.weekday === todayWd();
-    const chartWd = S.period === 'heute' ? todayWd() : S.weekday;
-    chart = detailBarChart(v.uid, chartDayType, chartColor, S.chartZoomed, S.chartRes, showFocus, chartWd);
+  {
+    // Heute gewählt → Live-Verlauf; anderer Tag → Durchschnitt dieses Wochentags
+    const isTodaySel   = S.weekday === todayWd();
+    const chartDayType = isTodaySel ? 'Heute' : typicalKey(v.uid, S.weekday);
+    chart = detailBarChart(v.uid, chartDayType, typeColor, S.chartZoomed, S.chartRes, isTodaySel, S.weekday);
   }
 
 
@@ -1011,7 +1223,7 @@ function renderDetail() {
   // Halle: statische Becken-Liste — Name darf kürzen, Temp immer sichtbar
   const halleTempList = (hallePools || []).map(p =>
     `<div style="display:flex;align-items:center;gap:8px;padding:5px 10px;border-radius:8px;">
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:${INK};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1;">${p.name}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:${INK};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1;">${tr(p.name)}</span>
       <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${META};white-space:nowrap;flex-shrink:0;">${p.temp}°</span>
     </div>`
   ).join('');
@@ -1024,100 +1236,141 @@ function renderDetail() {
                isToday ? '#fff' : INK, isToday ? '#fff' : META);
   }).join('');
 
+  // Ausserhalb der Saison: Rückblick (Monate oder Wochen) statt Tagesgrafik
+  const aw      = AW[v.uid] || {};
+  const monate  = aw.monate || [];
+  const wochen  = aw.wochen || [];
+  const byWeek  = S.histRes === 'woche' && wochen.length;
+  const items   = byWeek
+    ? wochen.map(w => ({ label: T().kw(w.kw), top: Math.round(w.auslastung_avg) + '%', val: w.auslastung_avg }))
+    : monate.map(m => ({ label: T().monthsShort[parseInt(m.monat.slice(5)) - 1], top: numFmt(m.spitze_avg), sub: Math.round(m.auslastung_avg) + '%', val: m.spitze_avg }));
+  const maxVal  = Math.max(...items.map(i => i.val), 0.001);
+  const histBars = items.map(i => `
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:${byWeek ? 9 : 11}px;font-weight:700;color:${INK};white-space:nowrap;">${i.top}</div>
+      <div style="width:100%;height:${CHART_H - 60}px;display:flex;align-items:flex-end;">
+        <div style="width:100%;height:${Math.max(3, i.val / maxVal * 100).toFixed(1)}%;background:${AVG_ALPHA(typeColor)};border-radius:7px 7px 0 0;"></div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:${byWeek ? 8.5 : 10}px;color:#ADADA9;white-space:nowrap;">${i.label}</div>
+      ${i.sub ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:${META};">${i.sub}</div>` : ''}
+    </div>`).join('');
+  const reviewYear = (monate[0]?.monat || v.seasonTo || '').slice(0, 4);
+  const histSwitch = `<div class="sw" role="radiogroup">
+    ${[['monat', T().histMonths], ['woche', T().histWeeks]].map(([k, l]) =>
+      `<button class="sw-btn${(k === 'woche') === !!byWeek ? ' on' : ''}" role="radio" aria-checked="${(k === 'woche') === !!byWeek}" onclick="setHistRes('${k}')">${l}</button>`).join('')}
+  </div>`;
+  const offSeasonSection = `
+      <div style="margin-top:clamp(12px,3vw,16px);font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:${META};line-height:1.55;">${T().seasonClosedNote(usualStartMonth(v))}</div>
+      ${items.length ? `
+      <div style="margin-top:clamp(16px,3vw,22px);">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+          <div>
+            <div class="stat-lbl" style="margin:0;">${T().seasonReview(reviewYear)}</div>
+            ${dataSeit ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:${META};margin-top:4px;">${T().recordedSince(dataSeit, aw.messtage_echt ?? '–')}</div>` : ''}
+          </div>
+          ${wochen.length ? histSwitch : ''}
+        </div>
+        <div style="display:flex;gap:${byWeek ? 3 : 10}px;align-items:flex-end;margin-top:16px;">${histBars}</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#ADADA9;margin-top:10px;">${byWeek ? T().legendWeeks : T().legendMonths}</div>
+      </div>` : ''}`;
+
+  // Auslastung zuoberst — das Wichtigste
+  const chartSection = offSeason ? offSeasonSection : inRevision && revision ? `
+      <div style="margin-top:clamp(14px,3vw,20px);padding:clamp(20px,4vw,28px);background:#F4F4F4;border-radius:20px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:${META};font-weight:600;">${T().revision}</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:clamp(17px,3vw,22px);font-weight:600;color:${INK};">${T().closedFromTo(fmtRevDate(revision.von), fmtRevDate(revision.bis))}</div>
+      </div>` : hasGuests ? `<!-- Chart section -->
+      <div style="margin-top:clamp(14px,3vw,20px);">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <div style="display:flex;gap:3px;flex:1 1 180px;min-width:0;">${weekdayTabs}</div>
+          ${chartControls}
+        </div>
+        <div style="margin-top:clamp(12px,3vw,20px);">${chart}</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:14px;height:14px;color:#ADADA9;margin-top:8px;padding-left:2px;">${dataSeit ? T().dataSince(dataSeit) : ''}</div>
+      </div>` : `
+      <div style="margin-top:clamp(12px,3vw,16px);font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:${META};line-height:1.5;">${T().noGuestData}</div>`;
+
   return `
   <div class="modal-scrim" onclick="closeDetail(event)" style="${S.chartZoomed ? 'overflow-y:hidden;' : ''}">
     <div class="modal-sheet" onclick="event.stopPropagation()" style="${S.chartZoomed ? 'overflow-y:hidden;' : ''}">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;">
-        <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;">
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:${META};font-weight:600;">${TYPE_LABEL[v.type]}</div>
-          <span style="display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;color:${statusColor};">
-            <i style="width:6px;height:6px;border-radius:50%;background:${statusDot};display:inline-block;"></i>${isInRevision(v.uid) ? 'Revision' : isOpen ? (closingTime(v.uid) ? 'offen bis ' + closingTime(v.uid) : 'offen') : (nextOpenTime(v.uid) || 'geschlossen')}
-            <span style="color:${META};">· ${v.season}</span>
-          </span>
+        <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+          <h1 style="font-family:'Outfit',sans-serif;font-size:clamp(20px,3.4vw,26px);font-weight:600;letter-spacing:-.01em;line-height:1.1;color:${INK};">${v.name}</h1>
+          <button onclick="toggleFav('${v.uid}')" aria-label="${T().favorite}"
+            style="font-size:20px;line-height:1;background:none;border:none;cursor:pointer;padding:2px;color:${fav ? FAV : '#CFCFCC'};transition:color .15s;flex-shrink:0;">${fav ? '★' : '☆'}</button>
         </div>
-        <button onclick="closeDetail(event)" style="font-family:'IBM Plex Mono',monospace;font-size:20px;line-height:1;font-weight:600;color:${INK};background:none;border:none;cursor:pointer;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">×</button>
+        <button onclick="closeDetail(event)" aria-label="${T().close}" style="font-family:'IBM Plex Mono',monospace;font-size:20px;line-height:1;font-weight:600;color:${INK};background:none;border:none;cursor:pointer;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">×</button>
       </div>
-
-      <div style="display:flex;align-items:baseline;gap:10px;margin-top:8px;flex-wrap:wrap;">
-        <h1 style="font-family:'Outfit',sans-serif;font-size:clamp(24px,4vw,36px);font-weight:600;letter-spacing:-.01em;line-height:1.05;color:${INK};">${v.name}</h1>
-        <button onclick="toggleFav('${v.uid}')" aria-label="Favorit"
-          style="font-size:20px;line-height:1;background:none;border:none;cursor:pointer;padding:2px;color:${fav ? PURPLE : '#CFCFCC'};transition:color .15s;flex-shrink:0;">${fav ? '★' : '☆'}</button>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;color:${statusColor};">
+        <i style="width:6px;height:6px;border-radius:50%;background:${statusDot};display:inline-block;"></i>${statusText(v.uid)}
+        <span style="color:${META};">· ${T().season}: ${seasonLabel(v)}</span>
       </div>
-      ${v.note ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:${META};margin-top:6px;">${v.note}</div>` : ''}
-      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.address)}" target="_blank" rel="noopener"
-        style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:${META};margin-top:6px;display:inline-block;text-decoration:underline;text-underline-offset:2px;text-decoration-color:${META}44;">${v.address}</a>
+      ${v.note ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:${META};margin-top:6px;">${tr(v.note)}</div>` : ''}
 
-      <!-- Stat cards -->
-      <div style="margin-top:clamp(16px,4vw,24px);display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;">
-        <!-- Gäste (nur wenn Zählung vorhanden) — immer eigene Zeile -->
-        ${fill != null || hasGuests ? `
-        <div class="stat-card" id="sc-guest" style="cursor:default;flex:1 1 100%;">
-          <div>
+      ${chartSection}
+
+      <!-- Stat cards: Gäste, Temperatur, Öffnungszeiten auf einer Linie -->
+      <div class="stat-row" style="margin-top:clamp(16px,4vw,24px);">
+        ${!offSeason && (fill != null || hasGuests) ? `
+        <div class="stat-card" id="sc-guest" style="cursor:default;">
+          <div style="flex:1;display:flex;align-items:flex-end;">
             ${fill != null
-              ? `<div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:${guestColor};font-size:clamp(32px,8vw,48px);">${numFmt(fill)}</div>`
-              : `<div style="font-family:'Outfit',sans-serif;font-weight:500;letter-spacing:-.01em;line-height:1.1;color:${META};font-size:clamp(16px,4vw,22px);">Keine Daten</div>`
-            }
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">Gäste jetzt</div>
+              ? `<div class="stat-val" style="color:${guestColor};">${numFmt(fill)}</div>`
+              : `<div class="stat-val hours" style="color:${META};font-weight:500;">${T().noData}</div>`}
           </div>
+          <div class="stat-lbl"><span class="lbl-long">${T().guestsNow}</span><span class="lbl-short">${T().guestsShort}</span></div>
         </div>` : ''}
 
-        <!-- Temperatur + Öffnungszeiten: immer eigene Zeile, nebeneinander -->
-        <div style="display:flex;gap:10px;flex:1 1 100%;align-items:stretch;">
-          ${isHalle && !hasTemp ? '' : `
-          <div class="stat-card" onclick="${hasTemp ? "toggleStat('temp')" : ''}" id="sc-temp" style="cursor:${hasTemp ? 'pointer' : 'default'};flex:1;">
-            <div>
-              <div style="min-height:clamp(32px,8vw,48px);display:flex;align-items:flex-end;">
-                <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.85;color:${hasTemp ? BLACK : META};font-size:clamp(32px,8vw,48px);">${displayTemp}</div>
-              </div>
-              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">${isHalle ? 'Beckentemperatur' : 'Wassertemperatur'}</div>
-            </div>
-            ${S.tempOpen && hasTemp ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">${isHalle ? halleTempList : tempList}</div>` : ''}
-          </div>`}
-
-          <div class="stat-card" onclick="toggleStat('hours')" id="sc-hours" style="flex:1;">
-            <div>
-              <div style="min-height:clamp(32px,8vw,48px);display:flex;align-items:flex-end;">
-                <div style="font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:.95;color:${BLACK};font-size:clamp(18px,4vw,26px);white-space:nowrap;">${todayHoursDisplay}</div>
-              </div>
-              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:${META};font-weight:700;margin-top:10px;">Öffnigszite</div>
-            </div>
-            ${S.hoursOpen ? `
-              <div style="margin-top:14px;padding-top:12px;border-top:1px solid #E2E2E0;display:flex;flex-direction:column;gap:2px;">${hoursList}</div>
-              ${relevantHinweise.length ? `
-              <div style="margin-top:10px;padding-top:10px;border-top:1px solid #E2E2E0;">
-                <button onclick="event.stopPropagation();toggleHinweise()"
-                  style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.02em;width:100%;text-align:left;padding:8px 0;background:none;border:none;color:${INK};cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:6px;">
-                  Besondere Öffnungszeiten &amp; Hinweise
-                  <span style="font-size:9px;flex-shrink:0;">${S.hinweiseOpen ? '▴' : '▾'}</span>
-                </button>
-                ${S.hinweiseOpen ? `<div style="margin-top:6px;display:flex;flex-direction:column;gap:6px;">${relevantHinweise.map(renderHinweis).join('')}</div>` : ''}
-              </div>` : ''}
-            ` : ''}
+        ${isHalle && !hasTemp ? '' : `
+        <div class="stat-card" onclick="${hasTemp ? "toggleStat('temp')" : ''}" id="sc-temp" style="cursor:${hasTemp ? 'pointer' : 'default'};${S.tempOpen && hasTemp ? 'background:#ECECEC;' : ''}">
+          <div style="flex:1;display:flex;align-items:flex-end;">
+            <div class="stat-val" style="color:${hasTemp ? BLACK : META};">${displayTemp}</div>
           </div>
-        </div>
+          <div class="stat-lbl"><span class="lbl-long">${isHalle ? T().poolTemp : T().waterTemp}</span><span class="lbl-short">${isHalle ? T().poolShort : T().waterShort}</span></div>
+          ${hasTemp ? `<span class="chev${S.tempOpen ? ' open' : ''}" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 10 10"><path d="M2 3.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>` : ''}
+        </div>`}
+
+        ${offSeason ? '' : `<div class="stat-card" onclick="toggleStat('hours')" id="sc-hours" style="${S.hoursOpen ? 'background:#ECECEC;' : ''}">
+          <div style="flex:1;display:flex;align-items:flex-end;">
+            <div class="stat-val hours" style="color:${BLACK};">${String(todayHoursDisplay).replace('–', '–<wbr>')}</div>
+          </div>
+          <div class="stat-lbl">${T().hours}</div>
+          <span class="chev${S.hoursOpen ? ' open' : ''}" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 10 10"><path d="M2 3.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>`}
       </div>
 
-      ${inRevision && revision ? `
-      <div style="margin-top:clamp(18px,4vw,28px);padding:clamp(20px,4vw,28px);background:#F4F4F4;border-radius:20px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;">
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:${META};font-weight:600;">Revision</div>
-        <div style="font-family:'Outfit',sans-serif;font-size:clamp(17px,3vw,22px);font-weight:600;color:${INK};">Geschlossen vom ${fmtRevDate(revision.von)} bis ${fmtRevDate(revision.bis)}</div>
-      </div>` : hasGuests ? `<!-- Chart section -->
-      <div style="margin-top:clamp(18px,4vw,28px);">
-        <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;letter-spacing:-.005em;color:${INK};text-transform:uppercase;">Wie voll isch es</div>
-        <div style="display:flex;gap:6px;margin-top:clamp(10px,3vw,16px);flex-wrap:wrap;align-items:center;justify-content:space-between;">
-          <div style="display:flex;gap:6px;">${periodTabs}</div>
-          ${showChartControls ? `<div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;">${chartControls}</div>` : ''}
-        </div>
-        ${S.period === 'woche' ? `<div style="display:flex;gap:4px;margin-top:12px;">${weekdayTabs}</div>` : ''}
-        <div style="margin-top:clamp(12px,3vw,20px);">${chart}</div>
-        ${dataSeit ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#ADADA9;margin-top:8px;padding-left:2px;">Daten seit ${dataSeit}</div>` : ''}
+      ${(S.tempOpen && hasTemp) || (S.hoursOpen && !offSeason) ? `
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+        ${S.tempOpen && hasTemp ? `
+        <div style="flex:1 1 220px;background:#F4F4F4;border-radius:10px;padding:12px 10px;">
+          <div class="stat-lbl" style="margin:0 10px 6px;">${isHalle ? T().poolTemp : T().waterTemp}</div>
+          <div style="display:flex;flex-direction:column;gap:2px;">${isHalle ? halleTempList : tempList}</div>
+        </div>` : ''}
+        ${S.hoursOpen && !offSeason ? `
+        <div style="flex:1 1 220px;background:#F4F4F4;border-radius:10px;padding:12px 10px;">
+          <div class="stat-lbl" style="margin:0 10px 6px;">${T().hours}</div>
+          <div style="display:flex;flex-direction:column;gap:2px;">${hoursList}</div>
+          ${hoursPeriod(v, todayISO())?.schoenwetter_ab ? `<div style="margin:8px 10px 0;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:${META};line-height:1.5;">${T().fairWeather(hoursPeriod(v, todayISO()).schoenwetter_ab)}</div>` : ''}
+          ${relevantHinweise.length ? `
+          <div style="margin:10px 10px 0;padding-top:10px;border-top:1px solid #E2E2E0;">
+            <button onclick="event.stopPropagation();toggleHinweise()"
+              style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.02em;width:100%;text-align:left;padding:8px 0;background:none;border:none;color:${INK};cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:6px;">
+              ${T().specialHours}
+              <span style="font-size:9px;flex-shrink:0;">${S.hinweiseOpen ? '▴' : '▾'}</span>
+            </button>
+            ${S.hinweiseOpen ? `<div style="margin-top:6px;display:flex;flex-direction:column;gap:6px;">${relevantHinweise.map(renderHinweis).join('')}</div>` : ''}
+          </div>` : ''}
+        </div>` : ''}
       </div>` : ''}
 
       <div style="margin-top:clamp(20px,4vw,32px);padding-top:14px;border-top:1px solid #E8E8E6;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;">
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#ADADA9;line-height:1.5;max-width:480px;">Inoffizielle Seite — Angaben ohne Gewähr, können sich kurzfristig ändern.</div>
+        <div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
+          <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.address)}" target="_blank" rel="noopener"
+            style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:${META};text-decoration:underline;text-underline-offset:2px;text-decoration-color:${META}44;">📍 ${v.address}</a>
+        </div>
         ${v.officialUrl ? `<a href="${v.officialUrl}" target="_blank" rel="noopener"
-          style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:${META};text-decoration:underline;text-underline-offset:2px;white-space:nowrap;flex-shrink:0;">
-          Offizielle Webseite ↗
+          style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.04em;font-weight:600;color:${INK};text-decoration:underline;text-underline-offset:2px;white-space:nowrap;flex-shrink:0;">
+          ${T().officialSite}
         </a>` : ''}
       </div>
     </div>
@@ -1133,13 +1386,13 @@ function render() {
   const list = filteredVenues();
   const liveTs = LIVE?.timestamp;
   const d = new Date();
-  const dateLabel = d.toLocaleDateString('de-CH', { weekday: 'long', day: 'numeric', month: 'long' });
-  const timeLabel = liveTs ? liveTs.slice(11, 16) : d.toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' });
+  const dateLabel = d.toLocaleDateString(T().dateLocale, { weekday: 'long', day: 'numeric', month: 'long' });
+  const timeLabel = liveTs ? liveTs.slice(11, 16) : d.toLocaleTimeString(T().dateLocale, { hour: '2-digit', minute: '2-digit' });
   let ageLabel = '';
   if (liveTs) {
     const liveDate = new Date(liveTs.replace(' ', 'T') + '+02:00');
     const ageMin = Math.round((d - liveDate) / 60000);
-    if (ageMin >= 1) ageLabel = ` · vor ${ageMin} Min`;
+    if (ageMin >= 1) ageLabel = T().ageMin(ageMin);
   }
 
   const cards = list.map(renderCard).join('');
@@ -1148,31 +1401,34 @@ function render() {
   const html = `
     <div style="max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:22px;">
 
-      <div>
-        <h1 style="font-family:'Outfit',sans-serif;font-size:clamp(28px,4vw,40px);font-weight:600;letter-spacing:-.01em;line-height:.95;color:${INK};">Wasserziit</h1>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:${META};margin-top:8px;letter-spacing:.03em;">
-          Stand ${dateLabel}${liveTs ? ', ' + timeLabel + ' Uhr' + ageLabel : ''}
+      <section style="background:#FFFFFF;border-radius:28px;padding:22px;box-shadow:0 4px 22px rgba(0,0,0,.08);display:flex;flex-direction:column;gap:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+          <div>
+            <h1 style="font-family:'Outfit',sans-serif;font-size:clamp(28px,4vw,40px);font-weight:600;letter-spacing:-.01em;line-height:.95;color:${BLACK};">Wasserziit</h1>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:${META};margin-top:8px;letter-spacing:.03em;">
+              ${T().stand(dateLabel, liveTs ? timeLabel : '', ageLabel)}
+            </div>
+          </div>
+          <!-- Sprache: bewusst dezent, nur Text -->
+          <div role="radiogroup" aria-label="Sprache / Language" style="flex-shrink:0;display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.06em;color:#CFCFCC;">
+            ${['de','en'].map(l => `<button role="radio" aria-checked="${LANG === l}" onclick="setLang('${l}')"
+              style="font:inherit;padding:4px 0;border:none;background:none;cursor:pointer;color:${LANG === l ? INK : META};font-weight:${LANG === l ? 700 : 500};">${l.toUpperCase()}</button>`).join('<span aria-hidden="true">/</span>')}
+          </div>
         </div>
-      </div>
 
-      <section style="background:#FFFFFF;border-radius:28px;padding:22px;box-shadow:0 4px 22px rgba(23,61,52,.08);display:flex;flex-direction:column;gap:16px;">
         <div style="display:flex;gap:8px;align-items:flex-start;">
           <div style="display:flex;gap:6px;flex-wrap:wrap;flex:1;">
             ${renderChips()}
           </div>
-          <div style="flex-shrink:0;display:inline-flex;align-items:center;gap:3px;background:#000;border-radius:999px;padding:4px;">
-            <button onclick="setViewMode('cards')" title="Kacheln"
-              style="width:27px;height:27px;border-radius:999px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;
-                     background:${S.viewMode==='cards'?'#fff':'transparent'};color:${S.viewMode==='cards'?'#000':'rgba(255,255,255,.65)'};">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <div class="sw" role="radiogroup">
+            <button class="sw-btn${S.viewMode==='cards' ? ' on' : ''}" role="radio" aria-checked="${S.viewMode==='cards'}" onclick="setViewMode('cards')" title="${T().tiles}" aria-label="${T().tiles}">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
                 <rect x="1" y="1" width="6" height="6" rx="1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2"/>
                 <rect x="1" y="9" width="6" height="6" rx="1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2"/>
               </svg>
             </button>
-            <button onclick="setViewMode('map')" title="Karte"
-              style="width:27px;height:27px;border-radius:999px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;
-                     background:${S.viewMode==='map'?'#fff':'transparent'};color:${S.viewMode==='map'?'#000':'rgba(255,255,255,.65)'};">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+            <button class="sw-btn${S.viewMode==='map' ? ' on' : ''}" role="radio" aria-checked="${S.viewMode==='map'}" onclick="setViewMode('map')" title="${T().map}" aria-label="${T().map}">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M8 1.5a4 4 0 0 1 4 4c0 2.8-4 9-4 9S4 8.3 4 5.5a4 4 0 0 1 4-4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
               </svg>
             </button>
@@ -1180,46 +1436,41 @@ function render() {
         </div>
 
         <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:${META};">
-          ${list.length} Badis · ${list.filter(v => computeIsOpen(v.uid)).length} offen
+          ${T().countLine(list.length, list.filter(v => computeIsOpen(v.uid)).length)}
         </div>
 
         ${S.viewMode === 'map' ? `
           <div style="position:relative;">
             <div id="map-slot" style="width:100%;height:clamp(400px,58vh,580px);border-radius:20px;background:#DEDEDE;"></div>
-            <div style="position:absolute;top:12px;right:12px;z-index:1000;display:inline-flex;align-items:center;gap:3px;background:#000;border-radius:999px;padding:4px;">
-              <button data-basemap="gray" onclick="setMapBasemap('gray')"
-                style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.03em;padding:5px 13px;border-radius:999px;border:none;cursor:pointer;
-                       background:${_mapBasemap==='gray'?'#fff':'transparent'};color:${_mapBasemap==='gray'?'#000':'#fff'};">Hell</button>
-              <button data-basemap="dark" onclick="setMapBasemap('dark')"
-                style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.03em;padding:5px 13px;border-radius:999px;border:none;cursor:pointer;
-                       background:${_mapBasemap==='dark'?'#fff':'transparent'};color:${_mapBasemap==='dark'?'#000':'#fff'};">Dunkel</button>
+            <div class="sw" role="radiogroup" style="position:absolute;top:12px;right:12px;z-index:1000;box-shadow:0 1px 4px rgba(0,0,0,.2);">
+              ${['gray','dark'].map(k => `<button class="sw-btn${_mapBasemap === k ? ' on' : ''}" data-basemap="${k}" role="radio" aria-checked="${_mapBasemap === k}" onclick="setMapBasemap('${k}')">${k === 'gray' ? T().light : T().dark}</button>`).join('')}
             </div>
           </div>` : isEmpty ? `
           <div style="padding:44px 10px 54px;text-align:center;">
-            <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:600;color:${INK};">Keni Badis gfunde</div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:${META};margin-top:10px;line-height:1.6;">Probier en andere Filter ode füeg Favoriten hinzue.</div>
+            <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:600;color:${INK};">${T().emptyTitle}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:${META};margin-top:10px;line-height:1.6;">${T().emptyHint}</div>
           </div>` : `
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));grid-auto-rows:1fr;gap:12px;"><!-- alle Kacheln gleich hoch -->
             ${cards}
           </div>`}
       </section>
 
-      <footer style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding-top:14px;">
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.04em;color:${META};line-height:1.7;max-width:640px;">
-          <div>Wassertemperatur &amp; Status — Sportamt Stadt Zürich</div>
-          <div style="margin-top:4px;">Besucherzahlen — Crowdmonitor, badi-public.crowdmonitor.ch:9591/api</div>
-          <div style="margin-top:4px;">Durchschnittliche Auslastung selber erhoben &amp; berechnet aus gesammelten Live-Daten, nicht offiziell.</div>
-          <div style="margin-top:4px;">Privates, nicht-kommerzielles Projekt.</div>
-          <div style="margin-top:4px;">Kontakt: Nadia Westermann · <a href="mailto:nadia.west@hispeed.ch" style="color:${META};text-decoration:underline;text-underline-offset:2px;">nadia.west@hispeed.ch</a></div>
+      <footer style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;padding-top:14px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.04em;">
+        <span style="color:${META};">© ${new Date().getFullYear()} Nadia Westermann</span>
+        ${[['impressum', "openLegal('impressum')"], ['datenschutz', "openLegal('datenschutz')"], ['cookies', 'openCookieSettings()']].map(([k, fn]) =>
+          `<button onclick="${fn}" style="font:inherit;color:${INK};font-weight:600;background:none;border:none;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">${T().legalLinks[k]}</button>`).join('')}
+        <button onclick="openLegal('feedback')" style="font:inherit;color:${INK};font-weight:600;background:none;border:none;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">${T().feedback}</button>
+        <div style="margin-left:auto;display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
+          <span style="color:${META};">Stadt Zürich:</span>
+          ${[['hallenbaeder', T().cityIndoor], ['sommerbaeder', T().citySummer]].map(([slug, label]) =>
+            `<a href="https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/${slug}.html" target="_blank" rel="noopener"
+              style="color:${INK};font-weight:600;text-decoration:underline;text-underline-offset:2px;white-space:nowrap;">${label} ↗</a>`).join('')}
         </div>
-        <a href="https://www.stadt-zuerich.ch/stzh/bathdatadownload" target="_blank" rel="noopener"
-          style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:${INK};text-decoration:underline;text-underline-offset:3px;white-space:nowrap;flex-shrink:0;">
-          stadt-zuerich.ch ↗
-        </a>
       </footer>
     </div>
 
     ${S.currentUid ? renderDetail() : ''}
+    ${S.legal ? renderLegal() : ''}
   `;
 
   // Scroll-Position vor Neuaufbau sichern (nur wenn kein expliziter Reset gewünscht)
@@ -1273,23 +1524,12 @@ function render() {
   }
 
 
-  // Temperatur- und Öffnungszeiten-Kachel auf gleiche Höhe bringen
-  setTimeout(() => {
-    const tempEl  = document.getElementById('sc-temp');
-    const hoursEl = document.getElementById('sc-hours');
-    if (!tempEl || !hoursEl) return;
-    tempEl.style.minHeight  = '';
-    hoursEl.style.minHeight = '';
-    const h = Math.max(tempEl.offsetHeight, hoursEl.offsetHeight);
-    tempEl.style.minHeight  = h + 'px';
-    hoursEl.style.minHeight = h + 'px';
-  }, 0);
 }
 
 // ── Actions ────────────────────────────────────────────────────────────────
-function setFilter(f)     { S.filter = f; render(); }
-function setPeriod(p)     { S.period = p; render(); }
+function setFilter(f)     { S.filter = S.filter === f ? 'alle' : f; render(); }
 function setWeekday(w)    { S.weekday = w; render(); }
+function setHistRes(r)    { S.histRes = r; render(); }
 function setChartRes(res) { S.chartRes = res; render(); }
 function toggleChartZoom(){ S.chartZoomed = !S.chartZoomed; render(); }
 function toggleHinweise() { S.hinweiseOpen = !S.hinweiseOpen; render(); }
@@ -1307,12 +1547,48 @@ function openDetail(uid) {
   S.tempOpen = false;
   S.hoursOpen = false;
   S.hinweiseOpen = false;
-  S.period = 'heute';
+  S.weekday = todayWd();
   S.chartZoomed = false;
   S.chartRes = '15min';
   document.body.style.overflow = 'hidden';
   render();
   document.querySelector('.modal-scrim')?.scrollTo(0, 0);
+}
+
+// ── Impressum / Datenschutz ───────────────────────────────────────────────
+function renderLegal() {
+  const L = S.legal === 'feedback' ? { title: T().feedback, sections: [] } : T().legal[S.legal];
+  const feedbackBody = S.legal === 'feedback' ? `
+    <div style="margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.65;color:${INK};">${T().feedbackText}</div>
+    <div style="margin-top:20px;display:flex;flex-wrap:wrap;align-items:center;gap:12px;">
+      <a href="mailto:nadia.west@hispeed.ch?subject=${encodeURIComponent(T().feedbackSubject)}"
+        style="display:inline-flex;align-items:center;height:38px;padding:0 18px;border-radius:10px;background:#000;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.03em;text-decoration:none;">${T().feedbackBtn}</a>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:${META};">nadia.west@hispeed.ch</span>
+    </div>` : '';
+  const sections = L.sections.map(([h, body]) => `
+    <div style="margin-top:18px;">
+      <div class="stat-lbl" style="margin:0 0 6px;">${h}</div>
+      <div class="legal-body" style="font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.65;color:${INK};">${body}</div>
+    </div>`).join('');
+  return `
+  <div class="modal-scrim" onclick="closeLegal()">
+    <div class="modal-sheet" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-label="${L.title}">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;">
+        <h2 style="font-family:'Outfit',sans-serif;font-size:clamp(20px,3.4vw,26px);font-weight:600;letter-spacing:-.01em;color:${INK};">${L.title}</h2>
+        <button onclick="closeLegal()" aria-label="${T().close}" style="font-family:'IBM Plex Mono',monospace;font-size:20px;line-height:1;font-weight:600;color:${INK};background:none;border:none;cursor:pointer;width:38px;height:38px;flex-shrink:0;">×</button>
+      </div>
+      ${sections}${feedbackBody}
+    </div>
+  </div>`;
+}
+
+function openLegal(which) { S.legal = which; document.body.style.overflow = 'hidden'; render(); document.querySelector('.modal-scrim')?.scrollTo(0, 0); }
+function closeLegal()     { S.legal = null; document.body.style.overflow = ''; render(); }
+
+// Cookie-Banner erneut zeigen, damit man die Einwilligung ändern kann
+function openCookieSettings() {
+  const b = document.getElementById('cookie-banner');
+  if (b) b.style.display = 'flex';
 }
 
 function closeDetail(e) {
@@ -1330,23 +1606,7 @@ function toggleFav(uid) {
 }
 
 function toggleStat(which) {
-  // Paired expand: guest and temp expand together if in same row
-  const guestEl = document.getElementById('sc-guest');
-  const tempEl  = document.getElementById('sc-temp');
-  const hoursEl = document.getElementById('sc-hours');
-
-  let group = [which];
-  try {
-    const els = { guest: guestEl, temp: tempEl, hours: hoursEl };
-    const clickedEl = els[which];
-    if (clickedEl) {
-      const clickedTop = Math.round(clickedEl.getBoundingClientRect().top);
-      group = Object.keys(els).filter(k => els[k] && Math.round(els[k].getBoundingClientRect().top) === clickedTop);
-    }
-  } catch(e) {}
-
-  const next = !S[which + 'Open'];
-  group.forEach(k => { S[k + 'Open'] = next; });
+  S[which + 'Open'] = !S[which + 'Open'];
   render();
 }
 
@@ -1381,7 +1641,7 @@ function parseLive(raw) {
 
 const MAP_BASEMAPS = {
   gray: { url:'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', attr:'Esri, HERE, Garmin' },
-  dark: { url:'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',                                                attr:'© OpenStreetMap, © CARTO', sub:'abcd', cls:'dc-dark-soft' },
+  dark: { url:'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',  attr:'Esri, HERE, Garmin' },
 };
 
 function getMapEl() {
@@ -1411,8 +1671,8 @@ function setMapBasemap(key) {
   const btns = document.querySelectorAll('[data-basemap]');
   btns.forEach(btn => {
     const active = btn.dataset.basemap === key;
-    btn.style.background = active ? '#fff' : 'transparent';
-    btn.style.color       = active ? '#000' : '#fff';
+    btn.classList.toggle('on', active);
+    btn.setAttribute('aria-checked', active);
   });
 }
 
@@ -1566,7 +1826,6 @@ async function fetchTemperaturenLive() {
 }
 
 // ── Live-Daten: persistente WebSocket-Verbindung ───────────────────────────
-let _temps      = { byUid: {}, byName: {} };
 let _lastWsData = null;
 let _ws         = null;
 let _wsTimer    = null;
@@ -1712,16 +1971,20 @@ Promise.all([
 });
 </script>
 
-<div id="cookie-banner" style="position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#173D34;color:#fff;padding:16px 20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;line-height:1.5;">
-  <p style="margin:0;max-width:560px;">Diese Seite verwendet Google Analytics, um Besucherzahlen zu messen. Deine Daten werden nur mit deiner Einwilligung erhoben.</p>
-  <div style="display:flex;gap:8px;flex-shrink:0;">
-    <button id="cookie-decline" style="border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:8px 18px;font-size:13px;cursor:pointer;font-family:inherit;background:transparent;color:#fff;">Ablehnen</button>
-    <button id="cookie-accept" style="border:none;border-radius:20px;padding:8px 18px;font-size:13px;cursor:pointer;font-family:inherit;background:#fff;color:#173D34;font-weight:600;">Akzeptieren</button>
+<div id="cookie-banner" role="dialog" aria-modal="true" aria-labelledby="cookie-title" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.45);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#000;color:#fff;border-radius:28px;padding:clamp(22px,5vw,30px);max-width:420px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.25);font-family:'IBM Plex Mono',monospace;">
+    <div id="cookie-title" style="font-family:'Outfit',sans-serif;font-size:22px;font-weight:600;letter-spacing:-.01em;line-height:1.1;">Cookies</div>
+    <p id="cookie-text" style="margin:12px 0 0;font-size:12.5px;line-height:1.6;color:rgba(255,255,255,.88);">Diese Seite verwendet Google Analytics, um Besucherzahlen zu messen. Deine Daten werden nur mit deiner Einwilligung erhoben.</p>
+    <div style="display:flex;gap:8px;margin-top:22px;">
+      <button id="cookie-decline" style="flex:1;border:1.5px solid rgba(255,255,255,.7);border-radius:999px;padding:11px 16px;font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.03em;cursor:pointer;background:transparent;color:#fff;">Ablehnen</button>
+      <button id="cookie-accept" style="flex:1;border:none;border-radius:999px;padding:11px 16px;font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.03em;cursor:pointer;background:#fff;color:#000;">Akzeptieren</button>
+    </div>
   </div>
 </div>
 <script>
   (function () {
     var banner = document.getElementById('cookie-banner');
+    applyStaticLang();
     var consent = localStorage.getItem('cookie_consent');
     if (consent === 'accepted' || consent === 'declined') banner.style.display = 'none';
     document.getElementById('cookie-accept').addEventListener('click', function () {
@@ -1731,6 +1994,15 @@ Promise.all([
     });
     document.getElementById('cookie-decline').addEventListener('click', function () {
       localStorage.setItem('cookie_consent', 'declined');
+      gtag('consent', 'update', { 'analytics_storage': 'denied' });
+      // bereits gesetzte Google-Analytics-Cookies entfernen
+      document.cookie.split(';').map(function (c) { return c.split('=')[0].trim(); })
+        .filter(function (n) { return n === '_ga' || n.indexOf('_ga_') === 0; })
+        .forEach(function (n) {
+          document.cookie = n + '=; Max-Age=0; path=/';
+          document.cookie = n + '=; Max-Age=0; path=/; domain=' + location.hostname.replace(/^www\./, '');
+          document.cookie = n + '=; Max-Age=0; path=/; domain=.' + location.hostname.replace(/^www\./, '');
+        });
       banner.style.display = 'none';
     });
   })();

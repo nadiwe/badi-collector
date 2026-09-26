@@ -232,8 +232,10 @@
         "typ": "api"
       },
       "saison_2026": {
-        "wert": "9. Mai – ca. 15. September",
-        "quelle": "https://www.stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "wert": "9. Mai – 20. September",
+        "von": "2026-05-09",
+        "bis": "2026-09-20",
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/allenmoos.html",
         "typ": "manuell",
         "pruefung": "jährlich"
       },
@@ -244,6 +246,37 @@
       "besucher": {
         "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
         "typ": "api"
+      },
+      "oeffnungszeiten_2026": {
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/allenmoos.html",
+        "typ": "manuell",
+        "pruefung": "jährlich",
+        "perioden": [
+          {
+            "von": "2026-05-09",
+            "bis": "2026-05-29",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-05-30",
+            "bis": "2026-08-16",
+            "zeit": "09:00–21:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-08-17",
+            "bis": "2026-09-06",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-09-07",
+            "bis": "2026-09-20",
+            "zeit": "09:00–19:00",
+            "schoenwetter_ab": "14:00"
+          }
+        ]
       }
     },
     {
@@ -256,8 +289,10 @@
         "typ": "api"
       },
       "saison_2026": {
-        "wert": "9. Mai – 29. September",
-        "quelle": "https://www.stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "wert": "9. Mai – 27. September",
+        "von": "2026-05-09",
+        "bis": "2026-09-27",
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/auhof.html",
         "typ": "manuell",
         "pruefung": "jährlich"
       },
@@ -268,6 +303,37 @@
       "besucher": {
         "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
         "typ": "api"
+      },
+      "oeffnungszeiten_2026": {
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/auhof.html",
+        "typ": "manuell",
+        "pruefung": "jährlich",
+        "perioden": [
+          {
+            "von": "2026-05-09",
+            "bis": "2026-05-29",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-05-30",
+            "bis": "2026-08-16",
+            "zeit": "09:00–21:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-08-17",
+            "bis": "2026-09-06",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-09-07",
+            "bis": "2026-09-27",
+            "zeit": "09:00–19:00",
+            "schoenwetter_ab": "14:00"
+          }
+        ]
       }
     },
     {
@@ -309,8 +375,10 @@
         "typ": "api"
       },
       "saison_2026": {
-        "wert": "9. Mai – ca. 15. September",
-        "quelle": "https://www.stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "wert": "9. Mai – 20. September",
+        "von": "2026-05-09",
+        "bis": "2026-09-20",
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/heuried.html",
         "typ": "manuell",
         "pruefung": "jährlich"
       },
@@ -321,6 +389,37 @@
       "besucher": {
         "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
         "typ": "api"
+      },
+      "oeffnungszeiten_2026": {
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/heuried.html",
+        "typ": "manuell",
+        "pruefung": "jährlich",
+        "perioden": [
+          {
+            "von": "2026-05-09",
+            "bis": "2026-05-29",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-05-30",
+            "bis": "2026-08-16",
+            "zeit": "09:00–21:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-08-17",
+            "bis": "2026-09-06",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-09-07",
+            "bis": "2026-09-20",
+            "zeit": "09:00–19:00",
+            "schoenwetter_ab": "14:00"
+          }
+        ]
       }
     },
     {
@@ -333,8 +432,10 @@
         "typ": "api"
       },
       "saison_2026": {
-        "wert": "1. Mai – 29. September",
-        "quelle": "https://www.stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "wert": "1. Mai – 27. September",
+        "von": "2026-05-01",
+        "bis": "2026-09-27",
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/letzigraben.html",
         "typ": "manuell",
         "pruefung": "jährlich"
       },
@@ -345,6 +446,38 @@
       "besucher": {
         "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
         "typ": "api"
+      },
+      "oeffnungszeiten_2026": {
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/letzigraben.html",
+        "typ": "manuell",
+        "pruefung": "jährlich",
+        "perioden": [
+          {
+            "von": "2026-05-01",
+            "bis": "2026-05-08",
+            "zeit": "07:00–19:00"
+          },
+          {
+            "von": "2026-05-09",
+            "bis": "2026-05-29",
+            "zeit": "07:00–20:00"
+          },
+          {
+            "von": "2026-05-30",
+            "bis": "2026-08-16",
+            "zeit": "07:00–21:00"
+          },
+          {
+            "von": "2026-08-17",
+            "bis": "2026-09-06",
+            "zeit": "07:00–20:00"
+          },
+          {
+            "von": "2026-09-07",
+            "bis": "2026-09-27",
+            "zeit": "07:00–19:00"
+          }
+        ]
       }
     },
     {
@@ -358,7 +491,9 @@
       },
       "saison_2026": {
         "wert": "11. April – 25. Oktober",
-        "quelle": "https://www.stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "von": "2026-04-11",
+        "bis": "2026-10-25",
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/seebach.html",
         "typ": "manuell",
         "pruefung": "jährlich"
       },
@@ -369,6 +504,48 @@
       "besucher": {
         "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
         "typ": "api"
+      },
+      "oeffnungszeiten_2026": {
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/seebach.html",
+        "typ": "manuell",
+        "pruefung": "jährlich",
+        "perioden": [
+          {
+            "von": "2026-04-11",
+            "bis": "2026-04-30",
+            "zeit": "09:00–19:00"
+          },
+          {
+            "von": "2026-05-01",
+            "bis": "2026-05-08",
+            "zeit": "07:00–19:00"
+          },
+          {
+            "von": "2026-05-09",
+            "bis": "2026-05-29",
+            "zeit": "07:00–20:00"
+          },
+          {
+            "von": "2026-05-30",
+            "bis": "2026-08-16",
+            "zeit": "07:00–21:00"
+          },
+          {
+            "von": "2026-08-17",
+            "bis": "2026-09-06",
+            "zeit": "07:00–20:00"
+          },
+          {
+            "von": "2026-09-07",
+            "bis": "2026-09-27",
+            "zeit": "07:00–19:00"
+          },
+          {
+            "von": "2026-09-28",
+            "bis": "2026-10-25",
+            "zeit": "09:00–18:00"
+          }
+        ]
       }
     },
     {
@@ -381,8 +558,10 @@
         "typ": "api"
       },
       "saison_2026": {
-        "wert": "9. Mai – 15. September",
-        "quelle": "https://www.stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "wert": "9. Mai – 20. September",
+        "von": "2026-05-09",
+        "bis": "2026-09-20",
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/zwischen-den-hoelzern.html",
         "typ": "manuell",
         "pruefung": "jährlich"
       },
@@ -393,6 +572,37 @@
       "besucher": {
         "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
         "typ": "api"
+      },
+      "oeffnungszeiten_2026": {
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/zwischen-den-hoelzern.html",
+        "typ": "manuell",
+        "pruefung": "jährlich",
+        "perioden": [
+          {
+            "von": "2026-05-09",
+            "bis": "2026-05-29",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-05-30",
+            "bis": "2026-08-16",
+            "zeit": "09:00–21:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-08-17",
+            "bis": "2026-09-06",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-09-07",
+            "bis": "2026-09-20",
+            "zeit": "09:00–19:00",
+            "schoenwetter_ab": "14:00"
+          }
+        ]
       }
     }
   ],
@@ -407,8 +617,10 @@
         "typ": "api"
       },
       "saison_2026": {
-        "wert": "9. Mai – ca. 15. September",
-        "quelle": "https://www.stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "wert": "14. Mai – 20. September",
+        "von": "2026-05-14",
+        "bis": "2026-09-20",
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/au-hoengg.html",
         "typ": "manuell",
         "pruefung": "jährlich"
       },
@@ -421,6 +633,37 @@
         "quelle": null,
         "typ": "keine",
         "hinweis": "Gratisbad, nicht im CrowdMonitor"
+      },
+      "oeffnungszeiten_2026": {
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/au-hoengg.html",
+        "typ": "manuell",
+        "pruefung": "jährlich",
+        "perioden": [
+          {
+            "von": "2026-05-14",
+            "bis": "2026-05-29",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-05-30",
+            "bis": "2026-08-16",
+            "zeit": "09:00–21:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-08-17",
+            "bis": "2026-09-06",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-09-07",
+            "bis": "2026-09-20",
+            "zeit": "09:00–19:00",
+            "schoenwetter_ab": "14:00"
+          }
+        ]
       }
     },
     {
@@ -433,8 +676,10 @@
         "typ": "api"
       },
       "saison_2026": {
-        "wert": "9. Mai – 15. September",
-        "quelle": "https://www.stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "wert": "9. Mai – 20. September",
+        "von": "2026-05-09",
+        "bis": "2026-09-20",
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/oberer-letten.html",
         "typ": "manuell",
         "pruefung": "jährlich"
       },
@@ -445,6 +690,37 @@
       "besucher": {
         "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
         "typ": "api"
+      },
+      "oeffnungszeiten_2026": {
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/oberer-letten.html",
+        "typ": "manuell",
+        "pruefung": "jährlich",
+        "perioden": [
+          {
+            "von": "2026-05-09",
+            "bis": "2026-05-29",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-05-30",
+            "bis": "2026-08-16",
+            "zeit": "09:00–21:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-08-17",
+            "bis": "2026-09-06",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-09-07",
+            "bis": "2026-09-20",
+            "zeit": "09:00–19:00",
+            "schoenwetter_ab": "14:00"
+          }
+        ]
       }
     },
     {
@@ -457,8 +733,10 @@
         "typ": "api"
       },
       "saison_2026": {
-        "wert": "9. Mai – 15. September",
-        "quelle": "https://www.stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "wert": "9. Mai – 20. September",
+        "von": "2026-05-09",
+        "bis": "2026-09-20",
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/unterer-letten.html",
         "typ": "manuell",
         "pruefung": "jährlich"
       },
@@ -469,6 +747,37 @@
       "besucher": {
         "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
         "typ": "api"
+      },
+      "oeffnungszeiten_2026": {
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/unterer-letten.html",
+        "typ": "manuell",
+        "pruefung": "jährlich",
+        "perioden": [
+          {
+            "von": "2026-05-09",
+            "bis": "2026-05-29",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-05-30",
+            "bis": "2026-08-16",
+            "zeit": "09:00–21:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-08-17",
+            "bis": "2026-09-06",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-09-07",
+            "bis": "2026-09-20",
+            "zeit": "09:00–19:00",
+            "schoenwetter_ab": "14:00"
+          }
+        ]
       }
     },
     {
@@ -481,8 +790,10 @@
         "typ": "api"
       },
       "saison_2026": {
-        "wert": "9. Mai – 15. September",
-        "quelle": "https://www.stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "wert": "9. Mai – 20. September",
+        "von": "2026-05-09",
+        "bis": "2026-09-20",
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/unterer-letten.html",
         "typ": "manuell",
         "pruefung": "jährlich"
       },
@@ -493,6 +804,37 @@
       "besucher": {
         "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
         "typ": "api"
+      },
+      "oeffnungszeiten_2026": {
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/unterer-letten.html",
+        "typ": "manuell",
+        "pruefung": "jährlich",
+        "perioden": [
+          {
+            "von": "2026-05-09",
+            "bis": "2026-05-29",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-05-30",
+            "bis": "2026-08-16",
+            "zeit": "09:00–21:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-08-17",
+            "bis": "2026-09-06",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-09-07",
+            "bis": "2026-09-20",
+            "zeit": "09:00–19:00",
+            "schoenwetter_ab": "14:00"
+          }
+        ]
       }
     },
     {
@@ -505,8 +847,10 @@
         "typ": "api"
       },
       "saison_2026": {
-        "wert": "9. Mai – 15. September",
-        "quelle": "https://www.stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "wert": "9. Mai – 20. September",
+        "von": "2026-05-09",
+        "bis": "2026-09-20",
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/stadthausquai.html",
         "typ": "manuell",
         "pruefung": "jährlich"
       },
@@ -517,6 +861,25 @@
       "besucher": {
         "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
         "typ": "api"
+      },
+      "oeffnungszeiten_2026": {
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/stadthausquai.html",
+        "typ": "manuell",
+        "pruefung": "jährlich",
+        "perioden": [
+          {
+            "von": "2026-05-09",
+            "bis": "2026-09-06",
+            "zeit": "07:00–19:30",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-09-07",
+            "bis": "2026-09-20",
+            "zeit": "07:00–19:00",
+            "schoenwetter_ab": "14:00"
+          }
+        ]
       }
     },
     {
@@ -529,8 +892,10 @@
         "typ": "api"
       },
       "saison_2026": {
-        "wert": "12. Mai – 15. September",
-        "quelle": "https://www.stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "wert": "17. Mai – 11. September",
+        "von": "2026-05-17",
+        "bis": "2026-09-11",
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/schanzengraben.html",
         "typ": "manuell",
         "pruefung": "jährlich"
       },
@@ -544,6 +909,19 @@
         "quelle": null,
         "typ": "keine",
         "hinweis": "Gratisbad, nicht im CrowdMonitor"
+      },
+      "oeffnungszeiten_2026": {
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/schanzengraben.html",
+        "typ": "manuell",
+        "pruefung": "jährlich",
+        "perioden": [
+          {
+            "von": "2026-05-17",
+            "bis": "2026-09-11",
+            "zeit": "11:00–18:30",
+            "tage": "so-fr"
+          }
+        ]
       }
     }
   ],
@@ -561,7 +939,9 @@
         "wert": "9. Mai – 20. September",
         "quelle": "https://www.seebadenge.ch",
         "typ": "manuell",
-        "pruefung": "jährlich"
+        "pruefung": "jährlich",
+        "von": "2026-05-09",
+        "bis": "2026-09-20"
       },
       "temperatur": {
         "quelle": "API - Stadt ZH (bathdatadownload)",
@@ -583,7 +963,9 @@
       },
       "saison_2026": {
         "wert": "11. April – 25. Oktober",
-        "quelle": "https://www.stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "von": "2026-04-11",
+        "bis": "2026-10-25",
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/utoquai.html",
         "typ": "manuell",
         "pruefung": "jährlich"
       },
@@ -594,6 +976,48 @@
       "besucher": {
         "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
         "typ": "api"
+      },
+      "oeffnungszeiten_2026": {
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/utoquai.html",
+        "typ": "manuell",
+        "pruefung": "jährlich",
+        "perioden": [
+          {
+            "von": "2026-04-11",
+            "bis": "2026-04-30",
+            "zeit": "09:00–19:00"
+          },
+          {
+            "von": "2026-05-01",
+            "bis": "2026-05-08",
+            "zeit": "07:00–19:00"
+          },
+          {
+            "von": "2026-05-09",
+            "bis": "2026-05-29",
+            "zeit": "07:00–20:00"
+          },
+          {
+            "von": "2026-05-30",
+            "bis": "2026-08-16",
+            "zeit": "07:00–21:00"
+          },
+          {
+            "von": "2026-08-17",
+            "bis": "2026-09-06",
+            "zeit": "07:00–20:00"
+          },
+          {
+            "von": "2026-09-07",
+            "bis": "2026-09-27",
+            "zeit": "07:00–19:00"
+          },
+          {
+            "von": "2026-09-28",
+            "bis": "2026-10-25",
+            "zeit": "09:00–18:00"
+          }
+        ]
       }
     },
     {
@@ -606,8 +1030,10 @@
         "typ": "api"
       },
       "saison_2026": {
-        "wert": "9. Mai – 29. September",
-        "quelle": "https://www.stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "wert": "9. Mai – 27. September",
+        "von": "2026-05-09",
+        "bis": "2026-09-27",
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/mythenquai.html",
         "typ": "manuell",
         "pruefung": "jährlich"
       },
@@ -618,6 +1044,37 @@
       "besucher": {
         "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
         "typ": "api"
+      },
+      "oeffnungszeiten_2026": {
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/mythenquai.html",
+        "typ": "manuell",
+        "pruefung": "jährlich",
+        "perioden": [
+          {
+            "von": "2026-05-09",
+            "bis": "2026-05-29",
+            "zeit": "07:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-05-30",
+            "bis": "2026-08-16",
+            "zeit": "07:00–21:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-08-17",
+            "bis": "2026-09-06",
+            "zeit": "07:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-09-07",
+            "bis": "2026-09-27",
+            "zeit": "07:00–19:00",
+            "schoenwetter_ab": "14:00"
+          }
+        ]
       }
     },
     {
@@ -630,8 +1087,10 @@
         "typ": "api"
       },
       "saison_2026": {
-        "wert": "9. Mai – 29. September",
-        "quelle": "https://www.stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "wert": "9. Mai – 27. September",
+        "von": "2026-05-09",
+        "bis": "2026-09-27",
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/tiefenbrunnen.html",
         "typ": "manuell",
         "pruefung": "jährlich"
       },
@@ -642,6 +1101,37 @@
       "besucher": {
         "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
         "typ": "api"
+      },
+      "oeffnungszeiten_2026": {
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/tiefenbrunnen.html",
+        "typ": "manuell",
+        "pruefung": "jährlich",
+        "perioden": [
+          {
+            "von": "2026-05-09",
+            "bis": "2026-05-29",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-05-30",
+            "bis": "2026-08-16",
+            "zeit": "09:00–21:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-08-17",
+            "bis": "2026-09-06",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-09-07",
+            "bis": "2026-09-27",
+            "zeit": "09:00–19:00",
+            "schoenwetter_ab": "14:00"
+          }
+        ]
       }
     },
     {
@@ -654,8 +1144,10 @@
         "typ": "api"
       },
       "saison_2026": {
-        "wert": "9. Mai – 15. September",
-        "quelle": "https://www.stadt-zuerich.ch/medienmitteilungen/2026/04",
+        "wert": "9. Mai – 20. September",
+        "von": "2026-05-09",
+        "bis": "2026-09-20",
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/wollishofen.html",
         "typ": "manuell",
         "pruefung": "jährlich"
       },
@@ -666,6 +1158,37 @@
       "besucher": {
         "quelle": "API - CrowdMonitor (wss://badi-public.crowdmonitor.ch:9591/api)",
         "typ": "api"
+      },
+      "oeffnungszeiten_2026": {
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/wollishofen.html",
+        "typ": "manuell",
+        "pruefung": "jährlich",
+        "perioden": [
+          {
+            "von": "2026-05-09",
+            "bis": "2026-05-29",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-05-30",
+            "bis": "2026-08-16",
+            "zeit": "09:00–21:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-08-17",
+            "bis": "2026-09-06",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-09-07",
+            "bis": "2026-09-20",
+            "zeit": "09:00–19:00",
+            "schoenwetter_ab": "14:00"
+          }
+        ]
       }
     }
   ]

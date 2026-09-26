@@ -8,6 +8,7 @@ import json
 import os
 from collections import defaultdict
 from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
 
 
 # ── Feiertage ─────────────────────────────────────────────────────────────
@@ -100,6 +101,27 @@ def load_revisionen(path: str = "data/revisionen.json") -> set:
                 d += timedelta(days=1)
         except (KeyError, ValueError):
             continue
+    return result
+
+
+def load_saisons(path: str = "data/badi-stammdaten.json") -> dict:
+    """uid → {jahr: (von, bis)} aus den Feldern saison_<jahr> der Stammdaten."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+    result: dict = defaultdict(dict)
+    for section in data.values():
+        if not isinstance(section, list):
+            continue
+        for e in section:
+            for key, val in e.items():
+                if key.startswith("saison_") and isinstance(val, dict) and val.get("von") and val.get("bis"):
+                    try:
+                        result[e["uid"]][int(key[7:])] = (date.fromisoformat(val["von"]), date.fromisoformat(val["bis"]))
+                    except (KeyError, ValueError):
+                        continue
     return result
 
 
@@ -250,6 +272,61 @@ def _impute(rows: list, open_d: set, in_season_gaps: set) -> list:
     return imputed
 
 
+# ── Saison ────────────────────────────────────────────────────────────────
+# Sommer = Mai–Sep, Winter = Okt–Apr. Die Durchschnitte (Wochentage, Werktag, …)
+# werden aus der aktuellen Saison berechnet, damit z.B. Hallenbäder im Winter
+# nicht mit Sommerdaten verglichen werden. Hat ein Wert in der aktuellen Saison
+# noch zu wenige Messtage (Saisonbeginn), wird auf alle Daten zurückgegriffen.
+
+MIN_SEASON_DAYS = 3
+
+
+def _season(d: date) -> str:
+    return "sommer" if 5 <= d.month <= 9 else "winter"
+
+
+def _current_season() -> str:
+    return _season(datetime.now(ZoneInfo("Europe/Zurich")).date())
+
+
+def _slot_buckets(rows: list):
+    """Slot-Durchschnitte pro (Badi, Tagestyp/Wochentag, Slot) + Messtage pro (Badi, Schlüssel)."""
+    bucket:     dict = defaultdict(list)
+    bucket_est: dict = defaultdict(bool)
+    days:       dict = defaultdict(set)
+    for r in rows:
+        for key in (r["day_type"], WD_KEYS[r["date"].weekday()]):
+            k = (r["name"], key, r["slot"])
+            bucket[k].append(r["util"])
+            if r["estimated"]:
+                bucket_est[k] = True
+            days[(r["name"], key)].add(r["date"])
+    avg = {k: sum(v) / len(v) for k, v in bucket.items()}
+    return avg, dict(bucket_est), days
+
+
+def _seasonal_slot_avg(active: list, season: str):
+    """Pro (Badi, Schlüssel): Werte der aktuellen Saison, sonst Fallback auf alle Daten."""
+    all_avg, all_est, all_days = _slot_buckets(active)
+    s_avg, s_est, s_days = _slot_buckets([r for r in active if _season(r["date"]) == season])
+
+    use_season = {bk for bk in all_days if len(s_days.get(bk, ())) >= MIN_SEASON_DAYS}
+    slot_avg, slot_est = {}, {}
+    for (badi, key, slot), v in all_avg.items():
+        if (badi, key) in use_season:
+            continue
+        slot_avg[(badi, key, slot)] = v
+        if all_est.get((badi, key, slot)):
+            slot_est[(badi, key, slot)] = True
+    for (badi, key, slot), v in s_avg.items():
+        if (badi, key) not in use_season:
+            continue
+        slot_avg[(badi, key, slot)] = v
+        if s_est.get((badi, key, slot)):
+            slot_est[(badi, key, slot)] = True
+    return slot_avg, slot_est, use_season
+
+
 # ── Konsolen-Ausgabe ──────────────────────────────────────────────────────
 
 DAY_TYPES = ["Werktag", "Wochenende", "Feiertag"]
@@ -288,6 +365,7 @@ def _save_json(
     d_max:     date,
     badis:     list,
     p_types:   list,
+    cur_season: str,
 ) -> None:
     uid_map = {r["name"]: r["uid"] for r in active}
 
@@ -305,6 +383,29 @@ def _save_json(
             est_days[r["name"]].add(r["date"])
         else:
             real_days[r["name"]].add(r["date"])
+
+    # Monatsrückblick (nur echte Messungen): Ø Tagesspitze Gäste + Ø Auslastung
+    day_peak: dict = defaultdict(int)
+    month_util: dict = defaultdict(list)
+    for r in active:
+        if r["estimated"]:
+            continue
+        day_peak[(r["name"], r["date"])] = max(day_peak[(r["name"], r["date"])], r["fill"])
+        month_util[(r["name"], r["date"].strftime("%Y-%m"))].append(r["util"])
+    month_peaks: dict = defaultdict(list)
+    for (name, d), peak in day_peak.items():
+        month_peaks[(name, d.strftime("%Y-%m"))].append(peak)
+
+    # Wochenrückblick (ISO-Kalenderwoche)
+    week_util: dict = defaultdict(list)
+    week_peaks: dict = defaultdict(list)
+    for r in active:
+        if not r["estimated"]:
+            iso = r["date"].isocalendar()
+            week_util[(r["name"], iso[0], iso[1])].append(r["util"])
+    for (name, d), peak in day_peak.items():
+        iso = d.isocalendar()
+        week_peaks[(name, iso[0], iso[1])].append(peak)
 
     badis_out = []
     for badi in badis:
@@ -329,6 +430,28 @@ def _save_json(
                 v = sb.get((badi, key))
                 saison[label] = round(sum(v) / len(v), 1) if v else None
 
+        monate = [
+            {
+                "monat":          m,
+                "tage":           len(month_peaks[(badi, m)]),
+                "spitze_avg":     round(sum(month_peaks[(badi, m)]) / len(month_peaks[(badi, m)])),
+                "auslastung_avg": round(sum(month_util[(badi, m)]) / len(month_util[(badi, m)]), 1),
+            }
+            for m in sorted(m for (n, m) in month_peaks if n == badi)
+        ]
+
+        wochen = [
+            {
+                "jahr":           y,
+                "kw":             w,
+                "von":            str(date.fromisocalendar(y, w, 1)),
+                "tage":           len(week_peaks[(badi, y, w)]),
+                "spitze_avg":     round(sum(week_peaks[(badi, y, w)]) / len(week_peaks[(badi, y, w)])),
+                "auslastung_avg": round(sum(week_util[(badi, y, w)]) / len(week_util[(badi, y, w)]), 1),
+            }
+            for (y, w) in sorted((y, w) for (n, y, w) in week_peaks if n == badi)
+        ]
+
         real = sorted(real_days.get(badi, set()))
         badis_out.append({
             "uid":              uid_map.get(badi, ""),
@@ -339,6 +462,8 @@ def _save_json(
             "letzte_messung":   str(real[-1]) if real else None,
             "slots":            slots_obj,
             "saison":           saison if saison else None,
+            "monate":           monate,
+            "wochen":           wochen,
         })
 
     output = {
@@ -346,6 +471,7 @@ def _save_json(
             "generiert": datetime.now().isoformat(timespec="seconds"),
             "von":        str(d_min),
             "bis":        str(d_max),
+            "saison":     cur_season,
         },
         "badis": badis_out,
     }
@@ -372,6 +498,17 @@ def main():
         if n_rev:
             print(f"  Revisionstage ausgeschlossen: {n_rev} Messwerte\n")
 
+    # Tage ausserhalb der offiziellen Saison ausschliessen (Zähler laufen teils weiter)
+    saisons = load_saisons()
+    if saisons:
+        def in_season(r):
+            s = saisons.get(r["uid"], {}).get(r["date"].year)
+            return s is None or s[0] <= r["date"] <= s[1]
+        n_before = len(rows)
+        rows = [r for r in rows if in_season(r)]
+        if n_before - len(rows):
+            print(f"  Ausserhalb der Saison ausgeschlossen: {n_before - len(rows)} Messwerte\n")
+
     open_d         = _open_days(rows)
     in_season_gaps = _find_in_season_gaps(rows, open_d)
     imputed_rows   = _impute(rows, open_d, in_season_gaps)
@@ -389,26 +526,15 @@ def main():
     badis   = sorted({r["name"] for r in active})
     p_types = [t for t in DAY_TYPES if any(r["day_type"] == t for r in active)]
 
-    # Slot-Durchschnitte mit geschätzt-Flag (Werktag/Wochenende/Feiertag + pro Wochentag)
-    bucket:     dict = defaultdict(list)
-    bucket_est: dict = defaultdict(bool)
-    for r in active:
-        dt_key = (r["name"], r["day_type"], r["slot"])
-        bucket[dt_key].append(r["util"])
-        if r["estimated"]:
-            bucket_est[dt_key] = True
-        wd = WD_KEYS[r["date"].weekday()]
-        wd_key = (r["name"], wd, r["slot"])
-        bucket[wd_key].append(r["util"])
-        if r["estimated"]:
-            bucket_est[wd_key] = True
-    slot_avg = {k: sum(v) / len(v) for k, v in bucket.items()}
-    slot_est = dict(bucket_est)
+    # Slot-Durchschnitte (Werktag/Wochenende/Feiertag + pro Wochentag) aus der aktuellen Saison
+    season = _current_season()
+    slot_avg, slot_est, use_season = _seasonal_slot_avg(active, season)
 
     n_gaps = len({d for (_, d) in in_season_gaps})
 
     print(f"\n{'═' * 64}")
     print(f"  Badi-Auslastung Zürich  │  {d_min} – {d_max}")
+    print(f"  Saison: {season}  │  {len(use_season)} Werte aus aktueller Saison, Rest aus allen Daten")
     if n_gaps:
         print(f"  Lückenfüllung: {n_gaps} Tage geschätzt  (* = enthält Schätzwerte)")
     print(f"{'═' * 64}")
@@ -476,7 +602,7 @@ def main():
         print()
 
     # ── JSON speichern ──────────────────────────────────────────────────
-    _save_json(slot_avg, slot_est, active, levels, d_min, d_max, badis, p_types)
+    _save_json(slot_avg, slot_est, active, levels, d_min, d_max, badis, p_types, season)
 
 
 if __name__ == "__main__":
