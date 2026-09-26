@@ -1,0 +1,54 @@
+name: Saison-Prüfung
+
+# Liest die Tabellen «Öffnungszeiten <Jahr>» der Stadt Zürich und trägt Saison und
+# Öffnungszeiten der Sommerbäder in die Stammdaten ein, sobald sie veröffentlicht sind.
+on:
+  schedule:
+    - cron: "0 6 * 2-5 1"   # Februar bis Mai, jeden Montag 06:00 UTC
+  workflow_dispatch:         # auch manuell startbar
+
+jobs:
+  pruefung:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - name: Repository laden
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+
+      - name: Saison und Öffnungszeiten prüfen
+        run: python3 pruefe_saison.py
+
+      - name: Änderungen speichern
+        id: speichern
+        run: |
+          if git diff --quiet data/badi-stammdaten.json; then
+            echo "Keine Änderungen."
+            echo "geaendert=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add data/badi-stammdaten.json
+          git commit -m "Saison/Öffnungszeiten $(date +%Y) von der Stadt Zürich übernommen"
+          # die Datensammlung pusht laufend → bei Konflikt neu aufsetzen
+          for i in 1 2 3; do
+            git pull --rebase && git push && break
+            sleep 10
+          done
+          echo "geaendert=true" >> "$GITHUB_OUTPUT"
+
+      - name: Bericht als Issue-Kommentar
+        if: steps.speichern.outputs.geaendert == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING=$(gh issue list --label "stammdaten" --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --body-file pruefung_saison.md
+          else
+            gh issue create --title "🌊 Saison-Prüfung $(date +%Y)" --body-file pruefung_saison.md --label "stammdaten" \
+              || gh issue create --title "🌊 Saison-Prüfung $(date +%Y)" --body-file pruefung_saison.md
+          fi

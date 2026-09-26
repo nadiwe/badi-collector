@@ -31,10 +31,10 @@
       },
       "temperatur": {
         "wert": {
-          "Schwimmbecken": "28°C",
-          "Nichtschwimmerbecken": "29°C",
-          "Sprungbecken": "29°C",
-          "Wärmebecken": "34°C"
+          "Schwimmerbecken": "27°C",
+          "Nichtschwimmerbecken": "30°C",
+          "Sprung- & Tauchbecken": "29°C",
+          "Wellnessbecken": "33°C"
         },
         "quelle": "https://www.bad-altstetten.ch",
         "typ": "manuell",
@@ -1189,6 +1189,63 @@
             "schoenwetter_ab": "14:00"
           }
         ]
+      }
+    },
+    {
+      "uid": "seb6944",
+      "name": "Seebad Katzensee",
+      "standort": "Katzenseestrasse, 8046 Zürich",
+      "officialUrl": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/katzensee.html",
+      "oeffnungszeiten": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "saison_2026": {
+        "wert": "9. Mai – 20. September",
+        "von": "2026-05-09",
+        "bis": "2026-09-20",
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/katzensee.html",
+        "typ": "manuell",
+        "pruefung": "jährlich"
+      },
+      "oeffnungszeiten_2026": {
+        "quelle": "https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/sommerbaeder/katzensee.html",
+        "typ": "manuell",
+        "pruefung": "jährlich",
+        "perioden": [
+          {
+            "von": "2026-05-09",
+            "bis": "2026-05-29",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-05-30",
+            "bis": "2026-08-16",
+            "zeit": "09:00–21:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-08-17",
+            "bis": "2026-09-06",
+            "zeit": "09:00–20:00",
+            "schoenwetter_ab": "14:00"
+          },
+          {
+            "von": "2026-09-07",
+            "bis": "2026-09-20",
+            "zeit": "09:00–19:00",
+            "schoenwetter_ab": "14:00"
+          }
+        ]
+      },
+      "temperatur": {
+        "quelle": "API - Stadt ZH (bathdatadownload)",
+        "typ": "api"
+      },
+      "besucher": {
+        "quelle": "Crowdmonitor liefert keine Daten für den Katzensee",
+        "typ": "keine"
       }
     }
   ]

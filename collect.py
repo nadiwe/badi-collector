@@ -1,6 +1,7 @@
 import asyncio
 import csv
 import json
+import re
 import os
 import urllib.request
 import websockets
@@ -42,7 +43,7 @@ TEMPERATUREN_IDS = {
     "flb6938", "flb6939", "flb6940", "flb8803", "flb6941", "flb6942",
     "fb002",
     "fb006", "fb008", "fb012", "fb013", "fb016", "fb018",
-    "seb6943",
+    "seb6943", "seb6944",
     "seb6945",
     "seb6946", "seb6947", "seb6948",
 }
@@ -139,6 +140,8 @@ def collect_temperaturen() -> dict:
             snapshot[uid] = {
                 "temperatureWater": temp or None,
                 "openClosed":       status or None,
+                # wann die Stadt den Status zuletzt geändert hat → Seite erkennt z.B. Regen-Schliessungen
+                "statusGeaendert":  _iso_modified(bath.findtext("dateModified")),
             }
 
     print(f"✓ Temperaturen gespeichert: {timestamp}")
@@ -150,7 +153,14 @@ _XML_ONLY_IDS = {
     "flb6938":   "flb6938",   # Flussbad Au-Höngg
     "flb6942":   "flb6942",   # Männerbad Schanzengraben
     "DOLDER-1":  "fb016",     # Freibad Dolder
+    "seb6944":   "seb6944",   # Seebad Katzensee
 }
+
+
+def _iso_modified(text):
+    """«Sa., 26.09.2026 07:09» → «2026-09-26T07:09»."""
+    m = re.search(r"(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2}:\d{2})", text or "")
+    return f"{m.group(3)}-{m.group(2)}-{m.group(1)}T{m.group(4)}" if m else None
 
 
 def generate_live_json(besucher: dict, temperaturen: dict, timestamp: str) -> None:
@@ -167,6 +177,7 @@ def generate_live_json(besucher: dict, temperaturen: dict, timestamp: str) -> No
             "maxspace":         b.get("maxspace"),
             "temperatureWater": t.get("temperatureWater"),
             "openClosed":       t.get("openClosed"),
+            "statusGeaendert":  t.get("statusGeaendert"),
         }
     for uid, temp_uid in _XML_ONLY_IDS.items():
         t = temperaturen.get(temp_uid, {})
@@ -178,6 +189,7 @@ def generate_live_json(besucher: dict, temperaturen: dict, timestamp: str) -> No
             "maxspace":         None,
             "temperatureWater": t.get("temperatureWater"),
             "openClosed":       t.get("openClosed"),
+            "statusGeaendert":  t.get("statusGeaendert"),
         }
     payload = {"timestamp": timestamp, "venues": venues}
     with open("data/live.json", "w", encoding="utf-8") as f:

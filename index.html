@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<!-- Google tag (gtag.js) — lädt immer, Analytics nur mit Consent -->
+<!-- Google Analytics: das Skript wird erst NACH der Einwilligung geladen (vorher keine Anfrage an Google) -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  gtag('consent', 'default', {
-    'analytics_storage': localStorage.getItem('cookie_consent') === 'accepted' ? 'granted' : 'denied'
-  });
-</script>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-YVCH6TEG6Z"></script>
-<script>
-  gtag('js', new Date());
-  gtag('config', 'G-YVCH6TEG6Z');
+  function loadAnalytics() {
+    if (window._gaLoaded) return;
+    window._gaLoaded = true;
+    gtag('consent', 'default', { 'analytics_storage': 'granted' });
+    gtag('js', new Date());
+    gtag('config', 'G-YVCH6TEG6Z');
+    var sc = document.createElement('script');
+    sc.async = true;
+    sc.src = 'https://www.googletagmanager.com/gtag/js?id=G-YVCH6TEG6Z';
+    document.head.appendChild(sc);
+  }
+  try { if (localStorage.getItem('cookie_consent') === 'accepted') loadAnalytics(); } catch (e) {}
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -74,10 +78,8 @@
 <meta name="twitter:title" content="Wasserziit — Zürich Badi Finder">
 <meta name="twitter:description" content="Aktuelle Badi-Auslastung in Zürich: Besucherzahlen, Wassertemperatur und Öffnungszeiten — live.">
 
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://server.arcgisonline.com https://www.google-analytics.com https://www.googletagmanager.com; connect-src 'self' wss://badi-public.crowdmonitor.ch:9591 https://badi-public.crowdmonitor.ch https://www.stadt-zuerich.ch https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://region1.google-analytics.com; object-src 'none'; base-uri 'self'; form-action 'none';">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self'; img-src 'self' data: blob: https://server.arcgisonline.com https://www.google-analytics.com https://www.googletagmanager.com; connect-src 'self' wss://badi-public.crowdmonitor.ch:9591 https://badi-public.crowdmonitor.ch https://www.stadt-zuerich.ch https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://region1.google-analytics.com; object-src 'none'; base-uri 'self'; form-action 'none';">
+<link rel="stylesheet" href="fonts/fonts.css"><!-- Schriften selbst gehostet, keine Anfrage an Google -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
 <style>
@@ -166,7 +168,7 @@ const I18N = {
     countLine: (n, open) => `${n} Badis · ${open} offen`,
     tiles: 'Kacheln', map: 'Karte', light: 'Hell', dark: 'Dunkel',
     emptyTitle: 'Keni Badis gfunde', emptyHint: 'Probier en andere Filter ode füeg Favoriten hinzue.',
-    open: 'offen', openUntil: t => `offen bis ${t}`, closed: 'geschlossen',
+    open: 'offen', openUntil: t => `offen bis ${t}`, closed: 'geschlossen', closedWeather: 'geschlossen (schlechtes Wetter)',
     opens: (prefix, t) => `öffnet ${prefix}${t}`, tomorrow: 'morgen',
     revision: 'Revision',
     devMore: p => `${p}% voller als sonst`, devLess: p => `${p}% ruhiger als sonst`, devSame: 'etwa wie sonst',
@@ -188,7 +190,8 @@ const I18N = {
     histMonths: 'Monate', histWeeks: 'Wochen', kw: w => `KW${w}`,
     recordedSince: (d, n) => `Aufgezeichnet seit ${d} · ${n} Messtage`,
     legendMonths: 'Zahl = Ø Tagesspitze Gäste · % = Ø Auslastung', legendWeeks: 'Ø Auslastung pro Woche (in % der Kapazität)',
-    fairWeather: t => `Ab ${t} Uhr nur bei schönem Wetter.`,
+    fairWeather: t => `Ab ${t} Uhr nur bei schönem Wetter.`, fairWeatherShort: t => `ab ${t} nur bei Sonne`,
+    fairWeatherSplit: (a, t, b) => `${a}–${t} bei jedem Wetter, ${t}–${b} nur bei schönem Wetter.`,
     favorite: 'Favorit', close: 'Schliessen',
     cookieText: 'Diese Seite verwendet Google Analytics, um Besucherzahlen zu messen. Deine Daten werden nur mit deiner Einwilligung erhoben.',
     cookieDecline: 'Ablehnen', cookieAccept: 'Akzeptieren',
@@ -210,7 +213,7 @@ const I18N = {
         title: 'Datenschutz',
         sections: [
           ['Google Analytics', 'Nur mit deiner Einwilligung. Misst Besucherzahlen; Daten können in die USA übermittelt werden. Widerruf jederzeit über «Cookie-Einstellungen».'],
-          ['Externe Dienste', 'GitHub Pages (Hosting), Google Fonts, unpkg.com, Esri (Karte) sowie Crowdmonitor und Stadt Zürich (Live-Daten) erhalten technisch bedingt deine IP-Adresse.'],
+          ['Externe Dienste', 'GitHub Pages (Hosting), unpkg.com, Esri (Karte) sowie Crowdmonitor und Stadt Zürich (Live-Daten) erhalten technisch bedingt deine IP-Adresse.'],
           ['Im Browser gespeichert', 'Favoriten, Sprache und Cookie-Wahl – nur lokal auf deinem Gerät.'],
           ['Kontakt', 'Auskunft oder Löschung: <a href="mailto:nadia.west@hispeed.ch">nadia.west@hispeed.ch</a>'],
         ],
@@ -232,7 +235,7 @@ const I18N = {
     countLine: (n, open) => `${n} pools · ${open} open`,
     tiles: 'Tiles', map: 'Map', light: 'Light', dark: 'Dark',
     emptyTitle: 'No pools found', emptyHint: 'Try a different filter or add some favourites.',
-    open: 'open', openUntil: t => `open until ${t}`, closed: 'closed',
+    open: 'open', openUntil: t => `open until ${t}`, closed: 'closed', closedWeather: 'closed (bad weather)',
     opens: (prefix, t) => `opens ${prefix}${t}`, tomorrow: 'tomorrow',
     revision: 'Maintenance',
     devMore: p => `${p}% busier than usual`, devLess: p => `${p}% quieter than usual`, devSame: 'about as usual',
@@ -254,7 +257,8 @@ const I18N = {
     histMonths: 'Months', histWeeks: 'Weeks', kw: w => `W${w}`,
     recordedSince: (d, n) => `Recorded since ${d} · ${n} days of data`,
     legendMonths: 'Number = avg. daily peak guests · % = avg. occupancy', legendWeeks: 'Avg. occupancy per week (% of capacity)',
-    fairWeather: t => `After ${t} only in fine weather.`,
+    fairWeather: t => `After ${t} only in fine weather.`, fairWeatherShort: t => `after ${t} sunny only`,
+    fairWeatherSplit: (a, t, b) => `${a}–${t} in any weather, ${t}–${b} only in fine weather.`,
     favorite: 'Favourite', close: 'Close',
     cookieText: 'This site uses Google Analytics to measure visitor numbers. Your data is only collected with your consent.',
     cookieDecline: 'Decline', cookieAccept: 'Accept',
@@ -276,7 +280,7 @@ const I18N = {
         title: 'Privacy',
         sections: [
           ['Google Analytics', 'Only with your consent. Measures visitor numbers; data may be transferred to the USA. Withdraw any time via “Cookie settings”.'],
-          ['External services', 'GitHub Pages (hosting), Google Fonts, unpkg.com, Esri (map) as well as Crowdmonitor and the City of Zurich (live data) receive your IP address for technical reasons.'],
+          ['External services', 'GitHub Pages (hosting), unpkg.com, Esri (map) as well as Crowdmonitor and the City of Zurich (live data) receive your IP address for technical reasons.'],
           ['Stored in your browser', 'Favourites, language and cookie choice – only locally on your device.'],
           ['Contact', 'Information or deletion: <a href="mailto:nadia.west@hispeed.ch">nadia.west@hispeed.ch</a>'],
         ],
@@ -293,7 +297,7 @@ const EN_TERMS = {
   'Schwimmbecken': 'Swimming pool', 'Schwimmerbecken': 'Swimming pool', '50m-Schwimmbecken': '50 m pool', '50m-Schwimmerbecken': '50 m pool',
   'Nichtschwimmerbecken': 'Non-swimmer pool', 'Lehrschwimmbecken': 'Teaching pool', 'Mehrzweckbecken': 'Multi-purpose pool',
   'Planschbecken': 'Paddling pool', 'Sprungbecken': 'Diving pool', 'Variobecken': 'Variable-depth pool',
-  'Wärmebad': 'Thermal pool', 'Wärmebecken': 'Warm-water pool',
+  'Wärmebad': 'Thermal pool', 'Wärmebecken': 'Warm-water pool', 'Sprung- & Tauchbecken': 'Diving pool', 'Wellnessbecken': 'Wellness pool',
 };
 function tr(s) { return LANG === 'en' && s ? (EN_TERMS[s] ?? s) : s; }
 
@@ -321,6 +325,7 @@ const VENUES = [
   { uid:'seb6946',  name:'Strandbad Mythenquai',              type:'see',   lat:47.3536, lng:8.5357, tempUid:'seb6946', address:'Mythenquai 95, 8002 Zürich',             hours:'09:00–21:00', season:'Mai–Sep'   },
   { uid:'seb6947',  name:'Strandbad Tiefenbrunnen',           type:'see',   lat:47.3529, lng:8.5546, tempUid:'seb6947', address:'Bellerivestrasse 201, 8008 Zürich',      hours:'09:00–21:00', season:'Mai–Sep'   },
   { uid:'seb6948',  name:'Strandbad Wollishofen',             type:'see',   lat:47.3411, lng:8.5375, tempUid:'seb6948', address:'Seestrasse 451, 8038 Zürich',            hours:'09:00–21:00', season:'Mai–Sep'   },
+  { uid:'seb6944',  name:'Seebad Katzensee',                  type:'see',   lat:47.4309, lng:8.4932, tempUid:'seb6944', address:'Katzenseestrasse, 8046 Zürich',          hours:'09:00–21:00', season:'Mai–Sep', noOccupancy: true },
   // Flussbäder — Limmat & Schanzengraben
   { uid:'flb6938',  name:'Flussbad Au-Höngg',                  type:'fluss', lat:47.3998, lng:8.4902, tempUid:'flb6938', address:'Föhrenbühlweg 5, 8049 Zürich',           hours:'09:00–21:00', season:'Mai–Sep'   },
   { uid:'flb6939',  name:'Flussbad Oberer Letten',            type:'fluss', lat:47.3846, lng:8.5363, tempUid:'flb6939', address:'Lettensteg 10, 8037 Zürich',             hours:'09:00–21:00', season:'Mai–Sep'   },
@@ -338,20 +343,22 @@ const VENUES = [
   { uid:'fb018',    name:'Freibad Zwischen den Hölzern',      type:'frei',  lat:47.4093, lng:8.4750, tempUid:'fb018',   address:'Goldbrunnenstrasse 119, 8055 Zürich',    hours:'09:00–21:00', season:'Mai–Sep'   },
   { uid:'DOLDER-1', name:'Freibad Dolder',                    type:'frei',  lat:47.3790, lng:8.5694, tempUid:'fb016',   address:'Gsteigstrasse 84, 8044 Zürich',          hours:'09:00–21:00', season:'Mai–Sep'   },
   // Hallenbäder
-  { uid:'SSD-1',    name:'Hallenbad Altstetten',              type:'halle', lat:47.3821, lng:8.4898, tempUid:null,      address:'Rautistrasse 62, 8047 Zürich',           hours:'06:00–21:00', season:'Ganzjährig', defaultTemp:29,
+  { uid:'SSD-1',    name:'Hallenbad Altstetten',              type:'halle', lat:47.3821, lng:8.4898, tempUid:null,      address:'Rautistrasse 62, 8047 Zürich',           hours:'06:00–21:00', season:'Ganzjährig', defaultTemp:27,
     noOccupancy: true,
     hoursPerDay:{ mo:'06:00–21:00', di:'08:00–21:00', mi:'06:00–21:00', do:'08:00–21:00', fr:'06:00–21:00', sa:'08:00–18:00', so:'08:00–18:00' } },
   { uid:'SSD-2',    name:'Hallenbad Bläsi',                   type:'halle', lat:47.4013, lng:8.5019, tempUid:null,      address:'Hofwiesenstrasse 280, 8057 Zürich',      hours:'09:00–22:00', season:'Ganzjährig', defaultTemp:29,
-    hoursPerDay:{ mo:'12:00–19:00', di:'09:00–20:00', mi:'09:00–19:00', do:'09:00–22:00', fr:'09:00–19:00', sa:'09:00–16:00', so:'09:00–16:00' } },
+    hoursPerDay:{ mo:'12:00–19:00', di:'09:00–20:00', mi:'09:00–19:00', do:'09:00–22:00', fr:'09:00–19:00', sa:'09:00–16:00', so:'09:00–16:00' },
+    hoursPerDayWinter:{ sa:'09:00–18:00', so:'09:00–18:00' } },
   { uid:'SSD-3',    name:'Hallenbad Bungertwies',             type:'halle', lat:47.3720, lng:8.5602, tempUid:null,      address:'Kronenstrasse 18, 8006 Zürich',          hours:'12:00–19:00', season:'Ganzjährig', defaultTemp:29,
-    hoursPerDay:{ mo:'12:00–19:00', di:'12:00–19:00', mi:'12:00–19:00', do:'12:00–19:00', so:'09:00–16:00' } },
+    hoursPerDay:{ mo:'12:00–13:30, 16:00–19:00', di:'12:00–13:30, 16:00–19:00', mi:'12:00–19:00', do:'12:30–19:00', so:'09:00–16:00' } },
   { uid:'SSD-4',    name:'Hallenbad City',                    type:'halle', lat:47.3721, lng:8.5329, tempUid:null,      address:'Sihlstrasse 71, 8001 Zürich',            hours:'06:00–22:00', season:'Ganzjährig', defaultTemp:28 },
   { uid:'SSD-6',    name:'Hallenbad Leimbach',                type:'halle', lat:47.3265, lng:8.5137, tempUid:null,      address:'Leimbachstrasse 200, 8041 Zürich',       hours:'06:00–22:00', season:'Ganzjährig', defaultTemp:29,
-    hoursPerDay:{ mo:'06:00–21:00', di:'06:00–21:00', mi:'06:00–21:00', do:'06:00–21:00', fr:'06:00–22:00', sa:'09:00–18:00', so:'09:00–18:00' } },
+    hoursPerDay:{ mo:'12:00–21:00', di:'12:00–21:00', mi:'12:00–21:00', do:'12:00–21:00', fr:'12:00–21:00', sa:'09:00–18:00', so:'09:00–18:00' } },
   { uid:'SSD-7',    name:'Hallenbad Oerlikon',                type:'halle', lat:47.4107, lng:8.5561, tempUid:null,      address:'Wallisellenstrasse 100, 8050 Zürich',    hours:'06:00–22:00', season:'Ganzjährig', defaultTemp:28,
     hoursPerDay:{ mo:'06:00–20:00', di:'06:00–20:00', mi:'06:00–22:00', do:'06:00–20:00', fr:'06:00–22:00', sa:'06:00–22:00', so:'06:00–22:00' } },
   { uid:'SSD-5',    name:'Wärmebad Käferberg',                type:'halle', lat:47.3994, lng:8.5180, tempUid:null,      address:'Emil-Klöti-Strasse 21, 8037 Zürich',     hours:'06:30–22:00', season:'Ganzjährig', defaultTemp:32,
-    hoursPerDay:{ mo:'11:00–15:00', di:'06:30–22:00', mi:'06:30–22:00', do:'06:30–22:00', fr:'06:30–22:00', sa:'09:00–16:00', so:'09:00–16:00' } },
+    hoursPerDay:{ mo:'09:00–15:00', di:'06:30–09:00, 11:00–22:00', mi:'06:30–15:00, 18:00–22:00', do:'06:30–08:00, 11:00–22:00', fr:'06:30–22:00', sa:'09:00–16:00', so:'09:00–16:00' },
+    hoursPerDayWinter:{ sa:'09:00–18:00', so:'09:00–18:00' } },
 ];
 
 const VENUE_MAP = Object.fromEntries(VENUES.map(v => [v.uid, v]));
@@ -368,7 +375,7 @@ let HALLE_TEMPS = {
   'SSD-5': [
     { name: 'Wärmebad', temp: 32 },
   ],
-  'SSD-1': [{ name: 'Schwimmerbecken', temp: 29 }, { name: 'Lehrschwimmbecken', temp: 30 }],
+  'SSD-1': [{ name: 'Schwimmerbecken', temp: 27 }, { name: 'Nichtschwimmerbecken', temp: 30 }, { name: 'Sprung- & Tauchbecken', temp: 29 }, { name: 'Wellnessbecken', temp: 33 }],
   'SSD-2': [{ name: 'Schwimmerbecken', temp: 29 }],
   'SSD-3': [{ name: 'Schwimmerbecken', temp: 29 }],
   'SSD-6': [{ name: 'Schwimmerbecken', temp: 28 }],
@@ -468,7 +475,12 @@ function hoursForDay(uid, wd) {
     return p.zeit;
   }
   // Wenn hoursPerDay vorhanden: nur diese verwenden — fehlender Tag = kein Betrieb
-  if (v.hoursPerDay) return v.hoursPerDay[wd] ?? null;
+  if (v.hoursPerDay) {
+    const month = parseInt(dateForWd(wd).slice(5, 7));
+    const winter = month >= 10 || month <= 4;      // Okt–Apr
+    if (winter && v.hoursPerDayWinter?.[wd]) return v.hoursPerDayWinter[wd];
+    return v.hoursPerDay[wd] ?? null;
+  }
   return v.hours ?? null;
 }
 
@@ -509,11 +521,33 @@ function statusText(uid) {
   const st = seasonState(v);
   if (st === 'after')  return T().seasonEnded(fmtIsoShort(v.seasonTo));
   if (st === 'before') return T().seasonStarts(fmtIsoShort(v.seasonFrom));
+  if (weatherClosed(uid)) return T().closedWeather;
   if (computeIsOpen(uid)) { const c = closingTime(uid); return c ? T().openUntil(c) : T().open; }
   // Sommerbad ohne Saisondaten, das die Stadt als geschlossen meldet: keine Prognose
   const cityStatus = LIVE?.venues?.[uid]?.openClosed ?? _temps?.byUid?.[v?.tempUid]?.openClosed;
   if (v && v.type !== 'halle' && !v.seasonFrom && cityStatus === 'geschlossen') return T().closed;
   return nextOpenTime(uid) || T().closed;
+}
+
+function intervals(h) {
+  if (!h) return [];
+  return h.split(',').map(part => {
+    const [a, b] = part.split(/[–-]/).map(x => x.trim());
+    return (a && b) ? { from: a, to: b, fromMin: hhmm(a), toMin: hhmm(b) } : null;
+  }).filter(Boolean);
+}
+
+// Nachmittags «nur bei schönem Wetter»: hat die Stadt das Bad HEUTE auf «geschlossen» gesetzt,
+// ist es wegen des Wetters zu (ein alter Status von gestern zählt nicht)
+function weatherClosed(uid) {
+  const v = VENUE_MAP[uid];
+  const p = hoursPeriod(v, todayISO());
+  if (!p?.schoenwetter_ab || nowHHMM() < hhmm(p.schoenwetter_ab)) return false;
+  const live = LIVE?.venues?.[uid];
+  const t    = _temps?.byUid?.[v?.tempUid] || {};
+  const status  = live?.openClosed ?? t.openClosed;
+  const changed = live?.statusGeaendert ?? t.statusGeaendert;
+  return status === 'geschlossen' && !!changed && changed.slice(0, 10) === todayISO();
 }
 
 function computeIsOpen(uid) {
@@ -522,30 +556,25 @@ function computeIsOpen(uid) {
   const v = VENUE_MAP[uid];
   const st = seasonState(v);
   if (st === 'before' || st === 'after') return false;
+  if (weatherClosed(uid)) return false;
   // Sommerbad ohne bekannte Saisondaten (z.B. Dolder): Status der Stadt gilt
   const cityStatus = live?.openClosed ?? _temps?.byUid?.[v?.tempUid]?.openClosed;
   if (v && v.type !== 'halle' && !v.seasonFrom && cityStatus === 'geschlossen') return false;
   const h = hoursForDay(uid, todayWd());
   // Öffnungszeiten sind zuverlässiger als API-Status (der bei voller Kapazität
   // oder Daten-Lag fälschlicherweise "geschlossen" meldet)
-  if (h) {
-    const parts = h.split(/[–-]/);
-    if (parts.length === 2) {
-      const nowMin = nowHHMM();
-      if (nowMin >= hhmm(parts[0].trim()) && nowMin < hhmm(parts[1].trim())) {
-        return true;
-      }
-    }
-  }
+  const nowMin = nowHHMM();
+  if (intervals(h).some(iv => nowMin >= iv.fromMin && nowMin < iv.toMin)) return true;
   // Ausserhalb der Öffnungszeiten: nur "offen" wenn API es explizit sagt
   return live?.openClosed === 'offen';
 }
 
 function closingTime(uid) {
-  const h = hoursForDay(uid, todayWd());
-  if (!h) return null;
-  const parts = h.split(/[–-]/);
-  return parts.length === 2 ? parts[1].trim() : null;
+  const ivs = intervals(hoursForDay(uid, todayWd()));
+  if (!ivs.length) return null;
+  const nowMin = nowHHMM();
+  const cur = ivs.find(iv => nowMin >= iv.fromMin && nowMin < iv.toMin);
+  return (cur || ivs[ivs.length - 1]).to;
 }
 
 function nextOpenTime(uid) {
@@ -556,14 +585,10 @@ function nextOpenTime(uid) {
     const d = new Date(now);
     d.setDate(now.getDate() + i);
     const wd = WD[d.getDay()];
-    const h = hoursForDay(uid, wd);
-    if (!h) continue;
-    const parts = h.split(/[–-]/);
-    if (parts.length !== 2) continue;
-    const openMin = hhmm(parts[0].trim());
-    if (i === 0 && nowMin >= openMin) continue;
+    const next = intervals(hoursForDay(uid, wd)).find(iv => i > 0 || iv.fromMin > nowMin);
+    if (!next) continue;
     const prefix = i === 0 ? '' : i === 1 ? T().tomorrow + ' ' : T().wdShort[wd] + ' ';
-    return T().opens(prefix, parts[0].trim());
+    return T().opens(prefix, next.from);
   }
   return null;
 }
@@ -798,10 +823,8 @@ function detailBarChart(uid, dayType, periodColor, zoomed, res, showFocus, wd) {
   // Auf Öffnungszeiten einschränken
   const meta = VENUE_MAP[uid];
   function openingParts() {
-    const h = (wd ? hoursForDay(uid, wd) : null) || meta?.hours;
-    if (!h) return null;
-    const parts = h.split(/[–-]/);
-    return parts.length === 2 ? parts.map(p => p.trim()) : null;
+    const ivs = intervals((wd ? hoursForDay(uid, wd) : null) || meta?.hours);
+    return ivs.length ? [ivs[0].from, ivs[ivs.length - 1].to] : null;
   }
   function filterToHours(arr) {
     const p = openingParts();
@@ -1137,6 +1160,8 @@ function renderDetail() {
   const sState    = seasonState(v);
   const offSeason = sState === 'before' || sState === 'after';
   const hasGuests = live?.maxspace != null && !offSeason;
+  const todayPeriod = offSeason ? null : hoursPeriod(v, todayISO());
+  const fairFrom    = todayPeriod?.schoenwetter_ab || null;   // z.B. '14:00'
   const fav = !!S.favs[v.uid];
   const todayStr = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Zurich' });
   const relevantHinweise = (HINWEISE[v.uid] || []).filter(h => !h.bis || h.bis >= todayStr);
@@ -1305,6 +1330,7 @@ function renderDetail() {
         <i style="width:6px;height:6px;border-radius:50%;background:${statusDot};display:inline-block;"></i>${statusText(v.uid)}
         <span style="color:${META};">· ${T().season}: ${seasonLabel(v)}</span>
       </div>
+      ${!offSeason && hoursPeriod(v, todayISO())?.schoenwetter_ab ? `<div style="margin-top:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:${META};">☀ ${T().fairWeather(hoursPeriod(v, todayISO()).schoenwetter_ab)}</div>` : ''}
       ${v.note ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:${META};margin-top:6px;">${tr(v.note)}</div>` : ''}
 
       ${chartSection}
@@ -1332,7 +1358,10 @@ function renderDetail() {
 
         ${offSeason ? '' : `<div class="stat-card" onclick="toggleStat('hours')" id="sc-hours" style="${S.hoursOpen ? 'background:#ECECEC;' : ''}">
           <div style="flex:1;display:flex;align-items:flex-end;">
-            <div class="stat-val hours" style="color:${BLACK};">${String(todayHoursDisplay).replace('–', '–<wbr>')}</div>
+            <div>
+              <div class="stat-val hours" style="color:${BLACK};">${String(todayHoursDisplay).split(', ').map(x => x.replace('–', '–<wbr>')).join('<br>')}</div>
+              ${fairFrom ? `<div style="margin-top:5px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:${META};">☀ ${T().fairWeatherShort(fairFrom)}</div>` : ''}
+            </div>
           </div>
           <div class="stat-lbl">${T().hours}</div>
           <span class="chev${S.hoursOpen ? ' open' : ''}" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 10 10"><path d="M2 3.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -1350,7 +1379,7 @@ function renderDetail() {
         <div style="flex:1 1 220px;background:#F4F4F4;border-radius:10px;padding:12px 10px;">
           <div class="stat-lbl" style="margin:0 10px 6px;">${T().hours}</div>
           <div style="display:flex;flex-direction:column;gap:2px;">${hoursList}</div>
-          ${hoursPeriod(v, todayISO())?.schoenwetter_ab ? `<div style="margin:8px 10px 0;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:${META};line-height:1.5;">${T().fairWeather(hoursPeriod(v, todayISO()).schoenwetter_ab)}</div>` : ''}
+          ${fairFrom ? `<div style="margin:10px 10px 2px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:${META};line-height:1.5;">☀ ${T().fairWeatherSplit(todayPeriod.zeit.split('–')[0], fairFrom, todayPeriod.zeit.split('–')[1])}</div>` : ''}
           ${relevantHinweise.length ? `
           <div style="margin:10px 10px 0;padding-top:10px;border-top:1px solid #E2E2E0;">
             <button onclick="event.stopPropagation();toggleHinweise()"
@@ -1634,6 +1663,7 @@ function parseLive(raw) {
       maxspace:         (v.maxspace    != null && v.maxspace    !== '') ? Number(v.maxspace)    : null,
       temperatureWater: temp,
       openClosed:       v.openClosed,
+      statusGeaendert:  v.statusGeaendert ?? null,
     };
   }
   return { timestamp: raw.timestamp, venues };
@@ -1818,6 +1848,7 @@ async function fetchTemperaturenLive() {
     const entry = {
       temperatureWater: bath.querySelector('temperatureWater')?.textContent?.trim() || null,
       openClosed:       bath.querySelector('openClosedTextPlain')?.textContent?.trim() || null,
+      statusGeaendert:  (m => m ? `${m[3]}-${m[2]}-${m[1]}T${m[4]}` : null)((bath.querySelector('dateModified')?.textContent || '').match(/(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2}:\d{2})/)),
     };
     if (uid)  byUid[uid]   = entry;
     if (name) byName[name] = entry;
@@ -1848,6 +1879,7 @@ function buildLiveFromWS(wsArray) {
       maxspace:         bad.maxspace,
       temperatureWater: t.temperatureWater ?? wsTemp,
       openClosed:       t.openClosed ?? bad.openClosed ?? null,
+      statusGeaendert:  t.statusGeaendert ?? null,
     };
   }
   // Venues nur in der XML-API (keine Besucherzahlen, aber Temperatur + Status)
@@ -1861,6 +1893,7 @@ function buildLiveFromWS(wsArray) {
       currentfill: null, freespace: null, maxspace: null,
       temperatureWater: t.temperatureWater || null,
       openClosed:       t.openClosed       || null,
+      statusGeaendert:  t.statusGeaendert  || null,
     };
   }
   return { timestamp: ts, venues };
@@ -1904,7 +1937,7 @@ async function fetchTempsFromCache() {
     const temp   = v.temperatureWater != null ? String(v.temperatureWater) : null;
     const status = v.openClosed || null;
     if (!temp && !status) continue;
-    const entry = { temperatureWater: temp, openClosed: status };
+    const entry = { temperatureWater: temp, openClosed: status, statusGeaendert: v.statusGeaendert || null };
     byUid[uid] = entry;
     if (meta.tempUid) byUid[meta.tempUid] = entry;
     byName[meta.name] = entry;
@@ -1989,7 +2022,7 @@ Promise.all([
     if (consent === 'accepted' || consent === 'declined') banner.style.display = 'none';
     document.getElementById('cookie-accept').addEventListener('click', function () {
       localStorage.setItem('cookie_consent', 'accepted');
-      gtag('consent', 'update', { 'analytics_storage': 'granted' });
+      loadAnalytics();
       banner.style.display = 'none';
     });
     document.getElementById('cookie-decline').addEventListener('click', function () {
