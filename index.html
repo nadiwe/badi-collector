@@ -148,6 +148,10 @@ function onRGB(hex) {
   return L > 0.3 ? '0,0,0' : '255,255,255';
 }
 const onColor = hex => `rgb(${onRGB(hex)})`;
+// E-Mail wird erst im Browser zusammengesetzt: steht so nicht lesbar im Quelltext (weniger Spam)
+const MAIL      = ['nadia.west', 'hispeed.ch'].join('@');
+const MAIL_LINK = `<a href="mailto:${MAIL}">${MAIL}</a>`;
+
 // ── Sprache (DE/EN) ────────────────────────────────────────────────────────
 let LANG = 'de';
 try { if (localStorage.getItem('wasserziit_lang') === 'en') LANG = 'en'; } catch(e) {}
@@ -203,7 +207,7 @@ const I18N = {
       impressum: {
         title: 'Impressum',
         sections: [
-          ['Verantwortlich', 'Nadia Westermann · <a href="mailto:nadia.west@hispeed.ch">nadia.west@hispeed.ch</a><br>Ideen, Fehler oder Wünsche? Schreib mir gerne.'],
+          ['Verantwortlich', `Nadia Westermann · ${MAIL_LINK}<br>Ideen, Fehler oder Wünsche? Schreib mir gerne.`],
           ['Hinweis', 'Privates, nicht-kommerzielles Projekt – keine offizielle Seite der Stadt Zürich.<br>Alle Angaben ohne Gewähr. Öffnungszeiten, Temperaturen und Auslastung können von der tatsächlichen Situation abweichen.'],
           ['Daten', 'Wassertemperatur &amp; Status: Sportamt Stadt Zürich · Besucherzahlen: Crowdmonitor · Durchschnittliche Auslastung: selbst berechnet aus gesammelten Live-Daten'],
           ['Karte', 'Esri, HERE, Garmin'],
@@ -215,7 +219,7 @@ const I18N = {
           ['Google Analytics', 'Nur mit deiner Einwilligung. Misst Besucherzahlen; Daten können in die USA übermittelt werden. Widerruf jederzeit über «Cookie-Einstellungen».'],
           ['Externe Dienste', 'GitHub Pages (Hosting), unpkg.com, Esri (Karte) sowie Crowdmonitor und Stadt Zürich (Live-Daten) erhalten technisch bedingt deine IP-Adresse.'],
           ['Im Browser gespeichert', 'Favoriten, Sprache und Cookie-Wahl – nur lokal auf deinem Gerät.'],
-          ['Kontakt', 'Auskunft oder Löschung: <a href="mailto:nadia.west@hispeed.ch">nadia.west@hispeed.ch</a>'],
+          ['Kontakt', `Auskunft oder Löschung: ${MAIL_LINK}`],
         ],
       },
     },
@@ -270,7 +274,7 @@ const I18N = {
       impressum: {
         title: 'Legal notice',
         sections: [
-          ['Responsible', 'Nadia Westermann · <a href="mailto:nadia.west@hispeed.ch">nadia.west@hispeed.ch</a><br>Ideas, bugs or wishes? Feel free to write to me.'],
+          ['Responsible', `Nadia Westermann · ${MAIL_LINK}<br>Ideas, bugs or wishes? Feel free to write to me.`],
           ['Note', 'Private, non-commercial project – not an official site of the City of Zurich.<br>All information without guarantee. Opening hours, temperatures and occupancy may differ from the actual situation.'],
           ['Data', 'Water temperature &amp; status: Sports Department, City of Zurich · Visitor numbers: Crowdmonitor · Average occupancy: calculated independently from collected live data'],
           ['Map', 'Esri, HERE, Garmin'],
@@ -282,7 +286,7 @@ const I18N = {
           ['Google Analytics', 'Only with your consent. Measures visitor numbers; data may be transferred to the USA. Withdraw any time via “Cookie settings”.'],
           ['External services', 'GitHub Pages (hosting), unpkg.com, Esri (map) as well as Crowdmonitor and the City of Zurich (live data) receive your IP address for technical reasons.'],
           ['Stored in your browser', 'Favourites, language and cookie choice – only locally on your device.'],
-          ['Contact', 'Information or deletion: <a href="mailto:nadia.west@hispeed.ch">nadia.west@hispeed.ch</a>'],
+          ['Contact', `Information or deletion: ${MAIL_LINK}`],
         ],
       },
     },
@@ -1590,9 +1594,9 @@ function renderLegal() {
   const feedbackBody = S.legal === 'feedback' ? `
     <div style="margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.65;color:${INK};">${T().feedbackText}</div>
     <div style="margin-top:20px;display:flex;flex-wrap:wrap;align-items:center;gap:12px;">
-      <a href="mailto:nadia.west@hispeed.ch?subject=${encodeURIComponent(T().feedbackSubject)}"
+      <a href="mailto:${MAIL}?subject=${encodeURIComponent(T().feedbackSubject)}"
         style="display:inline-flex;align-items:center;height:38px;padding:0 18px;border-radius:10px;background:#000;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.03em;text-decoration:none;">${T().feedbackBtn}</a>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:${META};">nadia.west@hispeed.ch</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:${META};">${MAIL}</span>
     </div>` : '';
   const sections = L.sections.map(([h, body]) => `
     <div style="margin-top:18px;">
