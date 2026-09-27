@@ -172,7 +172,7 @@ const I18N = {
     countLine: (n, open) => `${n} Badis · ${open} offen`,
     tiles: 'Kacheln', map: 'Karte', light: 'Hell', dark: 'Dunkel',
     emptyTitle: 'Keni Badis gfunde', emptyHint: 'Probier en andere Filter ode füeg Favoriten hinzue.',
-    open: 'offen', openUntil: t => `offen bis ${t}`, closed: 'geschlossen', closedWeather: 'geschlossen (schlechtes Wetter)',
+    open: 'offen', openUntil: t => `offen bis ${t}`, closed: 'geschlossen', closedWeather: 'geschlossen (schlechtes Wetter)', closedEvent: 'geschlossen (Anlass)', todayNote: 'Heute', summerMonths: 'Mai–Sep', winterMonths: 'Okt–Apr',
     opens: (prefix, t) => `öffnet ${prefix}${t}`, tomorrow: 'morgen',
     revision: 'Revision',
     devMore: p => `${p}% voller als sonst`, devLess: p => `${p}% ruhiger als sonst`, devSame: 'etwa wie sonst',
@@ -239,7 +239,7 @@ const I18N = {
     countLine: (n, open) => `${n} pools · ${open} open`,
     tiles: 'Tiles', map: 'Map', light: 'Light', dark: 'Dark',
     emptyTitle: 'No pools found', emptyHint: 'Try a different filter or add some favourites.',
-    open: 'open', openUntil: t => `open until ${t}`, closed: 'closed', closedWeather: 'closed (bad weather)',
+    open: 'open', openUntil: t => `open until ${t}`, closed: 'closed', closedWeather: 'closed (bad weather)', closedEvent: 'closed (event)', todayNote: 'Today', summerMonths: 'May–Sep', winterMonths: 'Oct–Apr',
     opens: (prefix, t) => `opens ${prefix}${t}`, tomorrow: 'tomorrow',
     revision: 'Maintenance',
     devMore: p => `${p}% busier than usual`, devLess: p => `${p}% quieter than usual`, devSame: 'about as usual',
@@ -525,6 +525,7 @@ function statusText(uid) {
   const st = seasonState(v);
   if (st === 'after')  return T().seasonEnded(fmtIsoShort(v.seasonTo));
   if (st === 'before') return T().seasonStarts(fmtIsoShort(v.seasonFrom));
+  if (eventClosure(uid)) return T().closedEvent;
   if (weatherClosed(uid)) return T().closedWeather;
   if (computeIsOpen(uid)) { const c = closingTime(uid); return c ? T().openUntil(c) : T().open; }
   // Sommerbad ohne Saisondaten, das die Stadt als geschlossen meldet: keine Prognose
@@ -543,6 +544,14 @@ function intervals(h) {
 
 // Nachmittags «nur bei schönem Wetter»: hat die Stadt das Bad HEUTE auf «geschlossen» gesetzt,
 // ist es wegen des Wetters zu (ein alter Status von gestern zählt nicht)
+// Sperrung wegen Anlass (besondere-hinweise.json, ganzesBad: true) — jetzt gerade aktiv?
+function eventClosure(uid) {
+  const d = new Date();
+  const now = todayISO() + 'T' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  return (HINWEISE[uid] || []).find(h => h.ganzesBad && h.von && h.bis &&
+    now >= `${h.von}T${h.ab || '00:00'}` && now < `${h.bis}T${h.bisZeit || '24:00'}`) || null;
+}
+
 function weatherClosed(uid) {
   const v = VENUE_MAP[uid];
   const p = hoursPeriod(v, todayISO());
@@ -560,7 +569,7 @@ function computeIsOpen(uid) {
   const v = VENUE_MAP[uid];
   const st = seasonState(v);
   if (st === 'before' || st === 'after') return false;
-  if (weatherClosed(uid)) return false;
+  if (eventClosure(uid) || weatherClosed(uid)) return false;
   // Sommerbad ohne bekannte Saisondaten (z.B. Dolder): Status der Stadt gilt
   const cityStatus = live?.openClosed ?? _temps?.byUid?.[v?.tempUid]?.openClosed;
   if (v && v.type !== 'halle' && !v.seasonFrom && cityStatus === 'geschlossen') return false;
@@ -1227,17 +1236,17 @@ function renderDetail() {
     const isToday = todayWd() === w.k;
     const total = GUEST_WEEK_TOTAL[v.uid]?.[w.k];
     const val = total != null ? '~' + numFmt(Math.round(total)) : '–';
-    const accentBg = isToday ? typeColor : 'transparent';
+    const accentBg = 'transparent';
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-radius:8px;background:${accentBg};">
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${isToday ? 600 : 400};color:${isToday ? '#fff' : INK};">${w.s}</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${isToday ? '#fff' : META};">${val}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${isToday ? 700 : 400};color:${isToday ? typeColor : INK};">${w.s}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${isToday ? 700 : 600};color:${isToday ? typeColor : META};">${val}</span>
     </div>`;
   }).join('');
 
   const ROW = (accentBg, label, labelBold, value, fg, meta) =>
-    `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-radius:8px;background:${accentBg};min-width:0;">
+    `<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:5px 10px;border-radius:8px;background:${accentBg};min-width:0;">
       <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${labelBold?600:400};color:${fg};white-space:nowrap;flex-shrink:0;">${label}</span>
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:${meta};white-space:nowrap;padding-left:8px;">${value}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:${labelBold ? 700 : 600};color:${meta};white-space:nowrap;padding-left:8px;text-align:right;line-height:1.6;">${value}</span>
     </div>`;
 
   const tempList = wdEntries.map(w => {
@@ -1245,8 +1254,8 @@ function renderDetail() {
     const weekTemp = TEMP_WEEK[v.uid]?.[w.k];
     const tVal = isToday && hasTemp ? parseFloat(temp) + '°'
                : weekTemp != null   ? weekTemp + '°' : '–';
-    return ROW(isToday ? typeColor : 'transparent', w.s, isToday, tVal,
-               isToday ? '#fff' : INK, isToday ? '#fff' : META);
+    return ROW('transparent', w.s, isToday, tVal,
+               isToday ? typeColor : INK, isToday ? typeColor : META);   // heute: Schrift in Typfarbe, kein Hintergrund
   }).join('');
 
   // Halle: statische Becken-Liste — Name darf kürzen, Temp immer sichtbar
@@ -1260,9 +1269,18 @@ function renderDetail() {
   // Hours weekly
   const hoursList = wdEntries.map(w => {
     const isToday = todayWd() === w.k;
-    const h = hoursForDay(v.uid, w.k) || '–';
-    return ROW(isToday ? typeColor : 'transparent', w.s, isToday, h,
-               isToday ? '#fff' : INK, isToday ? '#fff' : META);
+    let h = hoursForDay(v.uid, w.k) || '–';
+    // Saisonal unterschiedliche Zeiten (z.B. Bläsi, Käferberg am Wochenende): beide Varianten mit Zeitraum anzeigen
+    const winter = v.hoursPerDayWinter?.[w.k];
+    if (winter && v.hoursPerDay?.[w.k]) {
+      const m = parseInt(dateForWd(w.k).slice(5, 7));
+      const isWinter = m >= 10 || m <= 4;
+      const line = (zeit, label, active) =>
+        `<span style="opacity:${active ? 1 : .6};font-weight:${active ? 700 : 500};">${zeit} <span style="font-weight:500;">${label}</span></span>`;
+      h = line(v.hoursPerDay[w.k], T().summerMonths, !isWinter) + '<br>' + line(winter, T().winterMonths, isWinter);
+    }
+    return ROW('transparent', w.s, isToday, h,
+               isToday ? typeColor : INK, isToday ? typeColor : META);   // heute: Schrift in Typfarbe, kein Hintergrund
   }).join('');
 
   // Ausserhalb der Saison: Rückblick (Monate oder Wochen) statt Tagesgrafik
@@ -1332,8 +1350,10 @@ function renderDetail() {
       </div>
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;color:${statusColor};">
         <i style="width:6px;height:6px;border-radius:50%;background:${statusDot};display:inline-block;"></i>${statusText(v.uid)}
-        <span style="color:${META};">· ${T().season}: ${seasonLabel(v)}</span>
+        ${isHalle ? '' : `<span style="color:${META};">· ${T().season}: ${seasonLabel(v)}</span>`}
       </div>
+      ${(HINWEISE[v.uid] || []).filter(h => h.typ === 'schliessung' && h.von <= todayISO() && todayISO() <= h.bis).map(h =>
+        `<div style="margin-top:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8C4A1C;">⚠ ${T().todayNote}${h.zeiten ? ' ' + h.zeiten : ''}: ${h.beschreibung}</div>`).join('')}
       ${!offSeason && hoursPeriod(v, todayISO())?.schoenwetter_ab ? `<div style="margin-top:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:${META};">☀ ${T().fairWeather(hoursPeriod(v, todayISO()).schoenwetter_ab)}</div>` : ''}
       ${v.note ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:${META};margin-top:6px;">${tr(v.note)}</div>` : ''}
 
