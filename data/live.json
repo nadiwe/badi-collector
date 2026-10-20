@@ -1,13 +1,29 @@
 {
-  "timestamp": "2026-10-20 17:14:28",
+  "timestamp": "2026-10-20 17:15:17",
   "venues": {
-    "seb6947": {
-      "currentfill": "1",
-      "freespace": 3499,
-      "maxspace": 3500,
+    "LETZI-1": {
+      "currentfill": "0",
+      "freespace": 3800,
+      "maxspace": 3800,
       "temperatureWater": "22",
       "openClosed": "geschlossen",
-      "statusGeaendert": "2026-09-27T19:27"
+      "statusGeaendert": "2026-09-27T19:24"
+    },
+    "SSD-3": {
+      "currentfill": "11",
+      "freespace": 17,
+      "maxspace": 28,
+      "temperatureWater": null,
+      "openClosed": null,
+      "statusGeaendert": null
+    },
+    "seb6946": {
+      "currentfill": "1",
+      "freespace": 4499,
+      "maxspace": 4500,
+      "temperatureWater": "21",
+      "openClosed": "geschlossen",
+      "statusGeaendert": "2026-09-27T19:23"
     },
     "SSD-6": {
       "currentfill": "35",
@@ -17,101 +33,13 @@
       "openClosed": null,
       "statusGeaendert": null
     },
-    "fb012": {
-      "currentfill": "114",
-      "freespace": 2486,
-      "maxspace": 2600,
-      "temperatureWater": "23",
-      "openClosed": "geschlossen",
-      "statusGeaendert": "2026-09-20T19:00"
-    },
-    "fb006": {
-      "currentfill": "2",
-      "freespace": 7498,
-      "maxspace": 7500,
-      "temperatureWater": "22",
-      "openClosed": "geschlossen",
-      "statusGeaendert": "2026-09-26T13:14"
-    },
-    "SSD-7": {
-      "currentfill": "166",
-      "freespace": 834,
-      "maxspace": 1000,
-      "temperatureWater": null,
-      "openClosed": null,
-      "statusGeaendert": null
-    },
-    "fb018": {
-      "currentfill": "0",
-      "freespace": 2000,
-      "maxspace": 2000,
-      "temperatureWater": "21",
-      "openClosed": "geschlossen",
-      "statusGeaendert": "2026-09-20T18:51"
-    },
-    "seb6946": {
-      "currentfill": "2",
-      "freespace": 4498,
-      "maxspace": 4500,
-      "temperatureWater": "21",
-      "openClosed": "geschlossen",
-      "statusGeaendert": "2026-09-27T19:23"
-    },
-    "fb008": {
-      "currentfill": "0",
-      "freespace": 2001,
-      "maxspace": 2001,
-      "temperatureWater": "25",
-      "openClosed": "geschlossen",
-      "statusGeaendert": "2026-09-27T19:11"
-    },
-    "SSD-10": {
-      "currentfill": "37",
-      "freespace": 763,
-      "maxspace": 800,
-      "temperatureWater": "17",
-      "openClosed": "offen",
-      "statusGeaendert": "2026-10-20T09:03"
-    },
-    "SSD-11": {
-      "currentfill": "15",
-      "freespace": 1985,
-      "maxspace": 2000,
-      "temperatureWater": "23",
-      "openClosed": "offen",
-      "statusGeaendert": "2026-10-20T09:04"
-    },
-    "BADI-1": {
+    "flb6941": {
       "currentfill": "1",
-      "freespace": 52,
-      "maxspace": 53,
+      "freespace": 349,
+      "maxspace": 350,
       "temperatureWater": "22",
       "openClosed": "geschlossen",
-      "statusGeaendert": "2026-09-23T15:05"
-    },
-    "flb8803": {
-      "currentfill": "0",
-      "freespace": 800,
-      "maxspace": 800,
-      "temperatureWater": "22",
-      "openClosed": "geschlossen",
-      "statusGeaendert": "2026-09-21T09:48"
-    },
-    "SSD-3": {
-      "currentfill": "12",
-      "freespace": 16,
-      "maxspace": 28,
-      "temperatureWater": null,
-      "openClosed": null,
-      "statusGeaendert": null
-    },
-    "SSD-2": {
-      "currentfill": "32",
-      "freespace": 38,
-      "maxspace": 70,
-      "temperatureWater": null,
-      "openClosed": null,
-      "statusGeaendert": null
+      "statusGeaendert": "2026-09-20T19:07"
     },
     "seb6948": {
       "currentfill": "0",
@@ -121,25 +49,65 @@
       "openClosed": "geschlossen",
       "statusGeaendert": "2026-09-21T10:20"
     },
-    "flb6941": {
-      "currentfill": "1",
-      "freespace": 349,
-      "maxspace": 350,
-      "temperatureWater": "22",
-      "openClosed": "geschlossen",
-      "statusGeaendert": "2026-09-20T19:07"
+    "SSD-2": {
+      "currentfill": "30",
+      "freespace": 40,
+      "maxspace": 70,
+      "temperatureWater": null,
+      "openClosed": null,
+      "statusGeaendert": null
     },
-    "LETZI-1": {
-      "currentfill": "0",
-      "freespace": 3800,
-      "maxspace": 3800,
+    "SSD-5": {
+      "currentfill": "29",
+      "freespace": 41,
+      "maxspace": 70,
+      "temperatureWater": null,
+      "openClosed": null,
+      "statusGeaendert": null
+    },
+    "SSD-10": {
+      "currentfill": "36",
+      "freespace": 764,
+      "maxspace": 800,
+      "temperatureWater": "17",
+      "openClosed": "offen",
+      "statusGeaendert": "2026-10-20T09:03"
+    },
+    "fb006": {
+      "currentfill": "2",
+      "freespace": 7498,
+      "maxspace": 7500,
       "temperatureWater": "22",
       "openClosed": "geschlossen",
-      "statusGeaendert": "2026-09-27T19:24"
+      "statusGeaendert": "2026-09-26T13:14"
+    },
+    "fb008": {
+      "currentfill": "0",
+      "freespace": 2001,
+      "maxspace": 2001,
+      "temperatureWater": "25",
+      "openClosed": "geschlossen",
+      "statusGeaendert": "2026-09-27T19:11"
+    },
+    "SSD-11": {
+      "currentfill": "17",
+      "freespace": 1983,
+      "maxspace": 2000,
+      "temperatureWater": "23",
+      "openClosed": "offen",
+      "statusGeaendert": "2026-10-20T09:04"
+    },
+    "fb018": {
+      "currentfill": "0",
+      "freespace": 2000,
+      "maxspace": 2000,
+      "temperatureWater": "21",
+      "openClosed": "geschlossen",
+      "statusGeaendert": "2026-09-20T18:51"
     },
     "SSD-4": {
-      "currentfill": "210",
-      "freespace": 10,
+      "currentfill": "212",
+      "freespace": 8,
       "maxspace": 220,
       "temperatureWater": null,
       "openClosed": null,
@@ -153,13 +121,37 @@
       "openClosed": "geschlossen",
       "statusGeaendert": "2026-09-21T09:48"
     },
-    "SSD-5": {
-      "currentfill": "29",
-      "freespace": 41,
-      "maxspace": 70,
+    "SSD-7": {
+      "currentfill": "166",
+      "freespace": 834,
+      "maxspace": 1000,
       "temperatureWater": null,
       "openClosed": null,
       "statusGeaendert": null
+    },
+    "fb012": {
+      "currentfill": "113",
+      "freespace": 2487,
+      "maxspace": 2600,
+      "temperatureWater": "23",
+      "openClosed": "geschlossen",
+      "statusGeaendert": "2026-09-20T19:00"
+    },
+    "BADI-1": {
+      "currentfill": "1",
+      "freespace": 52,
+      "maxspace": 53,
+      "temperatureWater": "22",
+      "openClosed": "geschlossen",
+      "statusGeaendert": "2026-09-23T15:05"
+    },
+    "seb6947": {
+      "currentfill": "1",
+      "freespace": 3499,
+      "maxspace": 3500,
+      "temperatureWater": "22",
+      "openClosed": "geschlossen",
+      "statusGeaendert": "2026-09-27T19:27"
     },
     "flb6939": {
       "currentfill": "0",
@@ -168,6 +160,14 @@
       "temperatureWater": "22",
       "openClosed": "geschlossen",
       "statusGeaendert": "2026-09-21T10:12"
+    },
+    "flb8803": {
+      "currentfill": "0",
+      "freespace": 800,
+      "maxspace": 800,
+      "temperatureWater": "22",
+      "openClosed": "geschlossen",
+      "statusGeaendert": "2026-09-21T09:48"
     },
     "flb6938": {
       "currentfill": null,
