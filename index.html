@@ -115,12 +115,14 @@ a{text-decoration:none;color:inherit;}
 .stat-val.hours{font-size:clamp(15px,3.8vw,24px);line-height:1.1;}
 .stat-lbl{font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:#8C8C8C;font-weight:700;margin-top:10px;}
 .lbl-short{display:none;}
+.footer-city{margin-left:auto;}
 .wd-btn{height:32px;}
 .legal-body a{color:inherit;text-decoration:underline;text-underline-offset:2px;}
 @media (max-width:600px){
   .lbl-long{display:none;}.lbl-short{display:inline;}
   .sw-btn{padding:0 8px;letter-spacing:0;}
   .stat-row{gap:6px;}
+  .footer-city{margin-left:0;flex-basis:100%;}
   .wd-btn{height:28px;font-size:10.5px!important;}
   .stat-row>.stat-card{padding:12px 10px;}
   .stat-lbl{font-size:9px;letter-spacing:.06em;margin-top:8px;}
@@ -506,6 +508,21 @@ function seasonState(v) {
   if (!v?.seasonFrom) return null;
   const t = todayISO();
   return t < v.seasonFrom ? 'before' : t > v.seasonTo ? 'after' : 'in';
+}
+
+// Wassertemperatur der Stadt nur zeigen, solange sie stimmt: Nach Saisonende misst die Stadt
+// nicht mehr, der letzte Wert bleibt aber in der API stehen (z.B. 23° im November).
+// - Hallenbad: immer (Beckentemperatur)
+// - Bad mit Saisondaten (Frei, See, Fluss) ausserhalb der Saison: nie
+// - Ohne Saisondaten (z.B. Dolder): bei «geschlossen» nur mit frischem Wert
+const TEMP_MAX_AGE_DAYS = 3;
+function cityTempValid(v, live) {
+  if (!v || v.type === 'halle') return true;
+  const st = seasonState(v);
+  if (st !== null) return st === 'in';
+  const changed = live?.statusGeaendert;
+  const fresh = !!changed && (Date.now() - new Date(changed).getTime()) / 864e5 <= TEMP_MAX_AGE_DAYS;
+  return live?.openClosed !== 'geschlossen' || fresh;
 }
 
 // Üblicher Saisonstart (Monat der letzten Saison), Standard: Mai
@@ -1046,7 +1063,7 @@ function renderChips() {
     { key:'fluss', label:T().chip.fluss, color: TYPE_COLOR.fluss },
     { key:'fav',   label:T().chip.fav,   color: FAV },
   ];
-  return chips.map(c => {
+  return chips.filter(c => c.key !== 'fav' || counts.fav > 0).map(c => {
     const active = S.filter === c.key;
     const bg = active ? c.color : 'transparent';
     const col = active ? onColor(c.color) : c.color;
@@ -1091,7 +1108,7 @@ function renderCard(v) {
   const fill = live?.currentfill;
   const liveTemp = live?.temperatureWater;
   const hallePoolTemp = v.type === 'halle' ? mainPool(HALLE_TEMPS[v.uid])?.temp ?? null : null;
-  const temp = (liveTemp != null && liveTemp !== '') ? liveTemp : null;
+  const temp = (liveTemp != null && liveTemp !== '' && cityTempValid(v, live)) ? liveTemp : null;
   const hasTemp = temp != null || hallePoolTemp != null;
   const sState = seasonState(v);
   const offSeason = sState === 'before' || sState === 'after';
@@ -1161,7 +1178,7 @@ function renderDetail() {
   const revision   = REVISIONEN[v.uid] || null;
   const isOpen = computeIsOpen(v.uid);
   const fill = live?.currentfill;
-  const temp = live?.temperatureWater;
+  const temp = cityTempValid(v, live) ? live?.temperatureWater : null;
   const isHalle   = v.type === 'halle';
   const hallePools = isHalle ? (HALLE_TEMPS[v.uid] || null) : null;
   const hasTemp   = isHalle
@@ -1513,7 +1530,7 @@ function render() {
         ${[['impressum', "openLegal('impressum')"], ['datenschutz', "openLegal('datenschutz')"], ['cookies', 'openCookieSettings()']].map(([k, fn]) =>
           `<button onclick="${fn}" style="font:inherit;color:${INK};font-weight:600;background:none;border:none;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">${T().legalLinks[k]}</button>`).join('')}
         <button onclick="openLegal('feedback')" style="font:inherit;color:${INK};font-weight:600;background:none;border:none;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">${T().feedback}</button>
-        <div style="margin-left:auto;display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
+        <div class="footer-city" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
           <span style="color:${META};">Stadt Zürich:</span>
           ${[['hallenbaeder', T().cityIndoor], ['sommerbaeder', T().citySummer]].map(([slug, label]) =>
             `<a href="https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/sport-und-badeanlagen/${slug}.html" target="_blank" rel="noopener"
@@ -1653,6 +1670,8 @@ function closeDetail(e) {
 
 function toggleFav(uid) {
   if (S.favs[uid]) delete S.favs[uid]; else S.favs[uid] = true;
+  // letzter Stern entfernt → Favoriten-Filter verschwindet, wieder alle anzeigen
+  if (S.filter === 'fav' && !Object.keys(S.favs).length) S.filter = 'alle';
   try { localStorage.setItem('wasserzeit_favs', JSON.stringify(S.favs)); } catch(e) {}
   render();
 }
