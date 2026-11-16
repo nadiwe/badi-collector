@@ -1,8 +1,8 @@
 {
   "meta": {
-    "generiert": "2026-11-15T21:00:19",
+    "generiert": "2026-11-16T05:15:12",
     "von": "2026-07-03",
-    "bis": "2026-11-15",
+    "bis": "2026-11-16",
     "saison": "Winter (Okt–Apr)"
   },
   "badis": [
@@ -38298,12 +38298,17 @@
     {
       "uid": "SSD-2",
       "name": "Hallenbad Blaesi",
-      "messtage_echt": 115,
+      "messtage_echt": 116,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-11-15",
+      "letzte_messung": "2026-11-16",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:15",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:45",
             "auslastung": 0.0,
@@ -39250,6 +39255,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:15",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "08:00",
             "auslastung": 0.0,
@@ -41470,9 +41480,9 @@
         },
         {
           "monat": "2026-11",
-          "tage": 15,
-          "spitze_avg": 46,
-          "auslastung_avg": 28.7
+          "tage": 16,
+          "spitze_avg": 43,
+          "auslastung_avg": 28.6
         }
       ],
       "wochen": [
@@ -41611,18 +41621,31 @@
           "tage": 7,
           "spitze_avg": 45,
           "auslastung_avg": 25.9
+        },
+        {
+          "jahr": 2026,
+          "kw": 47,
+          "von": "2026-11-16",
+          "tage": 1,
+          "spitze_avg": 0,
+          "auslastung_avg": 0.0
         }
       ]
     },
     {
       "uid": "SSD-3",
       "name": "Hallenbad Bungertwies",
-      "messtage_echt": 115,
+      "messtage_echt": 116,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-11-15",
+      "letzte_messung": "2026-11-16",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:15",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:45",
             "auslastung": 0.0,
@@ -42609,6 +42632,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:15",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "08:00",
             "auslastung": 85.7,
@@ -44829,8 +44857,8 @@
         },
         {
           "monat": "2026-11",
-          "tage": 15,
-          "spitze_avg": 53,
+          "tage": 16,
+          "spitze_avg": 50,
           "auslastung_avg": 66.0
         }
       ],
@@ -44978,18 +45006,31 @@
           "tage": 7,
           "spitze_avg": 65,
           "auslastung_avg": 72.7
+        },
+        {
+          "jahr": 2026,
+          "kw": 47,
+          "von": "2026-11-16",
+          "tage": 1,
+          "spitze_avg": 0,
+          "auslastung_avg": 0.0
         }
       ]
     },
     {
       "uid": "SSD-4",
       "name": "Hallenbad City",
-      "messtage_echt": 101,
+      "messtage_echt": 102,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-11-15",
+      "letzte_messung": "2026-11-16",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:15",
+            "auslastung": 20.9,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:45",
             "auslastung": 29.5,
@@ -45936,6 +45977,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:15",
+            "auslastung": 20.9,
+            "geschaetzt": false
+          },
           {
             "zeit": "08:00",
             "auslastung": 35.0,
@@ -48156,8 +48202,8 @@
         },
         {
           "monat": "2026-11",
-          "tage": 15,
-          "spitze_avg": 200,
+          "tage": 16,
+          "spitze_avg": 190,
           "auslastung_avg": 54.8
         }
       ],
@@ -48289,18 +48335,31 @@
           "tage": 7,
           "spitze_avg": 208,
           "auslastung_avg": 55.4
+        },
+        {
+          "jahr": 2026,
+          "kw": 47,
+          "von": "2026-11-16",
+          "tage": 1,
+          "spitze_avg": 46,
+          "auslastung_avg": 20.9
         }
       ]
     },
     {
       "uid": "SSD-6",
       "name": "Hallenbad Leimbach",
-      "messtage_echt": 106,
+      "messtage_echt": 107,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-11-15",
+      "letzte_messung": "2026-11-16",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:15",
+            "auslastung": 13.8,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:45",
             "auslastung": 16.2,
@@ -49247,6 +49306,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:15",
+            "auslastung": 13.8,
+            "geschaetzt": false
+          },
           {
             "zeit": "08:00",
             "auslastung": 3.8,
@@ -51467,9 +51531,9 @@
         },
         {
           "monat": "2026-11",
-          "tage": 15,
-          "spitze_avg": 57,
-          "auslastung_avg": 33.7
+          "tage": 16,
+          "spitze_avg": 54,
+          "auslastung_avg": 33.6
         }
       ],
       "wochen": [
@@ -51600,18 +51664,31 @@
           "tage": 7,
           "spitze_avg": 66,
           "auslastung_avg": 37.6
+        },
+        {
+          "jahr": 2026,
+          "kw": 47,
+          "von": "2026-11-16",
+          "tage": 1,
+          "spitze_avg": 11,
+          "auslastung_avg": 13.8
         }
       ]
     },
     {
       "uid": "SSD-7",
       "name": "Hallenbad Oerlikon",
-      "messtage_echt": 114,
+      "messtage_echt": 115,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-11-15",
+      "letzte_messung": "2026-11-16",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:15",
+            "auslastung": 18.3,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:45",
             "auslastung": 4.7,
@@ -52598,6 +52675,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:15",
+            "auslastung": 18.3,
+            "geschaetzt": false
+          },
           {
             "zeit": "08:00",
             "auslastung": 5.8,
@@ -54818,9 +54900,9 @@
         },
         {
           "monat": "2026-11",
-          "tage": 15,
-          "spitze_avg": 175,
-          "auslastung_avg": 40.3
+          "tage": 16,
+          "spitze_avg": 167,
+          "auslastung_avg": 40.2
         }
       ],
       "wochen": [
@@ -54959,6 +55041,14 @@
           "tage": 7,
           "spitze_avg": 178,
           "auslastung_avg": 38.7
+        },
+        {
+          "jahr": 2026,
+          "kw": 47,
+          "von": "2026-11-16",
+          "tage": 1,
+          "spitze_avg": 44,
+          "auslastung_avg": 18.3
         }
       ]
     },
@@ -71103,12 +71193,17 @@
     {
       "uid": "SSD-5",
       "name": "Waermebad Kaeferberg",
-      "messtage_echt": 113,
+      "messtage_echt": 114,
       "tage_geschaetzt": 0,
       "erste_messung": "2026-07-03",
-      "letzte_messung": "2026-11-15",
+      "letzte_messung": "2026-11-16",
       "slots": {
         "Werktag": [
+          {
+            "zeit": "06:15",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "06:45",
             "auslastung": 1.4,
@@ -72055,6 +72150,11 @@
           }
         ],
         "mo": [
+          {
+            "zeit": "06:15",
+            "auslastung": 0.0,
+            "geschaetzt": false
+          },
           {
             "zeit": "08:00",
             "auslastung": 0.0,
@@ -74246,7 +74346,7 @@
       },
       "saison": {
         "Sommer_Mai_Sep": 15.2,
-        "Winter_Okt_Apr": 29.3
+        "Winter_Okt_Apr": 29.2
       },
       "monate": [
         {
@@ -74275,9 +74375,9 @@
         },
         {
           "monat": "2026-11",
-          "tage": 15,
-          "spitze_avg": 45,
-          "auslastung_avg": 31.0
+          "tage": 16,
+          "spitze_avg": 42,
+          "auslastung_avg": 30.9
         }
       ],
       "wochen": [
@@ -74416,6 +74516,14 @@
           "tage": 7,
           "spitze_avg": 48,
           "auslastung_avg": 33.0
+        },
+        {
+          "jahr": 2026,
+          "kw": 47,
+          "von": "2026-11-16",
+          "tage": 1,
+          "spitze_avg": 0,
+          "auslastung_avg": 0.0
         }
       ]
     }
